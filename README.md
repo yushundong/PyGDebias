@@ -121,7 +121,7 @@ model.predict()
 | FairEdit [8]  |          Edge Rewiring           |        Group Fairness         | [\[Paper\]](https://arxiv.org/pdf/2201.03681.pdf) [\[Code\]](https://github.com/royull/FairEdit) |
 |   NIFTY [9]   | Optimization with Regularization | Group/Counterfactual Fairness | [\[Paper\]](https://arxiv.org/pdf/2102.13186.pdf) [\[Code\]](https://github.com/chirag126/nifty) |
 |   GEAR [10]   |          Edge Rewiring           | Group/Counterfactual Fairness | [\[Paper\]](https://arxiv.org/pdf/2201.03662.pdf) [\[Code\]](https://github.com/jma712/GEAR) |
-|  InFoRM [11]  | Optimization with Regularization |      Individual Fairness      | [\[Paper\]](http://jiank2.web.illinois.edu/files/kdd20/kang20inform.pdf) [\[Code]](https://github.com/jiank2/inform) |
+|  InFoRM [11]  | Optimization with Regularization |      Individual Fairness      | [\[Paper\]](http://jiank2.web.illinois.edu/files/kdd20/kang20inform.pdf) [\[Code\]](https://github.com/jiank2/inform) |
 | REDRESS [12]  | Optimization with Regularization |      Individual Fairness      | [\[Paper\]](http://yushundong.github.io/files/kdd2021.pdf) [\[Code\]](https://github.com/yushundong/REDRESS) |
 |  GUIDE [13]   | Optimization with Regularization |      Individual Fairness      | [\[Paper\]](http://yushundong.github.io/files/KDD22_group_individual.pdf) [\[Code\]](https://github.com/mikesong724/GUIDE) |
 | RawlsGCN [14] |           Rebalancing            |    Degree-Related Fairness    | [\[Paper\]](http://jiank2.web.illinois.edu/files/www22/kang22rawlsgcn.pdf) [\[Code\]](https://github.com/jiank2/RawlsGCN) |
