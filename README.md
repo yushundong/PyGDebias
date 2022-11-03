@@ -6,7 +6,7 @@ Open-source library *PyGDebias* from the paper "Fairness in Graph Mining: A Surv
 
 ## Citation
 
-Our survey paper has been released on arxiv [\[PDF\]](http://yushundong.github.io/files/fairness_survey.pdf). If you find *PyGDebias* helpful, we would appreciate citations to the following papers:
+Our survey paper has been released on arxiv [\[PDF\]](http://yushundong.github.io/files/fairness_survey.pdf). If you find *PyGDebias* helpful, we would appreciate citations to the following paper:
 
 ```
 @article{dong2022fairness,
