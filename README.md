@@ -114,7 +114,7 @@ model.predict()
 
 |    Methods    |       Debiasing Technique        |       Fairness Notions        |                         Paper & Code                         |
 | :-----------: | :------------------------------: | :---------------------------: | :----------------------------------------------------------: |
-|  FairGNN [2]  |       Adversarial Learning       |        Group Fairness         | [\[Paper]](https://arxiv.org/pdf/2009.01454.pdf) [\[Code]](https://github.com/EnyanDai/FairGNN) |
+|  FairGNN [2]  |       Adversarial Learning       |        Group Fairness         | [\[Paper\]](https://arxiv.org/pdf/2009.01454.pdf) [\[Code\]](https://github.com/EnyanDai/FairGNN) |
 |   EDITS [3]   |          Edge Rewiring           |        Group Fairness         | [\[Paper]](https://yushundong.github.io/files/WWW2022_EDITS.pdf) [\[Code]](https://github.com/yushundong/EDITS) |
 | FairWalk [4]  |           Rebalancing            |        Group Fairness         | [\[Paper]](https://publications.cispa.saarland/2933/1/IJCAI19.pdf) [\[Code]](https://github.com/EnderGed/Fairwalk) |
 | CrossWalk [5] |           Rebalancing            |        Group Fairness         | [\[Paper]](https://arxiv.org/pdf/2105.02725.pdf) [\[Code]](https://github.com/ahmadkhajehnejad/CrossWalk) |
