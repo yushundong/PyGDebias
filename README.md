@@ -50,7 +50,7 @@ We summarize the basic API of the implemented graph mining algorithms as below.
 
 
 ~~~python
-```python
+from dataloading import load_data
 from GUIDE import GUIDE
 
 # Load a dataset. 
@@ -65,7 +65,6 @@ model.fit(adj, features, idx_train, idx_val, idx_test, labels, sens)
 
 # Evaluate the model.
 model.predict()
-```
 ~~~
 
 
