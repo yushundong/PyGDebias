@@ -183,7 +183,7 @@ We present the evaluation results of both utility (including AUCROC) and fairnes
 
 |         |     Credit      |       Credit       |     Credit      |      Credit      |   Recidivism    |     Recidivism     |   Recidivism    |    Recidivism    |
 | :-----: | :-------------: | :----------------: | :-------------: | :--------------: | :-------------: | :----------------: | :-------------: | :--------------: |
-|         |     AUCROC      | IF ($\times$$10^3$) |      GDIF       | Ranking-based IF |       AUC       | IF ($\times 10^3$) |      GDIF       | Ranking-Based IF |
+|         |     AUCROC      | IF (in $10^3$) |      GDIF       | Ranking-based IF |       AUC       | IF (in $10^3$) |      GDIF       | Ranking-Based IF |
 |   GCN   | **0.666±0.023** |  190.408±135.412   |   1.628±0.596   |   0.611±0.003    | **0.962±0.001** |   1.32e6±6.19e5    |   1.12±0.001    |   0.965±0.001    |
 | InFoRM  |   0.645±0.010   |    23.560±8.760    |   2.422±0.143   |   0.621±0.014    |   0.651±0.043   |    11.606±4.28     |   1.106±0.133   |   0.971±0.001    |
 | REDRESS |   0.570±0.005   |  8.827e11±1.95e11  |   3.048±0.301   | **0.913±0.005**  |   0.687±0.067   | 4.0393e12±6.84e12  |   1.816±0.594   | **0.980±0.002**  |
