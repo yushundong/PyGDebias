@@ -52,7 +52,6 @@ We summarize the basic API of the implemented graph mining algorithms as below.
 ~~~python
 ```python
 from GUIDE import GUIDE
-from individual_metrics import individual_fairness_evaluation
 
 # Load a dataset. 
 # Available choices: 'credit', 'german', 'recidivism', 'facebook', 'pokec_z', 'pokec_n', 'nba', 'twitter', 'google+', 'LCC', 'LCC_small', 'cora', 'citeseer', 'pubmed', 'amazon', 'yelp', 'epinion', 'ciao', 'dblp', 'filmtrust', 'lastfm', 'ml-100k', 'ml-1m', 'ml-20m', 'oklahoma', 'unc28'.
