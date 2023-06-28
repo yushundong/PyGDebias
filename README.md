@@ -71,7 +71,34 @@ model.predict()
 
 ## Collected Datasets
 
-26 graph datasets are collected in this library, including 24 commonly used ones and two newly constructed ones (Aminer-L and Aminer-S). We provide their statistics as follows.
+26 graph datasets are collected in this library, including 24 commonly used ones and two newly constructed ones (Aminer-L and Aminer-S).
+We provide their descriptions as follows.
+-  Facebook: Facebook has anonymized features for each node representative of various attributes of a person’s Facebook profile.
+-  Pokec_z & Pokec_n:  The two datasets are sampled from Pokec by province. Pokec contains anonymized data of the whole social network in 2012, in which the profiles contain gender, age, hobbies, interest, education, working field and etc.
+-    NBA: This dataset is an extension of a Kaggle dataset containing around 400 NBA basketball players. Features include the performance statistics of players in the 2016-2017 season and other various information e.g., nationality, age, and salary.
+-   German: The dataset is a credit graph which has 1,000 nodes representing clients in a German bank that are connected based on the similarity of their credit accounts.
+-   Credit: Credit contains individuals which are connected based on the similarity of their spending and payment patterns.
+- Recidivism: Recidivism has 18,876 nodes representing defendants who got released on bail at the U.S state courts during 1990-2009, where defendants are connected based on the similarity of past criminal records and demographics.
+-  Google+: The dataset is created by data collected from a social networking platform developed by Google.
+-  AMiner-L & AMiner-S: **AMiner-L** and **AMiner-S** are co-author networks with sensitive attributes ready for algorithmic fairness study on graphs. Specifically, we construct AMiner-L (titled 'LCC' in our built-in data loader) and AMiner-S (titled 'LCC_small' in our built-in data loader) based on the AMiner network [1]. To construct the two datasets, we first filter out the nodes in the AMiner network with incomplete information. Then we adopt two different approaches to sample a connected network from the filtered dataset: AMiner-L is a subgraph sampled with random walk, while AMiner-S is the largest connected component of the filtered AMiner network. In both datasets, nodes represent the researchers in different fields, and edges denote the co-authorship between researchers. The sensitive attribute is the continent of the affiliation each researcher belongs to, and the labels of nodes represent the primary research field of each researcher. 
+-    Cora: The Cora dataset is a collection of computer science research papers categorized into different topics.
+-  Citeseer: The CiteSeer dataset is a digital library of scientific articles, primarily focused on computer science, featuring citation relationships and widely utilized for research in information retrieval and citation network analysis.
+-   Pubmed: Pubmed contains citation networks that consider articles as nodes and descriptions of articles as their nodal attributes.
+-   Amazon: The dataset constitutes a respective knowledge graph with entities and relations crawled from Amazon. The collection consists of four different domains: CDs and Vinyl, Clothing, Cell Phones, and Beauty.
+-    Yelp: The Yelp dataset is a large collection of user-generated reviews and associated ratings for businesses, encompassing various industries and geographical locations.
+-    Ciao: The Ciao dataset is a comprehensive collection of product reviews and ratings from the Ciao shopping website.
+-    DBLP: The DBLP dataset is a bibliographic database containing computer science research publications, authors, and their relationships.
+- Filmtrust: The Filmtrust dataset is a collection of movie ratings and trust relationships between users.
+-   Lastfm: The Last.fm dataset is a music dataset that contains user listening histories, artist information, and user preferences.
+-   ML100k: The ML-100K dataset is a widely used benchmark dataset in the field of recommender systems, containing movie ratings and user information for evaluating collaborative filtering algorithms.
+-    ML1m: The ML-1M dataset is a movie rating dataset that contains one million ratings from users on various movies.
+-   ML20m: The ML-20M dataset is a larger movie rating dataset consisting of 20 million ratings from users on a vast collection of movies.
+- Oklahoma: Oklahoma is a dataset composed of social networks of the University of Oklahoma. A link represents a friendship relation in
+social media, and every user has a profile for vertex features, including student/faculty status, gender, and major,
+-   UNC: UNC is a dataset of social networks in the University of North Carolina at Chapel Hill.
+
+
+We provide their statistics as follows.
 
 |            |               #Nodes               |   #Edges   | #Features |
 | :--------: | :--------------------------------: | :--------: | :-------: |
@@ -102,13 +129,23 @@ model.predict()
 
 
 
-**AMiner-L** and **AMiner-S** are co-author networks with sensitive attributes ready for algorithmic fairness study on graphs. Specifically, we construct AMiner-L (titled 'LCC' in our built-in data loader) and AMiner-S (titled 'LCC_small' in our built-in data loader) based on the AMiner network [1]. To construct the two datasets, we first filter out the nodes in the AMiner network with incomplete information. Then we adopt two different approaches to sample a connected network from the filtered dataset: AMiner-L is a subgraph sampled with random walk, while AMiner-S is the largest connected component of the filtered AMiner network. In both datasets, nodes represent the researchers in different fields, and edges denote the co-authorship between researchers. The sensitive attribute is the continent of the affiliation each researcher belongs to, and the labels of nodes represent the primary research field of each researcher.
-
-
 
 ## Collected Algorithms
 
 13 different methods in total are implemented in this library. We provide an overview of their characteristics as follows.
+- FairGNN: FairGNN is a GNN model designed to address fairness issues in graph-based tasks by incorporating fairness regularization techniques, ensuring equitable treatment of different groups in the learned representations and predictions.
+- EDITS: EDITS approximates the inputs’ discrimination via Wasserstein distance and directly minimizes it between sensitive and nonsensitive groups by pruning the graph topology and node features.
+- CrossWalk:  CrossWalk is a method that enhances fairness in graph algorithms by biasing random walks to cross group boundaries and extends the range of the weighting including multi-hop neighbors.
+- UGE: UGE learns node embeddings from an underlying bias-free graph, which is not influenced by sensitive node attributes to deal with the unbiased graph embedding problem.
+- FairVGNN: FairVGNN is an advanced model that intelligently masks feature channels linked to sensitive attributes and dynamically fine-tunes encoder weights to reduce the impact of sensitive information, resulting in a fairer and unbiased machine learning algorithm.
+- FairEdit: NIFTY goes beyond simply removing biases from the input graph during training. It takes a proactive approach by introducing artificial nodes and edges to address biases comprehensively, resulting in a more balanced and unbiased learning process.
+- NIFTY: NIFTY is a groundbreaking approach designed to improve counterfactual fairness and stability of node representations. It achieves this through the utilization of a novel triplet-based objective function and layer-wise weight normalization using the Lipschitz constant, ensuring enhanced performance and reliability.
+- GEAR: GEAR tackles graph unfairness through two key mechanisms: counterfactual graph augmentation and an adversarial learning approach that focuses on learning embeddings that are insensitive to sensitive attributes. These techniques collectively contribute to the effective mitigation of unfairness in graph-based models.
+- InFoRM: InFoRM utilizes the similarity matrix of nodes to assess the individual fairness of GNNs. By incorporating a variant of the (d1, d2)-Lipschitz property, it addresses the challenge of achieving individual fairness solely based on node features, considering the interconnectedness of nodes in a graph.
+- REDRESS: REDRESS introduces a plug-and-play framework that leverages individual fairness measures from a ranking perspective. This approach optimizes the training of Graph Neural Networks (GNNs) to simultaneously maximize utility and promote ranking-based individual fairness. By learning to rank, the framework ensures consistent relative ranking orders of node pairs in both input and output spaces.
+- GUIDE: GUIDE is an innovative GNN framework that leverages the similarity matrix of individuals to learn personalized attention mechanisms. This enables the achievement of individual fairness while minimizing disparities at the group level.
+- RawlsGCN: RawlsGCN integrates the Rawlsian difference principle into GCN, mitigating degree-related unfairness and improving its overall performance.
+
 
 |    Methods    |       Debiasing Technique        |       Fairness Notions        |                         Paper & Code                         |
 | :-----------: | :------------------------------: | :---------------------------: | :----------------------------------------------------------: |
@@ -201,6 +238,14 @@ We present the evaluation results of both utility (including accuracy) and fairn
 | RawlsGCN | **0.8708 ± 0.0134** |                 **0.0782±0.0071**                 |
 
 
+
+## How to contribute
+You are welcome to become part of this project, see [contribute guide](https://) for more information.
+
+## Authors & Acknowledgements
+- Yushun Dong, Jing Ma, Chen Chen, Jundong Li, Zaiyi Zheng, Zhenyu Lei
+
+We extend our heartfelt appreciation to everyone who has contributed to and will contribute to this work. 
 
 ## Contact
 
