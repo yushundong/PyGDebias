@@ -240,7 +240,7 @@ We present the evaluation results of both utility (including accuracy) and fairn
 
 
 ## How to contribute
-You are welcome to become part of this project, see [contribute guide](https://) for more information.
+You are welcome to become part of this project. See [contribute guide](https://github.com/yushundong/PyGDebias/blob/main/contribute.md) for more information.
 
 ## Authors & Acknowledgements
 - Yushun Dong, Jing Ma, Chen Chen, Jundong Li, Zaiyi Zheng, Zhenyu Lei
