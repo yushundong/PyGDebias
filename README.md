@@ -16,7 +16,7 @@
 
 
 
-## Overview
+
 
 Graph mining algorithms have been playing a critical role in a plethora of areas. However, most of the existing ones lack fairness consideration. Consequently, they may deliver biased predictions toward certain demographic subgroups or individuals. To better understand existing debiasing techniques and facilitate the deployment of fairness-aware graph mining algorithms, we developed this library *PyGDebias* featured for built-in datasets and implementations of popular fairness-aware graph mining algorithms for the study of algorithmic fairness on graphs.
 
