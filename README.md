@@ -1,5 +1,5 @@
 <div  align="center">    
-<img src="./pygdebias.png" width = "600" height = "200" alt="pygdebias" align=center />
+<img src="./docs/pygdebias.png" width = "600" height = "200" alt="pygdebias" align=center />
 </div>
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/yushundong/PyGDebias)
@@ -252,7 +252,7 @@ We present the evaluation results of both utility (including accuracy) and fairn
 
 
 ## How to contribute
-You are welcome to become part of this project. See [contribute guide](https://github.com/yushundong/PyGDebias/blob/main/contribute.md) for more information.
+You are welcome to become part of this project. See [contribute guide](./docs/contribute.md) for more information.
 
 ## Authors & Acknowledgements
 Yushun Dong, Song Wang, Zaiyi Zheng, Zhenyu Lei, Jing Ma, Chen Chen, Jundong Li
