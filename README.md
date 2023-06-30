@@ -1,7 +1,10 @@
 <div  align="center">    
 <img src="./PyGDebias.jpg" width = "300" height = "100" alt="图片名称" align=center />
 </div>
+
 ![GitHub](https://img.shields.io/github/license/yushundong/PyGDebias)
+![GitHub all releases](https://img.shields.io/github/downloads/yushundong/PyGDebias/total)
+
 
 
 
