@@ -1,5 +1,5 @@
 <div  align="center">    
-<img src="./PyGDebias.jpg" width = "300" height = "200" alt="图片名称" align=center />
+<img src="./PyGDebias.jpg" width = "300" height = "100" alt="图片名称" align=center />
 </div>
 
 
