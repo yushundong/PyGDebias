@@ -1,4 +1,4 @@
-![avatar](/PyGDebias.jpg)
+![avatar](/PyGDebias.jpg =100*100)
 
 
 # Open-source Library *PyGDebias*: Graph Datasets and Fairness-Aware Graph Mining Algorithms
