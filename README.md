@@ -85,9 +85,6 @@ We summarize the basic API of the implemented graph mining algorithms as below.
 
 Here, we provide guidelines for setting up the library. There are basically 2 ways to install it
 
-TODO: requirements.txt at the end
-
-next step: datasets (command preprocessing)
 
 ### 3.1 Manually
 
