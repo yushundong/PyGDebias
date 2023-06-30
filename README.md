@@ -8,7 +8,15 @@
 ![GitHub forks](https://img.shields.io/github/forks/yushundong/pygdebias)
 ![GitHub watchers](https://img.shields.io/github/watchers/yushundong/pygdebias)
 ![GitHub all releases](https://img.shields.io/github/downloads/yushundong/PyGDebias/total)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/yushundong/pygdebias)
+![GitHub repo file count (file type)](https://img.shields.io/github/directory-file-count/yushundong/pygdebias)
+![GitHub repo size](https://img.shields.io/github/repo-size/yushundong/pygdebias)
+![GitHub issues](https://img.shields.io/github/issues/yushundong/pygdebias)
+![GitHub closed issues](https://img.shields.io/github/issues-closed/yushundong/pygdebias)
+![GitHub milestones](https://img.shields.io/github/milestones/all/yushundong/pygdebias)
+![GitHub release (release name instead of tag name)](https://img.shields.io/github/v/release/yushundong/pygdebias)
 ![GitHub](https://img.shields.io/github/license/yushundong/pygdebias)
+
 
 - [*PyGDebias*: Attributed Network Datasets and Fairness-Aware Graph Mining Algorithms](#pygdebias-attributed-network-datasets-and-fairness-aware-graph-mining-algorithms)
   - [1. Citation](#1-citation)
