@@ -1,4 +1,4 @@
-![avatar](/PyGDebias.png)
+![avatar](/PyGDebias.jpg)
 
 
 # Open-source Library *PyGDebias*: Graph Datasets and Fairness-Aware Graph Mining Algorithms
