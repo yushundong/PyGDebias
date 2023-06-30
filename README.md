@@ -1,4 +1,6 @@
-![avatar](/PyGDebias.jpg =100*100)
+<div  align="center">    
+<img src="./PyGDebias.jpg" width = "300" height = "200" alt="图片名称" align=center />
+</div>
 
 
 # Open-source Library *PyGDebias*: Graph Datasets and Fairness-Aware Graph Mining Algorithms
