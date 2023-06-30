@@ -157,8 +157,13 @@ def fair_metric(pred, labels, sens):
 
 class EDITS(nn.Module):
 
-    def __init__(self, lr, weight_decay, nfeat, node_num, nclass, nfeat_out, adj_lambda, layer_threshold=2, dropout=0.1):
+    def __init__(self, feat, lr=0.003, weight_decay=1e-7, nclass=2, adj_lambda=1e-1, layer_threshold=2, dropout=0.1):
         super(EDITS, self).__init__()
+
+        node_num=feat.shape[0]
+        nfeat=feat.shape[-1]
+        nfeat_out=nfeat//10
+
         self.x_debaising = X_debaising(nfeat)
         self.layer_threshold = layer_threshold
         self.adj_renew = Adj_renew(node_num, nfeat, nfeat_out, adj_lambda)
@@ -277,7 +282,7 @@ class EDITS(nn.Module):
 
 
 
-    def fit(self, adj, features, sens, epochs, lr, idx_train, idx_val, normalize=True, k=-1, device='cuda', half=True, truncation=4):
+    def fit(self, adj, features, sens,  idx_train, idx_val, epochs=100, normalize=True, lr=0.003, k=-1, device='cuda', half=True, truncation=4):
 
         """
         Args:
@@ -292,6 +297,7 @@ class EDITS(nn.Module):
             truncation:
 
         """
+        adj=sp.coo_matrix(adj.to_dense().numpy())
 
         features1 = features
         print("****************************Before debiasing****************************")
@@ -361,11 +367,12 @@ class EDITS(nn.Module):
 
         
         
-    def predict(self, adj_ori, labels, sens, idx_train, idx_val, idx_test, epochs, lr, nhid, dropout, weight_decay, model='GCN', device='cuda', threshold_proportion = 0.015):
+    def predict(self, adj_ori, labels, sens, idx_train, idx_val, idx_test, epochs=100, lr=0.003, nhid=50, dropout=0.2, weight_decay=1e-7, model='GCN', device='cuda', threshold_proportion = 0.015):
 
         """
         GCN: {credit: 0.02, german: 0.29, bail: 0.015}
         """
+        adj_ori=sp.coo_matrix(adj_ori.to_dense().numpy())
 
         A_debiased, features = self.adj1, self.X_debiased
         the_con1 = (A_debiased - adj_ori).A
@@ -373,6 +380,8 @@ class EDITS(nn.Module):
         the_con1 = np.where(the_con1 < np.min(the_con1) * threshold_proportion, -1 + the_con1 * 0, the_con1)
         the_con1 = np.where(np.abs(the_con1) == 1, the_con1, the_con1 * 0)
         A_debiased = adj_ori + sp.coo_matrix(the_con1)
+
+        print(A_debiased)
         assert A_debiased.max() == 1
         assert A_debiased.min() == 0
         features = features[:, torch.nonzero(features.sum(axis=0)).squeeze()].detach()
@@ -382,6 +391,7 @@ class EDITS(nn.Module):
         metric_wd(features, A_debiased, sens, 0.9, 0)
         metric_wd(features, A_debiased, sens, 0.9, 2)
         print("****************************************************************************")
+        self.val_loss=np.mean(metric_wd(features, A_debiased, sens, 0.9, 2))
         X_debiased = features.float()
         edge_index = convert.from_scipy_sparse_matrix(A_debiased)[0].cuda()
 
@@ -389,7 +399,8 @@ class EDITS(nn.Module):
         if model != 'GCN':
             return "Not Implemented"
 
-
+        self.labels=labels
+        self.sens=sens
 
         # Model and optimizer
         model = GCN(nfeat=X_debiased.shape[1], nhid=nhid, nclass=labels.max().item(), dropout=dropout).float()
@@ -433,35 +444,73 @@ class EDITS(nn.Module):
             #       'AUC_val: {:.4f}'.format(auc_roc_val),
             #       'time: {:.4f}s'.format(time.time() - t))
 
-            if epoch < 15:
-                return 0, 0, 0, 1e5, 0
+            #if epoch < 15:
+            #    return 0, 0, 0, 1e5, 0
             if loss_val < val_loss:
                 val_loss = loss_val.data
-                pa, eq, test_f1, test_auc = test(test_f1)
+                ACC, AUCROC, F1, ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1, SP, EO = test(test_f1)
+
                 # print("Parity of val: " + str(pa))
                 # print("Equality of val: " + str(eq))
-            return pa, eq, test_f1, val_loss, test_auc
+
+            #self.val_loss=val_loss.item()
+
+
+            return ACC, AUCROC, F1, ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1, SP, EO
 
 
         def test(test_f1):
             model.eval()
             output = model(x=X_debiased, edge_index=torch.LongTensor(edge_index.cpu()).cuda())
-            preds = (output.squeeze() > 0).type_as(labels)
+            preds = (output.squeeze() > 0).type_as(labels)[idx_test].detach().cpu().numpy()
+
             loss_test = F.binary_cross_entropy_with_logits(output[idx_test], labels[idx_test].unsqueeze(1).float())
-            auc_roc_test = roc_auc_score(labels.cpu().numpy()[idx_test.cpu().numpy()], output.detach().cpu().numpy()[idx_test.cpu().numpy()])
-            f1_test = f1_score(labels[idx_test.cpu().numpy()].cpu().numpy(), preds[idx_test.cpu().numpy()].cpu().numpy())
-            test_auc = auc_roc_test
-            test_f1 = f1_test
+
+            #auc_roc_test = roc_auc_score(labels.cpu().numpy()[idx_test.cpu().numpy()], output.detach().cpu().numpy()[idx_test.cpu().numpy()])
+            #f1_test = f1_score(labels[idx_test.cpu().numpy()].cpu().numpy(), preds[idx_test.cpu().numpy()].cpu().numpy())
+
+
+
+            output_preds = preds
+
+            F1_all = f1_score(labels[idx_test.cpu().numpy()].detach().cpu().numpy(), output_preds, average='micro')
+            ACC_all=accuracy_score(labels[idx_test.cpu().numpy()].detach().cpu().numpy(), output_preds,)
+            AUCROC_all=roc_auc_score(labels[idx_test.cpu().numpy()].detach().cpu().numpy(), output_preds)
+
+
             # print("Test set results:",
             #       "loss= {:.4f}".format(loss_test.item()),
             #       "F1_test= {:.4f}".format(test_f1),
             #       "AUC_test= {:.4f}".format(test_auc))
-            parity_test, equality_test = fair_metric(preds[idx_test.cpu().numpy()].cpu().numpy(),
-                                                    labels[idx_test.cpu().numpy()].cpu().numpy(),
-                                                    sens[idx_test.cpu().numpy()].cpu().numpy())
+
+            #parity_test, equality_test = fair_metric(preds[idx_test.cpu().numpy()].cpu().numpy(),
+            #                                        labels[idx_test.cpu().numpy()].cpu().numpy(),
+            #                                        sens[idx_test.cpu().numpy()].cpu().numpy())
+
             # print("Parity of test: " + str(parity_test))
             # print("Equality of test: " + str(equality_test))
-            return parity_test, equality_test, test_f1, test_auc
+
+
+            #ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1=self.predict_sens_group(output, idx_test)
+            sens=self.sens
+
+            SP, EO=self.fair_metric_direct(output_preds, labels[idx_test].detach().cpu().numpy(), sens[idx_test].detach().cpu().numpy())
+
+            pred=output_preds
+            result=[]
+            for sens in [0,1]:
+                F1 = f1_score(self.labels[idx_test][self.sens[idx_test]==sens], pred[self.sens[idx_test]==sens], average='micro')
+                ACC=accuracy_score(self.labels[idx_test][self.sens[idx_test]==sens], pred[self.sens[idx_test]==sens],)
+                AUCROC=roc_auc_score(self.labels[idx_test][self.sens[idx_test]==sens], pred[self.sens[idx_test]==sens])
+                result.extend([ ACC, AUCROC,F1])
+
+            ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1=result
+
+            return ACC_all, AUCROC_all, F1_all, ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1, SP, EO
+
+
+
+
 
         # Train model
         t_total = time.time()
@@ -471,16 +520,28 @@ class EDITS(nn.Module):
         test_auc = 0
         test_f1 = 0
         for epoch in tqdm(range(epochs)):
-            pa, eq, test_f1, val_loss, test_auc = train(epoch, pa, eq, test_f1, val_loss, test_auc)
-        print("Optimization Finished!")
-        print("Total time elapsed: {:.4f}s".format(time.time() - t_total))
-        print("Delta_{SP}: " + str(pa))
-        print("Delta_{EO}: " + str(eq))
-        print("F1: " + str(test_f1))
-        print("AUC: " + str(test_auc))
+            ACC, AUCROC, F1, ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1, SP, EO = train(epoch, pa, eq, test_f1, val_loss, test_auc)
+        #print("Optimization Finished!")
+        #print("Total time elapsed: {:.4f}s".format(time.time() - t_total))
+        #print("Delta_{SP}: " + str(pa))
+        #print("Delta_{EO}: " + str(eq))
+        #print("F1: " + str(test_f1))
+        #print("AUC: " + str(test_auc))
+
+        return ACC, AUCROC, F1, ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1, SP, EO
+
+    def fair_metric_direct(self, pred, labels, sens):
 
 
-
+        idx_s0 = sens == 0
+        idx_s1 = sens == 1
+        idx_s0_y1 = np.bitwise_and(idx_s0, labels == 1)
+        idx_s1_y1 = np.bitwise_and(idx_s1, labels == 1)
+        parity = abs(sum(pred[idx_s0]) / sum(idx_s0) -
+                     sum(pred[idx_s1]) / sum(idx_s1))
+        equality = abs(sum(pred[idx_s0_y1]) / sum(idx_s0_y1) -
+                       sum(pred[idx_s1_y1]) / sum(idx_s1_y1))
+        return parity.item(), equality.item()
 
 
 

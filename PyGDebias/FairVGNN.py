@@ -11,7 +11,6 @@ from torch.nn import Linear
 import torch.nn.functional as F
 from torch import nn
 from torch.nn import Parameter
-from source import GCNConv
 from torch_geometric.nn import GINConv, SAGEConv
 from torch.nn.utils import spectral_norm
 from torch_geometric.utils import add_remaining_self_loops, degree
@@ -29,7 +28,6 @@ import scipy.sparse as sp
 from scipy.spatial import distance_matrix
 from torch_geometric.data import Data
 import torch
-from dataset import process_german_bail_credit
 from torch_geometric.utils import from_scipy_sparse_matrix
 
 def train(model, data, optimizer, args):
@@ -369,19 +367,41 @@ def evaluate_ged3(x, classifier, discriminator, generator, encoder, data, args):
     accs['test'] = pred_test.eq(
         data.y[data.test_mask]).sum().item() / data.test_mask.sum().item()
 
+
+    accs['test_sens0']=pred_test[data.sens[data.test_mask]==0].eq(
+        data.y[data.test_mask][data.sens[data.test_mask]==0]).float().mean().item()
+
+    accs['test_sens1']=pred_test[data.sens[data.test_mask]==1].eq(
+        data.y[data.test_mask][data.sens[data.test_mask]==1]).float().mean().item()
+
     F1s['val'] = f1_score(data.y[data.val_mask].cpu(
     ).numpy(), pred_val.cpu().numpy())
 
+
+    loss_fn=torch.nn.BCELoss()
+    F1s['val_loss']=loss_fn(output[data.val_mask].squeeze().sigmoid(), torch.tensor(data.y[data.val_mask]).float()).item()
+
     F1s['test'] = f1_score(data.y[data.test_mask].cpu(
     ).numpy(), pred_test.cpu().numpy())
+
+    F1s['test_sens0']= f1_score(data.y[data.test_mask][data.sens[data.test_mask]==0].cpu(
+    ).numpy(), pred_test[data.sens[data.test_mask]==0].cpu().numpy())
+    F1s['test_sens1']= f1_score(data.y[data.test_mask][data.sens[data.test_mask]==1].cpu(
+    ).numpy(), pred_test[data.sens[data.test_mask]==1].cpu().numpy())
 
     auc_rocs['val'] = roc_auc_score(
         data.y[data.val_mask].cpu().numpy(), output[data.val_mask].detach().cpu().numpy())
     auc_rocs['test'] = roc_auc_score(
         data.y[data.test_mask].cpu().numpy(), output[data.test_mask].detach().cpu().numpy())
 
+    auc_rocs['test_sens0'] = roc_auc_score(
+        data.y[data.test_mask][data.sens[data.test_mask]==0].cpu().numpy(), output[data.test_mask][data.sens[data.test_mask]==0].detach().cpu().numpy())
+    auc_rocs['test_sens1'] = roc_auc_score(
+        data.y[data.test_mask][data.sens[data.test_mask]==1].cpu().numpy(), output[data.test_mask][data.sens[data.test_mask]==1].detach().cpu().numpy())
+
+
     paritys['val'], equalitys['val'] = fair_metric(pred_val.cpu().numpy(), data.y[data.val_mask].cpu(
-    ).numpy(), data.sens[data.val_mask].cpu().numpy())
+        ).numpy(), data.sens[data.val_mask].cpu().numpy())
 
     paritys['test'], equalitys['test'] = fair_metric(pred_test.cpu().numpy(), data.y[data.test_mask].cpu(
     ).numpy(), data.sens[data.test_mask].cpu().numpy())
@@ -927,6 +947,8 @@ class MLP_classifier(torch.nn.Module):
         return h
 
 def sens_correlation(features, sens_idx):
+    if sens_idx==-1:
+        sens_idx=features.shape[-1]-1
     corr = pd.DataFrame(np.array(features)).corr()
     return corr[sens_idx].to_numpy()
 def feature_norm(features):
@@ -934,7 +956,8 @@ def feature_norm(features):
     max_values = features.max(axis=0)[0]
     return 2 * (features - min_values).div(max_values - min_values) - 1
 def sys_normalized_adjacency(adj):
-    adj = sp.coo_matrix(adj)
+
+    adj = sp.coo_matrix(adj.to_dense().numpy())
     adj = adj + sp.eye(adj.shape[0])
     row_sum = np.array(adj.sum(1))
     row_sum = (row_sum == 0) * 1 + row_sum
@@ -968,10 +991,9 @@ def get_dataset(dataname, top_k,adj, features, labels, idx_train, idx_val, idx_t
     #elif(dataname == 'german'):
     #    load, label_num = load_german, 100
 
-
     adj_norm = sys_normalized_adjacency(adj)
     adj_norm_sp = sparse_mx_to_torch_sparse_tensor(adj_norm)
-    edge_index, _ = from_scipy_sparse_matrix(adj)
+    edge_index, _ = from_scipy_sparse_matrix(sp.coo_matrix(adj.to_dense().numpy()))
     train_mask = index_to_mask(features.shape[0], torch.LongTensor(idx_train))
     val_mask = index_to_mask(features.shape[0], torch.LongTensor(idx_val))
     test_mask = index_to_mask(features.shape[0], torch.LongTensor(idx_test))
@@ -979,28 +1001,30 @@ def get_dataset(dataname, top_k,adj, features, labels, idx_train, idx_val, idx_t
     #adj_norm_sp, edge_index, features, labels, train_mask, val_mask, test_mask, sens = load(
     #    dataset=dataname, label_number=label_num)
 
-
     x_max, x_min = torch.max(features, dim=0)[
                        0], torch.min(features, dim=0)[0]
 
     norm_features = feature_norm(features)
     norm_features[:, sens_idx] = features[:, sens_idx]
     features = norm_features
-
     corr_matrix = sens_correlation(features, sens_idx)
     corr_idx = np.argsort(-np.abs(corr_matrix))
     if(top_k > 0):
         # corr_idx = np.concatenate((corr_idx[:top_k], corr_idx[-top_k:]))
         corr_idx = corr_idx[:top_k]
-
+    print('return')
     return Data(x=features, edge_index=edge_index, adj_norm_sp=adj_norm_sp, y=labels.float(), train_mask=train_mask, val_mask=val_mask, test_mask=test_mask, sens=sens), sens_idx, corr_matrix, corr_idx, x_min, x_max
 
 
+class args_class():
+    def __init__(self):
+        pass
 
-class fairvgnn():
+
+class FairVGNN():
 
     def run(self, data, args):
-        pbar = tqdm(range(args.runs), unit='run')
+
         criterion = nn.BCELoss()
         acc, f1, auc_roc, parity, equality = np.zeros(args.runs), np.zeros(
             args.runs), np.zeros(args.runs), np.zeros(args.runs), np.zeros(args.runs)
@@ -1008,6 +1032,8 @@ class fairvgnn():
         data = data.to(args.device)
 
         generator = channel_masker(args).to(args.device)
+
+
         optimizer_g = torch.optim.Adam([
             dict(params=generator.weights, weight_decay=args.g_wd)], lr=args.g_lr)
 
@@ -1041,7 +1067,7 @@ class fairvgnn():
                 dict(params=encoder.conv1.parameters(), weight_decay=args.e_wd),
                 dict(params=encoder.conv2.parameters(), weight_decay=args.e_wd)], lr=args.e_lr)
 
-        for count in pbar:
+        for count in range(args.runs):
             seed_everything(count + args.seed)
             generator.reset_parameters()
             discriminator.reset_parameters()
@@ -1173,12 +1199,25 @@ class fairvgnn():
                 if auc_rocs['val'] + F1s['val'] + accs['val'] - args.alpha * (
                         tmp_parity['val'] + tmp_equality['val']) > best_val_tradeoff:
                     test_acc = accs['test']
+                    test_acc_sens0=accs['test_sens0']
+                    test_acc_sens1=accs['test_sens1']
+
                     test_auc_roc = auc_rocs['test']
+                    test_auc_roc_sens0=auc_rocs['test_sens0']
+                    test_auc_roc_sens1=auc_rocs['test_sens1']
+
+
                     test_f1 = F1s['test']
+                    test_f1_sens0= F1s['test_sens0']
+                    test_f1_sens1= F1s['test_sens1']
+
                     test_parity, test_equality = tmp_parity['test'], tmp_equality['test']
 
                     best_val_tradeoff = auc_rocs['val'] + F1s['val'] + \
                                         accs['val'] - (tmp_parity['val'] + tmp_equality['val'])
+
+                    self.val_loss=-accs['val']
+
 
             acc[count] = test_acc
             f1[count] = test_f1
@@ -1186,21 +1225,24 @@ class fairvgnn():
             parity[count] = test_parity
             equality[count] = test_equality
 
-        return acc, f1, auc_roc, parity, equality
 
-    def fit(self,adj, feats, labels, idx_train, idx_val, idx_test, sens, sens_idx, runs=5, epochs=200, d_epochs=5, g_epochs=5,
-            c_epochs=5, g_lr=0.001, g_wd=0, d_lr=0.001, d_wd=0, c_lr=0.01, c_wd=0, e_lr=0.001, e_wd=0, early_stopping=0,
-            prop='spmm', dropout=0.5, hidden=16, seed=1, encoder='GCN', K=10, top_k=10, clip_e=0.1, f_mask='yes',weight_clip='yes',ratio=0.5, alpha=1):
 
-        parser = argparse.ArgumentParser()
 
-        args = parser.parse_args()
+        return acc, f1, auc_roc, parity, equality, test_acc_sens0, test_acc_sens1, test_auc_roc_sens0, test_auc_roc_sens1, test_f1_sens0, test_f1_sens1
+
+    def fit(self,adj, feats, labels, idx_train, idx_val, idx_test, sens, sens_idx, runs=1, epochs=200, d_epochs=5, g_epochs=5,
+            c_epochs=5, g_lr=0.001, g_wd=0, d_lr=0.001, d_wd=0, c_lr=0.001, c_wd=0, e_lr=0.001, e_wd=0, early_stopping=0,
+            prop='spmm', dropout=0.5, hidden=16, seed=1, encoder='GCN', K=10, top_k=10, clip_e=1, f_mask='yes',weight_clip='yes',ratio=1, alpha=1):
+
+        #parser = argparse.ArgumentParser()
+
+        args = args_class()
         args.runs=runs
         args.epochs=epochs
         args.d_epochs=d_epochs
         args.g_epochs=g_epochs
         args.c_epochs=c_epochs
-        args.g_lr=g_lr,
+        args.g_lr=g_lr
         args.g_wd=g_wd
         args.d_lr=d_lr
         args.d_wd=d_wd
@@ -1223,11 +1265,11 @@ class fairvgnn():
         args.alpha=alpha
         args.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-        data, args.sens_idx, args.corr_sens, args.corr_idx, args.x_min, args.x_max = get_dataset(
-            args.dataset, args.top_k, adj, feats, labels, idx_train, idx_val, idx_test, sens, sens_idx)
 
-        args.num_features, args.num_classes = data.x.shape[1], len(
-            data.y.unique()) - 1
+        data, args.sens_idx, args.corr_sens, args.corr_idx, args.x_min, args.x_max = get_dataset(None, args.top_k, adj, feats, labels, idx_train, idx_val, idx_test, sens, sens_idx)
+
+        #args.num_features, args.num_classes = data.x.shape[1], len(data.y.unique()) - 1
+        args.num_features, args.num_classes = data.x.shape[1], 1
 
 
         args.train_ratio, args.val_ratio = torch.tensor([
@@ -1239,17 +1281,20 @@ class fairvgnn():
                                                data.y[data.train_mask].long()], args.val_ratio[
                                                data.y[data.val_mask].long()]
 
-
-        self.acc, self.f1, self.auc_roc, self.parity, self.equality = self.run(data, args)
+        self.args=args
+        print('running')
+        self.acc, self.f1, self.auc_roc, self.parity, self.equality, self.test_acc_sens0, self.test_acc_sens1, self.test_auc_roc_sens0, self.test_auc_roc_sens1, self.test_f1_sens0, self.test_f1_sens1 = self.run(data, args)
 
     def predict(self):
-        acc, f1, auc_roc, parity, equality = self.acc, self.f1, self.auc_roc, self.parity, self.equality
-        print('======' + args.dataset + args.encoder + '======')
-        print('auc_roc:', np.mean(auc_roc) * 100, np.std(auc_roc) * 100)
-        print('Acc:', np.mean(acc) * 100, np.std(acc) * 100)
-        print('f1:', np.mean(f1) * 100, np.std(f1) * 100)
-        print('parity:', np.mean(parity) * 100, np.std(parity) * 100)
-        print('equality:', np.mean(equality) * 100, np.std(equality) * 100)
+        acc, f1, auc_roc, parity, equality, test_acc_sens0, test_acc_sens1, test_auc_roc_sens0, test_auc_roc_sens1, test_f1_sens0, test_f1_sens1 = self.acc, self.f1, self.auc_roc, self.parity, self.equality, self.test_acc_sens0, self.test_acc_sens1, self.test_auc_roc_sens0, self.test_auc_roc_sens1, self.test_f1_sens0, self.test_f1_sens1
 
-        return acc, f1, auc_roc, parity, equality
+
+        print('auc_roc:', np.mean(auc_roc))
+        print('Acc:', np.mean(acc))
+        print('f1:', np.mean(f1))
+        print('parity:', np.mean(parity))
+        print('equality:', np.mean(equality))
+
+
+        return acc.item(), auc_roc.item(), f1.item(), test_acc_sens0,test_auc_roc_sens0,test_f1_sens0,   test_acc_sens1,  test_auc_roc_sens1,  test_f1_sens1, parity.item(), equality.item()
 

@@ -7,7 +7,7 @@ import time
 import argparse
 import pickle
 from torch_geometric.nn import GCNConv, SAGEConv, GINConv
-from sklearn.metrics import f1_score, roc_auc_score
+from sklearn.metrics import f1_score, roc_auc_score, accuracy_score
 from torch_geometric.utils import dropout_adj, convert
 from scipy.sparse.csgraph import laplacian
 import torch.nn as nn
@@ -42,6 +42,38 @@ import scipy.sparse as sp
 
 import networkx as nx
 
+def avg_err(x_corresponding, x_similarity, x_sorted_scores, y_ranks, top_k):
+    the_maxs, _ = torch.max(x_corresponding, 1)
+    the_maxs = the_maxs.reshape(the_maxs.shape[0], 1).repeat(1, x_corresponding.shape[1])
+    c = 2 * torch.ones_like(x_corresponding)
+    x_corresponding = ( c.pow(x_corresponding) - 1) / c.pow(the_maxs)
+    the_ones = torch.ones_like(x_corresponding)
+    new_x_corresponding = torch.cat((the_ones, 1 - x_corresponding), 1)
+
+    for i in range(x_corresponding.shape[1] - 1):
+        x_corresponding = torch.mul(x_corresponding, new_x_corresponding[:, -x_corresponding.shape[1] - 1 - i : -1 - i])
+    the_range = torch.arange(0., x_corresponding.shape[1]).repeat(x_corresponding.shape[0], 1) + 1
+    score_rank = (1 / the_range[:, 0:]) * x_corresponding[:, 0:]
+    final = torch.mean(torch.sum(score_rank, axis=1))
+    print("Now Average ERR@k = ", final.item())
+
+    return final.item()
+
+
+
+def avg_ndcg(x_corresponding, x_similarity, x_sorted_scores, y_ranks, top_k):
+    c = 2 * torch.ones_like(x_sorted_scores[:, :top_k])
+    numerator = c.pow(x_sorted_scores[:, :top_k]) - 1
+    denominator = torch.log2(2 + torch.arange(x_sorted_scores[:, :top_k].shape[1], dtype=torch.float)).repeat(x_sorted_scores.shape[0], 1).cuda()
+    idcg = torch.sum((numerator / denominator), 1)
+    new_score_rank = torch.zeros(y_ranks.shape[0], y_ranks[:, :top_k].shape[1])
+    numerator = c.pow(x_corresponding.cuda()[:, :top_k]) - 1
+    denominator = torch.log2(2 + torch.arange(new_score_rank[:, :top_k].shape[1], dtype=torch.float)).repeat(x_sorted_scores.shape[0], 1).cuda()
+    ndcg_list = torch.sum((numerator / denominator), 1) / idcg
+    avg_ndcg = torch.mean(ndcg_list)
+    print("Now Average NDCG@k = ", avg_ndcg.item())
+
+    return avg_ndcg.item()
 
 def sparse_mx_to_torch_sparse_tensor(sparse_mx):
     """Convert a scipy sparse matrix to a torch sparse tensor."""
@@ -379,15 +411,15 @@ class InFoRM_GNN(nn.Module):
         lap = laplacian(sim)
 
 
-        # print("Calculating laplacians...(this may take a while)")
-        # lap_list, m_list, avgSimD_list = calculate_group_lap(sim, sens)
-        # saveLaplacians = {}
-        # saveLaplacians['lap_list'] = lap_list
-        # saveLaplacians['m_list'] = m_list
-        # saveLaplacians['avgSimD_list'] = avgSimD_list
-        # with open("laplacians-1" + '.pickle', 'wb') as f:
-        #     pickle.dump(saveLaplacians, f, protocol=pickle.HIGHEST_PROTOCOL)
-        # print("Laplacians calculated and stored.")
+        print("Calculating laplacians...(this may take a while)")
+        lap_list, m_list, avgSimD_list = calculate_group_lap(sim, sens)
+        saveLaplacians = {}
+        saveLaplacians['lap_list'] = lap_list
+        saveLaplacians['m_list'] = m_list
+        saveLaplacians['avgSimD_list'] = avgSimD_list
+        with open("laplacians-1" + '.pickle', 'wb') as f:
+            pickle.dump(saveLaplacians, f, protocol=pickle.HIGHEST_PROTOCOL)
+        print("Laplacians calculated and stored.")
 
 
         with open("laplacians-1" + '.pickle', 'rb') as f:
@@ -505,7 +537,7 @@ class InFoRM_GNN(nn.Module):
 
             auc_roc_val = roc_auc_score(labels.cpu().numpy()[self.idx_val.cpu().numpy()], output.detach().cpu().numpy()[self.idx_val.cpu().numpy()])
 
-            if epoch % 100 == 0:
+            if epoch % 500 == 0:
                 print(f"[Train] Epoch {epoch}:train_loss: {loss_train.item():.4f} | train_auc_roc: {auc_roc_train:.4f} | val_loss: {loss_val.item():.4f} | val_auc_roc: {auc_roc_val:.4f}")
 
             if loss_val.item() < best_loss:
@@ -517,6 +549,21 @@ class InFoRM_GNN(nn.Module):
         print("Total time elapsed: {:.4f}s".format(time.time() - t_total))
 
 
+    def calculate_ranking_fairness(self, epoch, model_name, adj, output):
+        y_similarity1 = simi(output[self.idx_train])
+        x_similarity = simi(self.features[self.idx_train])
+        lambdas1, x_sorted_scores, y_sorted_idxs, x_corresponding = lambdas_computation(x_similarity, y_similarity1, self.top_k, self.k_para, self.sigma_1)
+        assert lambdas1.shape == y_similarity1.shape
+
+        y_similarity = simi(output[self.idx_test])
+        x_similarity = simi(self.features[self.idx_test])
+
+        print("Ranking optimizing... ")
+        x_sorted_scores, y_sorted_idxs, x_corresponding = lambdas_computation_only_review(x_similarity, y_similarity, self.top_k, self.k_para)
+        self.all_ndcg_list_test.append(avg_ndcg(x_corresponding, x_similarity, x_sorted_scores, y_sorted_idxs, self.top_k))
+
+        y_similarity1.backward(self.lambdas_para * lambdas1)
+        self.optimizer.step()
 
 
     def predict(self):
@@ -530,6 +577,12 @@ class InFoRM_GNN(nn.Module):
         # noisy_output_preds = (noisy_output.squeeze() > 0).type_as(self.labels)
         auc_roc_test = roc_auc_score(self.labels.cpu().numpy()[self.idx_test.cpu().numpy()],
                                      output.detach().cpu().numpy()[self.idx_test.cpu().numpy()])
+
+        F1 = f1_score(self.labels.cpu().numpy()[self.idx_test.cpu().numpy()], output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()], average='micro')
+        ACC=accuracy_score(output.detach().cpu().numpy()[self.idx_test.cpu().numpy()], output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],)
+        AUCROC=roc_auc_score(self.labels[idx_test], output_preds)
+
+
         # counterfactual_fairness = 1 - (output_preds.eq(counter_output_preds)[self.idx_test].sum().item() / self.idx_test.shape[0])
         # robustness_score = 1 - (output_preds.eq(noisy_output_preds)[self.idx_test].sum().item() / self.idx_test.shape[0])
 
@@ -548,8 +601,7 @@ class InFoRM_GNN(nn.Module):
         print(f'Individual Unfairness for Group 2: {f_u2}')
         print(f'GDIF: {GDIF}')
 
-        return output, self.labels, self.idx_test
-
+        return F1, ACC, AUCROC, individual_unfairness, GDIF
 
 
 

@@ -497,12 +497,13 @@ class REDRESS(nn.Module):
 
         loss_val = F.cross_entropy(the_softmax(output[self.idx_val]), self.labels[self.idx_val])
         acc_val =  0  # accuracy(output[self.idx_val], self.labels[self.idx_val])
-        print('Epoch: {:04d}'.format(epoch+1),
-              'loss_train: {:.4f}'.format(loss_train.item()),
-            #   'acc_train: {:.4f}'.format(acc_train.item()),
-              'loss_val: {:.4f}'.format(loss_val.item()),
-            #   'acc_val: {:.4f}'.format(acc_val.item()),
-              'time: {:.4f}s'.format(time.time() - t))
+        if epoch%300==0:
+            print('Epoch: {:04d}'.format(epoch+1),
+                  'loss_train: {:.4f}'.format(loss_train.item()),
+                #   'acc_train: {:.4f}'.format(acc_train.item()),
+                  'loss_val: {:.4f}'.format(loss_val.item()),
+                #   'acc_val: {:.4f}'.format(acc_val.item()),
+                  'time: {:.4f}s'.format(time.time() - t))
 
         return output1
 

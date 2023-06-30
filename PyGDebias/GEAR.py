@@ -8,7 +8,8 @@ from sklearn.linear_model import LogisticRegression
 from torch_geometric.nn import GCNConv, global_mean_pool, global_max_pool, global_add_pool, SAGPooling, GATConv, GINConv, SAGEConv, DeepGraphInfomax, JumpingKnowledge
 
 from sklearn.metrics import accuracy_score,roc_auc_score,recall_score,f1_score
-from torch.nn.utils import spectral_norm
+#from torch.nn.utils import spectral_norm
+from torch.nn.utils.parametrizations import spectral_norm
 import time
 import argparse
 import numpy as np
@@ -51,8 +52,10 @@ EPS = 1e-15
 class GCN(nn.Module):
     def __init__(self, nfeat, nhid, dropout=0.5):
         super(GCN, self).__init__()
-        self.gc1 = spectral_norm(GCNConv(nfeat, nhid).lin)
-
+        #self.gc1 = spectral_norm(GCNConv(nfeat, nhid).lin)
+        
+        self.gc1 = GCNConv(nfeat, nhid)
+        
     def forward(self, x, edge_index):
         x = self.gc1(x, edge_index)
         return x
@@ -369,6 +372,8 @@ class CFDA(nn.Module):
                 # save model
                 save_model = True
                 if save_model and epoch > 0:
+                    if not os.path.exists(model_path):
+                        os.makedirs(model_path)
                     save_model_path = model_path + f'weights_CFDA_{dataset}' + '.pt'
                     torch.save(self.state_dict(), save_model_path)
                     print('saved model weight in: ', save_model_path)
@@ -422,7 +427,7 @@ class CFDA(nn.Module):
 def generate_cf_data(data, sens_idx, mode=1, sens_cf=None, adj_raw=None, model_path='', train='non-test', dataset = 'running-1', device='cuda'):
     h_dim = 32
     input_dim = data.x.shape[1]
-    adj = adj_raw.tocoo()
+    adj = sp.coo_matrix(adj_raw.to_dense().numpy())
     indices_adj = torch.LongTensor([adj.row, adj.col])
     adj = torch.sparse_coo_tensor(indices_adj, adj.data, size=(adj.shape[0], adj.shape[1])).float()
 
@@ -513,6 +518,7 @@ class Encoder(torch.nn.Module):
     def __init__(self, in_channels: int, out_channels: int,
                 base_model='sage', k: int = 2):
         super(Encoder, self).__init__()
+        self.conv = None
         self.base_model = base_model
         if self.base_model == 'gcn':
             self.conv = GCN(in_channels, out_channels)
@@ -1007,7 +1013,7 @@ def get_all_node_emb(model, mask, subgraph, num_node, hidden_size, batch_size):
 
 
 def compute_loss_sim(model, subgraph, cf_subgraph, idx_select, n, sim_coeff, hidden_size, batch_size, z1=None, z2=None):
-    idx_select_mask = (torch.zeros(n).scatter_(0, idx_select, 1) > 0)
+    idx_select_mask = ((torch.zeros(n)).scatter_(0, idx_select, 1) > 0)
     if z1 is None:
         z1 = get_all_node_emb(model, idx_select_mask, subgraph, n, hidden_size, batch_size)
     if z2 is None:
@@ -1030,22 +1036,20 @@ def compute_loss_sim(model, subgraph, cf_subgraph, idx_select, n, sim_coeff, hid
 
 
 def compute_loss(model, subgraph, cf_subgraph_list, labels, idx_select, n, sim_coeff, hidden_size, batch_size, device):
-    idx_select_mask = (torch.zeros(n).scatter_(0, idx_select, 1) > 0)
+    idx_select_mask = ((torch.zeros(n)).scatter_(0, idx_select, 1) > 0)
     z1 = get_all_node_emb(model, idx_select_mask, subgraph, n, hidden_size, batch_size)
-
     # classifier
     c1 = model.classifier(z1)
 
     # Binary Cross-Entropy
     l1 = F.binary_cross_entropy_with_logits(c1, labels[idx_select].unsqueeze(1).float().to(device)) / 2
-
     loss_c = (1 - sim_coeff) * l1
 
     loss_sim = 0.0
     for si in range(len(cf_subgraph_list)):
         cf_subgraph = cf_subgraph_list[si]
         z2 = get_all_node_emb(model, idx_select_mask, cf_subgraph, n, hidden_size, batch_size)
-        loss_sim_si = compute_loss_sim(model, subgraph, cf_subgraph, idx_select, z1, z2, n, sim_coeff, hidden_size, batch_size)
+        loss_sim_si = compute_loss_sim(model, subgraph, cf_subgraph, idx_select, n, sim_coeff, hidden_size, batch_size, z1, z2)
         loss_sim += loss_sim_si
     loss_sim /= len(cf_subgraph_list)
 
@@ -1130,10 +1134,13 @@ def stats_cov(data1, data2):
     return result
 
 
+
+
+
 def analyze_dependency(sens, adj, ypred_tst, idx_select, type='mean'):
     if type == 'mean':
         # row-normalize
-        adj_norm = normalize(adj, norm='l1', axis=1)
+        adj_norm = normalize(adj.to_dense().numpy(), norm='l1', axis=1)
         nb_sens_ave = adj_norm @ sens  # n x 1, average sens of 1-hop neighbors
 
         # S_N(i), Y_i | S_i
@@ -1144,12 +1151,13 @@ def analyze_dependency(sens, adj, ypred_tst, idx_select, type='mean'):
 
 
 class GEAR(torch.nn.Module):
-    def __init__(self, num_features, hidden_size=1024, proj_hidden=16, num_class=1, encoder_hidden_size=1024, encoder_base_model='gcn'):
+    def __init__(self, features, hidden_size=1024, proj_hidden=16, num_class=1, encoder_hidden_size=1024, encoder_base_model='gcn', experiment_type='train'):
         super(GEAR, self).__init__()
-        self.encoder = Encoder(num_features, encoder_hidden_size, base_model=encoder_base_model)
+        self.encoder = Encoder(features.shape[1], encoder_hidden_size, base_model=encoder_base_model)
         self.hidden_size = hidden_size
         self.num_proj_hidden = proj_hidden
         self.num_class = num_class
+        self.experiment_type = experiment_type
 
         # Projection
         self.fc1 = nn.Sequential(
@@ -1195,13 +1203,12 @@ class GEAR(torch.nn.Module):
 
         z = hidden[index]  # JM: center node, batch_size x hidden_size
         return z
+      
 
 
     def preprocess(self, adj, features, labels, idx_train, idx_val, idx_test, sens, sens_idx, subgraph_size=30, n_order=10, dataset="None", raw_data_info=None):
 
-
         ##  to be adapted
-
         data_path_root = '../'
         self.model_path = 'models_save/'
         # self.model_path = 'graphFair_subgraph/cf/'
@@ -1225,9 +1232,7 @@ class GEAR(torch.nn.Module):
         self.idx_val, _ = torch.sort(idx_val)
         self.idx_test, _ = torch.sort(idx_test)
 
-
-
-        edge_index = torch.tensor(adj.nonzero(), dtype=torch.long)
+        edge_index = torch.tensor(adj.to_dense().nonzero(), dtype=torch.long)
         num_class = labels.unique().shape[0] - 1
 
         # preprocess the input
@@ -1236,12 +1241,14 @@ class GEAR(torch.nn.Module):
         self.data.y = labels  # n
 
         # ============== generate counterfactual data (ground-truth) ================
-        # if experiment_type == 'cf':
-        sens_rate_list = [0, 0.5, 1.0]
-        path_truecf_data = 'graphFair_subgraph/cf/'
-        generate_cf_true(self.data, dataset, sens_rate_list, sens_idx, path_truecf_data, save_file=True,
-                             raw_data_info=raw_data_info)  # generate
-        # sys.exit()  # stop here
+        if self.experiment_type == 'cf':
+            sens_rate_list = [0, 0.5, 1.0]
+            path_truecf_data = 'graphFair_subgraph/cf/'
+            generate_cf_true(self.data, dataset, sens_rate_list, sens_idx, path_truecf_data, save_file=True,
+                                raw_data_info=raw_data_info)  # generate
+            sys.exit()  # stop here
+
+        num_node = self.data.x.size(0)
 
         # Subgraph: Setting up the subgraph extractor
         self.subgraph_size = subgraph_size
@@ -1254,6 +1261,8 @@ class GEAR(torch.nn.Module):
         self.cf_subgraph_list = []
         subgraph_load = False
         if subgraph_load:
+            if not os.path.exists(f'graphFair_subgraph/aug/'):
+                        os.makedirs(f'graphFair_subgraph/aug/')
             path_cf_ag = 'graphFair_subgraph/aug/' + f'{dataset}_cf_aug_' + str(0) + '.pkl'
             with open(path_cf_ag, 'rb') as f:
                 data_cf = pickle.load(f)['data_cf']
@@ -1261,7 +1270,9 @@ class GEAR(torch.nn.Module):
         else:
             sens_cf = 1 - self.data.x[:, sens_idx]
             data_cf = generate_cf_data(self.data, sens_idx, mode=1, sens_cf=sens_cf, adj_raw=adj,
-                                       model_path=self.model_path, dataset=dataset)  #
+                                    model_path=self.model_path, dataset=dataset)  #
+            if not os.path.exists(f'graphFair_subgraph/aug/'):
+                        os.makedirs(f'graphFair_subgraph/aug/')
             path_cf_ag = 'graphFair_subgraph/aug/' + f'{dataset}_cf_aug_' + str(0) + '.pkl'
             with open(path_cf_ag, 'wb') as f:
                 data_cf_save = {'data_cf': data_cf}
@@ -1287,7 +1298,7 @@ class GEAR(torch.nn.Module):
                     print('loaded counterfactual augmentation data from: ' + path_cf_ag)
             else:
                 data_cf = generate_cf_data(self.data, sens_idx, mode=0, sens_cf=sens_cf, adj_raw=adj,
-                                           model_path=self.model_path)  #
+                                        model_path=self.model_path)  #
                 path_cf_ag = 'graphFair_subgraph/aug/' + f'{dataset}_cf_aug_' + str(si + 1) + '.pkl'
                 with open(path_cf_ag, 'wb') as f:
                     data_cf_save = {'data_cf': data_cf}
@@ -1305,6 +1316,7 @@ class GEAR(torch.nn.Module):
 
         # Setting up the model and optimizer
         # model = self.GraphCF(encoder=Encoder(self.data.num_features, encoder_hidden_size, base_model=encoder_base_model), args=args, num_class=encoder_num_class).to(device)
+        print(epochs, lr, batch_size, weight_decay, sim_coeff, encoder_name, dataset_name, device)
         par_1 = list(self.encoder.parameters()) + list(self.fc1.parameters()) + list(self.fc2.parameters()) + list(
             self.fc3.parameters()) + list(self.fc4.parameters())
         par_2 = list(self.c1.parameters()) + list(self.encoder.parameters())
@@ -1336,9 +1348,8 @@ class GEAR(torch.nn.Module):
 
                 # forward: factual subgraph
                 batch, index = self.subgraph.search(sample_idx)
-                z = self.forward(batch.x.cuda(), batch.edge_index.cuda(), batch.batch.cuda(),
-                          index.cuda())  # center node rep, subgraph rep
-
+                z = self(batch.x.cuda(), batch.edge_index.cuda(), batch.batch.cuda(), index.cuda())  # center node rep, subgraph rep
+                #assert 1==0
                 # projector
                 p1 = self.projection(z)
                 # predictor
@@ -1409,14 +1420,14 @@ class GEAR(torch.nn.Module):
                                f'models_save/weights_graphCF_{encoder_name}_{dataset_name}_exp' + '.pt')
 
 
-    def predict(self, encoder_name="None", dataset_name="None"):
+    def predict(self, encoder_name="None", dataset_name="None", batch_size=100, sim_coeff=0.6):
 
         results_all_exp = {}
 
         # ========= test all ===========
         # evaluate on the best model, we use TRUE CF graphs
-        sens_rate_list = [0, 0.5, 1.0]
-        path_true_cf_data = 'graphFair_subgraph/cf'  # no '/'
+        sens_rate_list = [0.0, 1.0]
+        path_true_cf_data = 'graphFair_subgraph/aug'  # no '/'
 
         # model = models.GraphCF(encoder=models.Encoder(data.num_features, args.hidden_size, base_model=args.encoder),
         #                        args=args, num_class=num_class).to(device)
@@ -1429,12 +1440,12 @@ class GEAR(torch.nn.Module):
 
         #
         self.eval()
-        eval_results_orin = evaluate(self, self.data, self.subgraph, self.cf_subgraph_list, self.labels, self.sens, self.idx_test)
+        eval_results_orin = evaluate(self, self.data, self.subgraph, self.cf_subgraph_list, self.labels, self.sens, self.idx_test, self.n, sim_coeff, self.hidden_size, batch_size)
 
         n = len(self.data.y)
         idx_select_mask = (torch.zeros(n).scatter_(0, self.idx_test, 1) > 0)  # size = n, bool
         # performance
-        emb = get_all_node_emb(self, idx_select_mask, self.subgraph, n, self.hidden_size, self.batch_size)
+        emb = get_all_node_emb(self, idx_select_mask, self.subgraph, n, self.hidden_size, batch_size)
         output = self.forwarding_predict(emb)
         output_preds = (output.squeeze() > 0).type_as(self.data.y)
 
@@ -1442,12 +1453,12 @@ class GEAR(torch.nn.Module):
         # counterfactual fairness -- true
         for i in range(len(sens_rate_list)):
             # load cf-true data
-            sens_rate = sens_rate_list[i]
+            sens_rate = int(sens_rate_list[i])
             post_str = dataset_name + '_cf_' + str(sens_rate)
-            file_path = path_true_cf_data + '/' + dataset_name + '_cf_' + str(sens_rate) + '.pkl'
+            file_path = path_true_cf_data + '/' + dataset_name + '_cf_aug_' + str(sens_rate) + '.pkl'
 
             with open(file_path, 'rb') as f:
-                data_cf = pickle.load(f)['data']
+                data_cf = pickle.load(f)['data_cf']
                 print('loaded data from: ' + file_path)
 
             cf_subgraph = Subgraph(data_cf.x, data_cf.edge_index, self.ppr_path, self.subgraph_size, self.n_order)  # true
@@ -1455,7 +1466,7 @@ class GEAR(torch.nn.Module):
 
             n = len(data_cf.y)
             # performance
-            emb_cf = get_all_node_emb(self, idx_select_mask, cf_subgraph, n, self.hidden_size, self.batch_size)
+            emb_cf = get_all_node_emb(self, idx_select_mask, cf_subgraph, n, self.hidden_size, batch_size)
             output_cf = self.forwarding_predict(emb_cf)
             output_preds_cf = (output_cf.squeeze() > 0).type_as(data_cf.y)
 

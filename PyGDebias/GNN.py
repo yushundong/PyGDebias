@@ -191,9 +191,9 @@ class Encoder(torch.nn.Module):
 
 
 
-class NIFTY(torch.nn.Module):
+class GNN(torch.nn.Module):
     def __init__(self, adj, features, labels, idx_train, idx_val, idx_test, sens, sens_idx, num_hidden=16, num_proj_hidden=16, lr=0.001, weight_decay=1e-5, drop_edge_rate_1=0.1, drop_edge_rate_2=0.1, drop_feature_rate_1=0.1, drop_feature_rate_2=0.1, encoder="gcn", sim_coeff=0.5, nclass=1, device="cuda"):
-        super(NIFTY, self).__init__()
+        super(GNN, self).__init__()
 
         self.device = device
 
@@ -205,10 +205,6 @@ class NIFTY(torch.nn.Module):
         self.encoder = Encoder(in_channels=features.shape[1], out_channels=num_hidden, base_model=encoder).to(device)
         # model = SSF(encoder=encoder, num_hidden=args.hidden, num_proj_hidden=args.proj_hidden, sim_coeff=args.sim_coeff,
                     # nclass=num_class).to(device)
-        self.val_edge_index_1 = dropout_adj(self.edge_index.to(device), p=drop_edge_rate_1)[0]
-        self.val_edge_index_2 = dropout_adj(self.edge_index.to(device), p=drop_edge_rate_2)[0]
-        self.val_x_1 = drop_feature(features.to(device), drop_feature_rate_1, sens_idx, sens_flag=False)
-        self.val_x_2 = drop_feature(features.to(device), drop_feature_rate_2, sens_idx)
 
         self.sim_coeff = sim_coeff
         #self.encoder = encoder
@@ -321,64 +317,14 @@ class NIFTY(torch.nn.Module):
 
     def forwarding_predict(self, emb):
 
-        # projector
-        p1 = self.projection(emb)
-
-        # predictor
-        h1 = self.prediction(p1)
-
         # classifier
         c1 = self.classifier(emb)
 
         return c1
 
-    def linear_eval(self, emb, labels, idx_train, idx_test):
-        x = emb.detach()
-        classifier = nn.Linear(in_features=x.shape[1], out_features=2, bias=True)
-        classifier = classifier.to('cuda')
-        optimizer = torch.optim.Adam(classifier.parameters(), lr=0.001, weight_decay=1e-4)
-        for i in range(1000):
-            optimizer.zero_grad()
-            preds = classifier(x[idx_train])
-            loss = F.cross_entropy(preds, labels[idx_train])
-            loss.backward()
-            optimizer.step()
-            if i%100==0:
-                print(loss.item())
-        classifier.eval()
-        preds = classifier(x[idx_test]).argmax(dim=1)
-        correct = (preds == labels[idx_test]).sum().item()
-        return preds, correct/preds.shape[0]
 
 
-
-    def ssf_validation(self, x_1, edge_index_1, x_2, edge_index_2, y):
-        z1 = self.forward(x_1, edge_index_1)
-        z2 = self.forward(x_2, edge_index_2)
-
-        # projector
-        p1 = self.projection(z1)
-        p2 = self.projection(z2)
-
-        # predictor
-        h1 = self.prediction(p1)
-        h2 = self.prediction(p2)
-
-        l1 = self.D(h1[self.idx_val], p2[self.idx_val]) / 2
-        l2 = self.D(h2[self.idx_val], p1[self.idx_val]) / 2
-        sim_loss = self.sim_coeff * (l1 + l2)
-
-        # classifier
-        c1 = self.classifier(z1)
-        c2 = self.classifier(z2)
-
-        # Binary Cross-Entropy
-        l3 = F.binary_cross_entropy_with_logits(c1[self.idx_val], y[self.idx_val].unsqueeze(1).float().to(self.device)) / 2
-        l4 = F.binary_cross_entropy_with_logits(c2[self.idx_val], y[self.idx_val].unsqueeze(1).float().to(self.device)) / 2
-
-        return sim_loss, l3 + l4
-
-    def fit_GNN(self, epochs=300):
+    def fit(self, epochs=300):
         best_loss = 100
         for epoch in range(epochs + 1):
 
@@ -421,86 +367,8 @@ class NIFTY(torch.nn.Module):
 
 
 
-    def fit(self, epochs=300):
 
-
-
-        # Train model
-        t_total = time.time()
-        best_loss = 100
-        best_acc = 0
-
-
-        for epoch in range(epochs + 1):
-            t = time.time()
-
-            sim_loss = 0
-            cl_loss = 0
-            rep = 1
-            for _ in range(rep):
-                self.train()
-                self.optimizer_1.zero_grad()
-                self.optimizer_2.zero_grad()
-                edge_index_1 = dropout_adj(self.edge_index, p=self.drop_edge_rate_1)[0]
-                edge_index_2 = dropout_adj(self.edge_index, p=self.drop_edge_rate_2)[0]
-                x_1 = drop_feature(self.features, self.drop_feature_rate_1, self.sens_idx, sens_flag=False)
-                x_2 = drop_feature(self.features, self.drop_feature_rate_2, self.sens_idx)
-                z1 = self.forward(x_1, edge_index_1)
-                z2 = self.forward(x_2, edge_index_2)
-
-                # projector
-                p1 = self.projection(z1)
-                p2 = self.projection(z2)
-
-                # predictor
-                h1 = self.prediction(p1)
-                h2 = self.prediction(p2)
-
-                l1 = self.D(h1[self.idx_train], p2[self.idx_train]) / 2
-                l2 = self.D(h2[self.idx_train], p1[self.idx_train]) / 2
-                sim_loss += self.sim_coeff * (l1 + l2)
-
-            (sim_loss / rep).backward()
-            self.optimizer_1.step()
-
-            # classifier
-            z1 = self.forward(x_1, edge_index_1)
-            z2 = self.forward(x_2, edge_index_2)
-            c1 = self.classifier(z1)
-            c2 = self.classifier(z2)
-
-            # Binary Cross-Entropy
-            l3 = F.binary_cross_entropy_with_logits(c1[self.idx_train],
-                                                    self.labels[self.idx_train].unsqueeze(1).float().to(self.device)) / 2
-            l4 = F.binary_cross_entropy_with_logits(c2[self.idx_train],
-                                                    self.labels[self.idx_train].unsqueeze(1).float().to(self.device)) / 2
-
-            cl_loss = (1 - self.sim_coeff) * (l3 + l4)
-            cl_loss.backward()
-            self.optimizer_2.step()
-            loss = (sim_loss / rep + cl_loss)
-
-            # Validation
-            self.eval()
-            val_s_loss, val_c_loss = self.ssf_validation(self.val_x_1, self.val_edge_index_1, self.val_x_2, self.val_edge_index_2, self.labels)
-            emb = self.forward(self.val_x_1, self.val_edge_index_1)
-            output = self.forwarding_predict(emb)
-            preds = (output.squeeze() > 0).type_as(self.labels)
-            auc_roc_val = roc_auc_score(self.labels.cpu().numpy()[self.idx_val], output.detach().cpu().numpy()[self.idx_val])
-
-            if epoch % 100 == 0:
-                print(f"[Train] Epoch {epoch}:train_s_loss: {(sim_loss/rep):.4f} | train_c_loss: {cl_loss:.4f} | val_s_loss: {val_s_loss:.4f} | val_c_loss: {val_c_loss:.4f} | val_auc_roc: {auc_roc_val:.4f}")
-
-            if (val_c_loss + val_s_loss) < best_loss:
-                self.val_loss=val_c_loss.item()+val_s_loss.item()
-
-
-                print(f'{epoch} | {val_s_loss:.4f} | {val_c_loss:.4f}')
-                best_loss = val_c_loss + val_s_loss
-                torch.save(self.state_dict(), f'weights_ssf_{self.encoder}.pt')
-
-
-    def predict_GNN(self):
+    def predict(self):
 
         self.load_state_dict(torch.load(f'weights_GNN_{self.encoder}.pt'))
         self.eval()
@@ -528,58 +396,6 @@ class NIFTY(torch.nn.Module):
 
 
 
-
-    def predict(self):
-
-        self.load_state_dict(torch.load(f'weights_ssf_{self.encoder}.pt'))
-        self.eval()
-        emb = self.forward(self.features.to(self.device), self.edge_index.to(self.device))
-        output = self.forwarding_predict(emb)
-        counter_features = self.features.clone()
-        counter_features[:, self.sens_idx] = 1 - counter_features[:, self.sens_idx]
-        counter_output = self.forwarding_predict(self.forward(counter_features.to(self.device), self.edge_index.to(self.device)))
-        noisy_features = self.features.clone() + torch.ones(self.features.shape).normal_(0, 1).to(self.device)
-        noisy_output = self.forwarding_predict(self.forward(noisy_features.to(self.device), self.edge_index.to(self.device)))
-
-        # Report
-        output_preds = (output.squeeze() > 0).type_as(self.labels)
-
-        counter_output_preds = (counter_output.squeeze() > 0).type_as(self.labels)
-        noisy_output_preds = (noisy_output.squeeze() > 0).type_as(self.labels)
-        auc_roc_test = roc_auc_score(self.labels.cpu().numpy()[self.idx_test.cpu()],
-                                     output.detach().cpu().numpy()[self.idx_test.cpu()])
-        counterfactual_fairness = 1 - (output_preds.eq(counter_output_preds)[self.idx_test].sum().item() / self.idx_test.shape[0])
-        robustness_score = 1 - (output_preds.eq(noisy_output_preds)[self.idx_test].sum().item() / self.idx_test.shape[0])
-
-        parity, equality = self.fair_metric(output_preds[self.idx_test].cpu().numpy(), self.labels[self.idx_test].cpu().numpy(),
-                                       self.sens[self.idx_test].numpy())
-        f1_s = f1_score(self.labels[self.idx_test].cpu().numpy(), output_preds[self.idx_test].cpu().numpy())
-
-
-
-        output_preds = (output.squeeze() > 0).type_as(self.labels)[self.idx_test].detach().cpu().numpy()
-
-        labels = self.labels.detach().cpu().numpy()
-        idx_test = self.idx_test
-
-        F1 = f1_score(labels[idx_test], output_preds, average='micro')
-        ACC = accuracy_score(labels[idx_test], output_preds, )
-        AUCROC = roc_auc_score(labels[idx_test], output_preds)
-
-        ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1 = self.predict_sens_group(output_preds,
-                                                                                                       idx_test)
-
-        SP, EO = self.fair_metric(output_preds, self.labels[idx_test].detach().cpu().numpy(),
-                                  self.sens[idx_test].detach().cpu().numpy())
-
-
-        return ACC, AUCROC, F1, ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1, SP, EO
-        # print report
-        #print("The AUCROC of estimator: {:.4f}".format(auc_roc_test))
-        #print(f'Parity: {parity} | Equality: {equality}')
-        #print(f'F1-score: {f1_s}')
-        #print(f'CounterFactual Fairness: {counterfactual_fairness}')
-        #print(f'Robustness Score: {robustness_score}')
 
 
 

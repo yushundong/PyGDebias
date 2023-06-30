@@ -25,9 +25,8 @@ from dgl.data import DGLDataset
 import urllib.request
 import zipfile
 import os.path
-from dataset import load_data, process_pokec_nba
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, accuracy_score, roc_auc_score
 RAW_FOLDER = './raw_data'
 DATA_FOLDER = './processed_data'
 WEIGHT_FOLDER = './precomputed_weights'
@@ -702,14 +701,64 @@ class UGE():
         self.lgreg_sens = LogisticRegression(random_state=0, class_weight='balanced', max_iter=500).fit(
             self.embs[idx_train], self.sens[idx_train])
 
-    def predict(self,idx_test):
+
+
+    def fair_metric(self, pred, labels, sens):
+        idx_s0 = sens == 0
+        idx_s1 = sens == 1
+        idx_s0_y1 = np.bitwise_and(idx_s0, labels == 1)
+        idx_s1_y1 = np.bitwise_and(idx_s1, labels == 1)
+        parity = abs(sum(pred[idx_s0]) / sum(idx_s0) -
+                     sum(pred[idx_s1]) / sum(idx_s1))
+
+
+        equality = abs(sum(pred[idx_s0_y1]) / sum(idx_s0_y1) -
+                       sum(pred[idx_s1_y1]) / sum(idx_s1_y1))
+
+
+        return parity.item(), equality.item()
+
+    def predict(self,idx_test, idx_val):
 
         pred = self.lgreg.predict(self.embs[idx_test])
-        score = f1_score(self.labels[idx_test], pred, average='micro')
-        return score
+        F1 = f1_score(self.labels[idx_test], pred, average='micro')
+        ACC=accuracy_score(self.labels[idx_test], pred,)
 
+        if self.labels.max()>1:
+            AUCROC=0
+        else:
+            AUCROC=roc_auc_score(self.labels[idx_test], pred)
+
+        ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1=self.predict_sens_group(idx_test)
+
+        SP, EO=self.fair_metric(np.array(pred), self.labels[idx_test].cpu().numpy(), self.sens[idx_test].cpu().numpy())
+
+
+        pred = self.lgreg.predict_proba(self.embs[idx_val])
+        loss_fn=torch.nn.BCELoss()
+        self.val_loss=loss_fn(torch.FloatTensor(pred).softmax(-1)[:,-1], torch.tensor(self.labels[idx_val]).float()).item()
+        return ACC, AUCROC, F1, ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1, SP, EO
+
+
+
+    def predict_sens_group(self, idx_test):
+        pred = self.lgreg.predict(self.embs[idx_test])
+
+        result=[]
+        for sens in [0,1]:
+            F1 = f1_score(self.labels[idx_test][self.sens[idx_test]==sens], pred[self.sens[idx_test]==sens], average='micro')
+            ACC=accuracy_score(self.labels[idx_test][self.sens[idx_test]==sens], pred[self.sens[idx_test]==sens],)
+            if self.labels.max() > 1:
+                AUCROC = 0
+            else:
+                AUCROC=roc_auc_score(self.labels[idx_test][self.sens[idx_test]==sens], pred[self.sens[idx_test]==sens])
+            result.extend([ACC, AUCROC,F1])
+
+        return result
 
     def predict_sens(self,idx_test):
         pred = self.lgreg_sens.predict(self.embs[idx_test])
-        score = f1_score(self.sens[idx_test], pred, average='micro')
-        return score
+        F1 = f1_score(self.labels[idx_test], pred, average='micro')
+        ACC=accuracy_score(self.labels[idx_test], pred,)
+        AUCROC=roc_auc_score(self.labels[idx_test], pred)
+        return ACC, AUCROC, F1

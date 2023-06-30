@@ -10,7 +10,7 @@ from collections import Counter
 from concurrent.futures import ProcessPoolExecutor
 import logging
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, accuracy_score, roc_auc_score
 import logging
 import sys
 from io import open
@@ -29,7 +29,7 @@ import numpy as np
 import multiprocessing
 import pickle
 import scipy.sparse as sp
-
+import torch
 from gensim.models import Word2Vec
 
 
@@ -51,6 +51,7 @@ except AttributeError:
 
 logger = logging.getLogger(__name__)
 LOGFORMAT = "%(asctime).19s %(levelname)s %(filename)s: %(lineno)s %(message)s"
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.ERROR)
 
 
 class Graph(defaultdict):
@@ -221,13 +222,16 @@ class Graph(defaultdict):
         return [str(node) for node in path]
 def from_numpy(x, undirected=True):
     G = Graph()
-
+    print(x.shape)
     if issparse(x):
         cx = x.tocoo()
         for i,j,v in zip(cx.row, cx.col, cx.data):
             G[i].append(j)
     else:
       raise Exception("Dense matrices not yet supported.")
+
+    for i in range(x.shape[0]):
+        G[i].append(i)
 
     if undirected:
         G.make_undirected()
@@ -261,8 +265,8 @@ def debug(type_, value, tb):
     pdb.pm()
 
 class CrossWalk():
-    def run(self, adj_matrix, number_walks=5, representation_size=64, seed=0, walk_length=20, window_size=5, workers=5, pmodified=1.0):
-        self.number_walks=number_walks
+    def run(self, adj_matrix, number_walks=5, representation_size=64, seed=0, walk_length=20, window_size=5, workers=1, pmodified=1.0):
+        self.number_walks=int(number_walks)
         #parser.add_argument('--number-walks', default=5, type=int,
         #                    help='Number of random walks to start at each node')
         self.representation_size=representation_size
@@ -297,7 +301,7 @@ class CrossWalk():
                                       path_length=self.walk_length, p_modified=self.pmodified,
                                       alpha=0, rand=random.Random(self.seed))
         print("Training...")
-        model = Word2Vec(walks, vector_size=self.representation_size, window=self.window_size, min_count=0, sg=1,
+        model = Word2Vec(walks, size=self.representation_size, window=self.window_size, min_count=0, sg=1,
                          hs=1, workers=self.workers)
 
         print(model.wv.vectors.shape)
@@ -314,10 +318,52 @@ class CrossWalk():
             self.embs[idx_train], self.sens[idx_train])
 
 
-    def predict(self,idx_test):
+
+    def fair_metric(self, pred, labels, sens):
+
+
+        idx_s0 = sens == 0
+        idx_s1 = sens == 1
+        idx_s0_y1 = np.bitwise_and(idx_s0, labels == 1)
+        idx_s1_y1 = np.bitwise_and(idx_s1, labels == 1)
+        parity = abs(sum(pred[idx_s0]) / sum(idx_s0) -
+                     sum(pred[idx_s1]) / sum(idx_s1))
+        equality = abs(sum(pred[idx_s0_y1]) / sum(idx_s0_y1) -
+                       sum(pred[idx_s1_y1]) / sum(idx_s1_y1))
+        return parity.item(), equality.item()
+
+    def predict(self,idx_test, idx_val):
+
         pred = self.lgreg.predict(self.embs[idx_test])
-        score = f1_score(self.labels[idx_test], pred, average='micro')
-        return score
+        print(pred)
+
+        F1 = f1_score(self.labels[idx_test], pred, average='micro')
+        ACC=accuracy_score(self.labels[idx_test], pred,)
+        AUCROC=roc_auc_score(self.labels[idx_test], pred)
+
+        ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1=self.predict_sens_group(idx_test)
+
+
+        SP, EO=self.fair_metric(np.array(pred), self.labels[idx_test].cpu().numpy(), self.sens[idx_test].cpu().numpy())
+
+        pred = self.lgreg.predict_proba(self.embs[idx_val])
+        loss_fn=torch.nn.BCELoss()
+        self.val_loss=loss_fn(torch.FloatTensor(pred).softmax(-1)[:,-1], torch.tensor(self.labels[idx_val]).float()).item()
+        return ACC, AUCROC, F1, ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1, SP, EO
+
+
+
+    def predict_sens_group(self, idx_test):
+        pred = self.lgreg.predict(self.embs[idx_test])
+
+        result=[]
+        for sens in [0,1]:
+            F1 = f1_score(self.labels[idx_test][self.sens[idx_test]==sens], pred[self.sens[idx_test]==sens], average='micro')
+            ACC=accuracy_score(self.labels[idx_test][self.sens[idx_test]==sens], pred[self.sens[idx_test]==sens],)
+            AUCROC=roc_auc_score(self.labels[idx_test][self.sens[idx_test]==sens], pred[self.sens[idx_test]==sens])
+            result.extend([ACC, AUCROC,F1])
+
+        return result
 
     def predict_sens(self,idx_test):
         pred = self.lgreg_sens.predict(self.embs[idx_test])

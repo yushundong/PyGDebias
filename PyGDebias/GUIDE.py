@@ -181,7 +181,7 @@ class SimAttConv(MessagePassing):
     def __init__(self, in_channels: Union[int, Tuple[int, int]],
                  out_channels: int, heads: int = 1, concat: bool = True,
                  negative_slope: float = 0.2, dropout: float = 0.0,
-                 add_self_loops: bool = True, bias: bool = True, **kwargs):
+                 add_self_loops: bool = False, bias: bool = True, **kwargs):
         kwargs.setdefault('aggr', 'add')
         super(SimAttConv, self).__init__(node_dim=0, **kwargs)
 
@@ -269,6 +269,7 @@ class SimAttConv(MessagePassing):
                 edge_index = set_diag(edge_index)
 
         # propagate_type: (x: OptPairTensor, alpha: OptPairTensor)
+
         out = self.propagate(edge_index, x=(x_l, x_r),
                              alpha=(alpha_l, alpha_r), edge_weight=edge_weight, size=size)
 
@@ -521,6 +522,9 @@ class GUIDE(nn.Module):
         lap = laplacian(sim)
         print(f"Similarity matrix nonzero entries: {torch.count_nonzero(sim_edge_weight)}")
 
+
+
+
         # print("Get laplacians for IFG calculations...")
         # print("Calculating laplacians...(this may take a while for pokec_n)")
         # lap_list, m_list, avgSimD_list = calculate_group_lap(sim, sens)
@@ -616,9 +620,9 @@ class GUIDE(nn.Module):
 
                 
         print(f"--------------------Training GUIDE--------------------------")
+
         for epoch in range(epochs+1):
             t = time.time()
-            
             ################################Training################################
             
             self.train()
@@ -701,6 +705,12 @@ class GUIDE(nn.Module):
         output_preds = (output.squeeze()>0).type_as(self.labels)
         auc_roc_test = roc_auc_score(self.labels.cpu().numpy()[self.idx_test.cpu().numpy()], output.detach().cpu().numpy()[self.idx_test.cpu().numpy()])
 
+
+
+        F1 = f1_score(self.labels.cpu().numpy()[self.idx_test.cpu().numpy()], output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()], average='micro')
+        ACC=accuracy_score(output.detach().cpu().numpy()[self.idx_test.cpu().numpy()], output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],)
+        AUCROC=roc_auc_score(self.labels[idx_test], output_preds)
+
         individual_unfairness = torch.trace( torch.mm( output.t(), torch.sparse.mm(self.lap, output) ) ).item()
         f_u1 = torch.trace(torch.mm(output.t(), torch.sparse.mm(self.lap_1, output)))/self.m_u1
         f_u1 = f_u1.item()
@@ -718,7 +728,7 @@ class GUIDE(nn.Module):
         print(f'Individual Unfairness for Group 2: {f_u2}')
         print(f'GDIF: {GDIF}')
 
-        return output, self.labels, self.idx_test
+        return F1, ACC, AUCROC, individual_unfairness, GDIF
 
 
 

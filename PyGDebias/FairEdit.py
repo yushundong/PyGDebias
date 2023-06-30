@@ -57,7 +57,6 @@ from tqdm import tqdm
 from torch_geometric.data import Data, Batch
 from torch_geometric.nn import MessagePassing
 from torch_geometric.utils import k_hop_subgraph, to_networkx, sort_edge_index, dense_to_sparse, to_dense_adj
-from dataset import process_german_bail_credit
 from ismember import ismember
 
 EPS = 1e-15
@@ -165,25 +164,6 @@ class APPNP(torch.nn.Module):
         x = self.prop1(x, edge_index)
         return x
 
-class Encoder_DGI(nn.Module):
-    def __init__(self, nfeat, nhid):
-        super(Encoder_DGI, self).__init__()
-        self.hidden_ch = nhid
-        self.conv = spectral_norm(GCNConv(nfeat, self.hidden_ch))
-        self.activation = nn.PReLU()
-
-    def corruption(self, x, edge_index):
-        # corrupted features are obtained by row-wise shuffling of the original features
-        # corrupted graph consists of the same nodes but located in different places
-        return x[torch.randperm(x.size(0))], edge_index
-
-    def summary(self, z, *self, **kwself):
-        return torch.sigmoid(z.mean(dim=0))
-
-    def forward(self, x, edge_index):
-        x = self.conv(x, edge_index)
-        x = self.activation(x)
-        return x
 
 
 class Encoder(torch.nn.Module):
@@ -671,6 +651,7 @@ class fair_edit_trainer():
         masked_scores = scores * to_add
         masked_scores = torch.triu(masked_scores, diagonal=1)
         num_non_zero = torch.count_nonzero(masked_scores)
+
         edits_to_make = floor(N**2 * add_prob)
         if num_non_zero < edits_to_make:
             edits_to_make = num_non_zero
@@ -680,6 +661,8 @@ class fair_edit_trainer():
         end = torch.cat((base_end, base_start))
         start = torch.cat((base_start, base_end))
         add_indices = torch.stack([end, start])
+
+
 
         return delete_indices, add_indices
 
@@ -711,7 +694,7 @@ class fair_edit_trainer():
         grad_gen = GNNExplainer(self.model)
 
         # perturb graph (return the ACTUAL edges)
-        deleted_edges, added_edges = self.add_drop_edge_random()
+        deleted_edges, added_edges = self.add_drop_edge_random(add_prob=0.5)
         # get indices of pertubations in edge list (indices in particular edge_lists)
         del_indices, add_indices = self.perturb_graph(deleted_edges, added_edges)
         # generate gradients on these perturbations
@@ -720,37 +703,41 @@ class fair_edit_trainer():
         deleted_grads = edge_mask[del_indices]
 
         # figure out which perturbations were best
-        best_add_score = torch.min(added_grads)
-        best_add_idx = torch.argmin(added_grads)
-        best_add = added_edges[:, best_add_idx]
+        #print('addedge',added_edges)
 
+        add=False
+
+        if add:
+            best_add_score = torch.min(added_grads)
+            best_add_idx = torch.argmin(added_grads)
+            best_add = added_edges[:, best_add_idx]
+
+        # we want to add edge since better
+            if best_add_score < best_delete_score:
+                # add both directions since undirected graph
+                best_add_comp = torch.tensor([[best_add[1]], [best_add[0]]]).cuda()
+                self.edge_index = torch.cat((self.edge_index, best_add.view(2, 1), best_add_comp), axis=1)
+        #else: # delete
         best_delete_score = torch.min(deleted_grads)
         best_delete_idx = torch.argmin(deleted_grads)
         best_delete = deleted_edges[:, best_delete_idx]
+        val_del = (self.edge_index == torch.tensor([[best_delete[1]], [best_delete[0]]]).cuda())
+        sum_del = torch.sum(val_del, dim=0).cuda()
+        col_idx_del = np.where(sum_del.cpu() == 2)[0][0]
+        self.edge_index = torch.cat((self.edge_index[:, :col_idx_del], self.edge_index[:, col_idx_del+1:]), axis=1)
 
-        # we want to add edge since better
-        if best_add_score < best_delete_score:
-            # add both directions since undirected graph
-            best_add_comp = torch.tensor([[best_add[1]], [best_add[0]]]).cuda()
-            self.edge_index = torch.cat((self.edge_index, best_add.view(2, 1), best_add_comp), axis=1)
-        else: # delete
-            val_del = (self.edge_index == torch.tensor([[best_delete[1]], [best_delete[0]]]).cuda())
-            sum_del = torch.sum(val_del, dim=0).cuda()
-            col_idx_del = np.where(sum_del.cpu() == 2)[0][0]
-            self.edge_index = torch.cat((self.edge_index[:, :col_idx_del], self.edge_index[:, col_idx_del+1:]), axis=1)
-
-            best_delete_comp = torch.tensor([[best_delete[1]], [best_delete[0]]]).cuda()
-            val_del_comp = (self.edge_index == torch.tensor([[best_delete_comp[1]], [best_delete_comp[0]]]).cuda())
-            sum_del_comp = torch.sum(val_del_comp, dim=0).cuda()
-            col_idx_del_comp = np.where(sum_del_comp.cpu() == 2)[0][0]
-            self.edge_index = torch.cat((self.edge_index[:, :col_idx_del_comp], self.edge_index[:, col_idx_del_comp+1:]), axis=1)
+        best_delete_comp = torch.tensor([[best_delete[1]], [best_delete[0]]]).cuda()
+        val_del_comp = (self.edge_index == torch.tensor([[best_delete_comp[1]], [best_delete_comp[0]]]).cuda())
+        sum_del_comp = torch.sum(val_del_comp, dim=0).cuda()
+        col_idx_del_comp = np.where(sum_del_comp.cpu() == 2)[0][0]
+        self.edge_index = torch.cat((self.edge_index[:, :col_idx_del_comp], self.edge_index[:, col_idx_del_comp+1:]), axis=1)
 
     def train(self, epochs=200):
 
         best_loss = 100
         best_acc = 0
 
-        for epoch in range(epochs):
+        for epoch in tqdm(range(epochs)):
             self.model.train()
             self.optimizer.zero_grad()
             output = self.model(self.features, self.edge_index)
@@ -769,10 +756,13 @@ class fair_edit_trainer():
 
             # Binary Cross-Entropy
             preds = (output.squeeze()>0).type_as(self.labels)
-            loss_val = F.binary_cross_entropy_with_logits(output[self.val_idx ], self.labels[self.val_idx ].unsqueeze(1).float().to(self.device))
+            loss_val = F.binary_cross_entropy_with_logits(output[self.val_idx ], self.labels[self.val_idx ].unsqueeze(1).float().to(self.device)).item()
 
 
-            f1_val = f1_score(self.labels[self.val_idx ].cpu().numpy(), preds[self.val_idx ].cpu().numpy())
+            acc_val = accuracy_score(self.labels[self.val_idx ].cpu().numpy(), preds[self.val_idx ].cpu().numpy())
+            #loss_val=-acc_val
+
+
             #           Counter factual fairness
             counter_output = self.model(self.counter_features.to(self.device),self.edge_index.to(self.device))
             counter_preds = (counter_output.squeeze()>0).type_as(self.labels)
@@ -785,35 +775,72 @@ class fair_edit_trainer():
             parity, equality = fair_metric(preds[self.val_idx].cpu().numpy(), self.labels[self.val_idx].cpu().numpy(), self.sens[self.val_idx].numpy())
 
             if epoch < self.edit_num:
-                print(epoch)
                 self.fair_graph_edit()
 
 
-            if loss_val.item() < best_loss:
-                best_loss = loss_val.item()
+            if loss_val < best_loss:
+                best_loss = loss_val
                 #torch.save(self.model.state_dict(), 'results/weights/{0}_{1}_{2}.pt'.format(self.model_name, 'fairedit', self.dataset))
 
                 # Report
                 idx_test=self.test_idx
-                labels=self.labels
+                labels=self.labels.detach().cpu().numpy()
                 sens=self.sens
-                output_preds = (output.squeeze() > 0).type_as(labels)
-                counter_output_preds = (counter_output.squeeze() > 0).type_as(labels)
-                noisy_output_preds = (noisy_output.squeeze() > 0).type_as(labels)
-                auc_roc_test = roc_auc_score(labels.cpu().numpy()[idx_test.cpu()],
-                                             output.detach().cpu().numpy()[idx_test.cpu()])
+                output_preds = (output.squeeze() > 0).type_as(self.labels)[idx_test].detach().cpu().numpy()
+                #counter_output_preds = (counter_output.squeeze() > 0).type_as(labels)
+                #noisy_output_preds = (noisy_output.squeeze() > 0).type_as(labels)
 
-                parity_s, equality_s = fair_metric(output_preds[idx_test].cpu().numpy(), labels[idx_test].cpu().numpy(),
-                                               sens[idx_test].numpy())
-                f1_s = f1_score(labels[idx_test].cpu().numpy(), output_preds[idx_test].cpu().numpy())
+                #auc_roc_test = roc_auc_score(labels.cpu().numpy()[idx_test.cpu()],
+                #                             output.detach().cpu().numpy()[idx_test.cpu()])
+#
+                #parity_s, equality_s = fair_metric(output_preds[idx_test].cpu().numpy(), labels[idx_test].cpu().numpy(),
+                #                               sens[idx_test].numpy())
+                #f1_s = f1_score(labels[idx_test].cpu().numpy(), output_preds[idx_test].cpu().numpy())
+#
+                #acc_s= torch.eq(labels[idx_test],output_preds[idx_test]).cpu().float().mean().item()
 
-                acc_s= torch.eq(labels[idx_test],output_preds[idx_test]).cpu().float().mean().item()
+                F1 = f1_score(labels[idx_test], output_preds, average='micro')
+                ACC=accuracy_score(labels[idx_test], output_preds,)
+                AUCROC=roc_auc_score(labels[idx_test], output_preds)
+
+                ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1=self.predict_sens_group(output_preds, idx_test)
+
+
+                SP, EO=self.fair_metric(output_preds, self.labels[idx_test].detach().cpu().numpy(), self.sens[idx_test].detach().cpu().numpy())
+
+        self.val_loss=best_loss
+        return ACC, AUCROC, F1, ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1, SP, EO
 
 
 
-        print("== f1: {} fair: {} robust: {}, parity:{} equility: {}".format(f1_val,fair_score,robustness_score,parity,equality))
-        return auc_roc_test, f1_s ,acc_s,parity_s, equality_s
+        #print("== f1: {} fair: {} robust: {}, parity:{} equility: {}".format(f1_val,fair_score,robustness_score,parity,equality))
+        #return auc_roc_test, f1_s ,acc_s,parity_s, equality_s
 
+
+    def fair_metric(self, pred, labels, sens):
+
+
+        idx_s0 = sens == 0
+        idx_s1 = sens == 1
+        idx_s0_y1 = np.bitwise_and(idx_s0, labels == 1)
+        idx_s1_y1 = np.bitwise_and(idx_s1, labels == 1)
+        parity = abs(sum(pred[idx_s0]) / sum(idx_s0) -
+                     sum(pred[idx_s1]) / sum(idx_s1))
+        equality = abs(sum(pred[idx_s0_y1]) / sum(idx_s0_y1) -
+                       sum(pred[idx_s1_y1]) / sum(idx_s1_y1))
+        return parity.item(), equality.item()
+
+    def predict_sens_group(self, output, idx_test):
+        #pred = self.lgreg.predict(self.embs[idx_test])
+        pred=output
+        result=[]
+        for sens in [0,1]:
+            F1 = f1_score(self.labels[idx_test][self.sens[idx_test]==sens].detach().cpu().numpy(), pred[self.sens[idx_test]==sens], average='micro')
+            ACC=accuracy_score(self.labels[idx_test][self.sens[idx_test]==sens].detach().cpu().numpy(), pred[self.sens[idx_test]==sens],)
+            AUCROC=roc_auc_score(self.labels[idx_test][self.sens[idx_test]==sens].detach().cpu().numpy(), pred[self.sens[idx_test]==sens])
+            result.extend([ACC, AUCROC, F1])
+
+        return result
 
 
 def fair_metric(pred, labels, sens):
@@ -1022,7 +1049,7 @@ def sparse_mx_to_torch_sparse_tensor(sparse_mx):
 
 
 class FairEdit():
-    def fit(self,adj, features, labels, idx_train, idx_val, idx_test, sens, sens_idx, model_name='gcn', epochs=500, lr=1e-3, weight_decay=5e-4, hidden=16, dropout=0.5):
+    def fit(self,adj, features, labels, idx_train, idx_val, idx_test, sens, sens_idx, model_name='gcn', epochs=100, lr=1e-3, weight_decay=5e-4, hidden=16, dropout=0.5, edit_num=10):
         self.model_name=model_name
         self.epochs=epochs
         self.lr=lr
@@ -1037,8 +1064,8 @@ class FairEdit():
         norm_features[:, sens_idx] = features[:, sens_idx]
         features = norm_features
 
-        edge_index = convert.from_scipy_sparse_matrix(adj)[0]
-        num_class = labels.unique().shape[0] - 1
+        edge_index = convert.from_scipy_sparse_matrix(sp.coo_matrix(adj.to_dense().numpy()))[0]
+        num_class = 1#labels.unique().shape[0] - 1
 
         #### Load Models ####
         if self.model_name == 'gcn':
@@ -1066,16 +1093,18 @@ class FairEdit():
         labels = labels.to(device)
 
 
-        trainer = fair_edit_trainer(model=model, dataset=self.dataset, optimizer=optimizer,
+        trainer = fair_edit_trainer(model=model, dataset=None, optimizer=optimizer,
                                     features=features, edge_index=edge_index,
                                     labels=labels, device=device, train_idx=idx_train,
-                                    val_idx=idx_val, sens_idx=sens_idx, sens=sens, test_idx=idx_test)
-        auc_roc_test, f1_s, acc_s, parity_s, equality_s = trainer.train(epochs=self.epochs)
+                                    val_idx=idx_val, sens_idx=sens_idx, sens=sens, test_idx=idx_test, edit_num=edit_num)
+
+
             # moved up because training epochs are already incorporated into nifty
         self.trainer=trainer
 
 
     def predict(self):
-        auc_roc_test, f1_s, acc_s, parity_s, equality_s = self.trainer.train(epochs=1)
-        return auc_roc_test, f1_s, acc_s, parity_s, equality_s
+        ACC, AUCROC, F1, ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1, SP, EO = self.trainer.train(epochs=100)
+        self.val_loss=self.trainer.val_loss
+        return ACC, AUCROC, F1, ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1, SP, EO
 
