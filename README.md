@@ -2,8 +2,11 @@
 <img src="./PyGDebias.jpg" width = "300" height = "100" alt="图片名称" align=center />
 </div>
 
-![GitHub](https://img.shields.io/github/license/yushundong/PyGDebias)
+![GitHub Repo stars](https://img.shields.io/github/stars/yushundong/PyGDebias)
+![GitHub forks](https://img.shields.io/github/forks/yushundong/pygdebias)
+![GitHub watchers](https://img.shields.io/github/watchers/yushundong/pygdebias)
 ![GitHub all releases](https://img.shields.io/github/downloads/yushundong/PyGDebias/total)
+![GitHub](https://img.shields.io/github/license/yushundong/PyGDebias)
 
 
 
