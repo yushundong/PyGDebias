@@ -8,8 +8,7 @@
 ![GitHub all releases](https://img.shields.io/github/downloads/yushundong/PyGDebias/total)
 ![GitHub](https://img.shields.io/github/license/yushundong/PyGDebias)
 
-
-
+-------------------
 
 # Open-source Library *PyGDebias*: Graph Datasets and Fairness-Aware Graph Mining Algorithms
 
