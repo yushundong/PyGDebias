@@ -10,11 +10,9 @@
 
 -------------------
 
-# Open-source Library *PyGDebias*: Graph Datasets and Fairness-Aware Graph Mining Algorithms
+# *PyGDebias*: Attributed Network Datasets and Fairness-Aware Graph Mining Algorithms
 
 
-## Paper
-Open-source library *PyGDebias* from the paper "Fairness in Graph Mining: A Survey" [\[PDF\]](http://yushundong.github.io/files/fairness_survey.pdf).
 
 
 
@@ -29,7 +27,7 @@ Specifically, this open-source library *PyGDebias* aims to provide a systematic 
 
 ## Citation
 
-Our survey paper has been released on arxiv [\[PDF\]](http://yushundong.github.io/files/fairness_survey.pdf). If you find *PyGDebias* helpful, we would appreciate citations to the following paper:
+Our survey paper "Fairness in Graph Mining: A Survey" has been released on arxiv [\[PDF\]](http://yushundong.github.io/files/fairness_survey.pdf). If you find *PyGDebias* helpful, we would appreciate citations to the following paper:
 
 ```
 @article{dong2022fairness,
