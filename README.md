@@ -7,14 +7,14 @@
 ![GitHub Repo stars](https://img.shields.io/github/stars/yushundong/PyGDebias)
 ![GitHub forks](https://img.shields.io/github/forks/yushundong/pygdebias)
 ![GitHub watchers](https://img.shields.io/github/watchers/yushundong/pygdebias)
-![GitHub all releases](https://img.shields.io/github/downloads/yushundong/PyGDebias/total)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/yushundong/pygdebias)
 ![GitHub repo file count (file type)](https://img.shields.io/github/directory-file-count/yushundong/pygdebias)
 ![GitHub repo size](https://img.shields.io/github/repo-size/yushundong/pygdebias)
-![GitHub issues](https://img.shields.io/github/issues/yushundong/pygdebias)
-![GitHub closed issues](https://img.shields.io/github/issues-closed/yushundong/pygdebias)
 ![GitHub milestones](https://img.shields.io/github/milestones/all/yushundong/pygdebias)
 ![GitHub release (release name instead of tag name)](https://img.shields.io/github/v/release/yushundong/pygdebias)
+![GitHub all releases](https://img.shields.io/github/downloads/yushundong/PyGDebias/total)
+![GitHub issues](https://img.shields.io/github/issues/yushundong/pygdebias)
+![GitHub closed issues](https://img.shields.io/github/issues-closed/yushundong/pygdebias)
 ![GitHub](https://img.shields.io/github/license/yushundong/pygdebias)
 
 
