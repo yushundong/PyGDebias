@@ -1,3 +1,5 @@
+
+
 <div  align="center">    
 <img src="./docs/pygdebias.png" width = "600" height = "200" alt="pygdebias" align=center />
 </div>
@@ -6,16 +8,33 @@
 ![GitHub forks](https://img.shields.io/github/forks/yushundong/pygdebias)
 ![GitHub watchers](https://img.shields.io/github/watchers/yushundong/pygdebias)
 ![GitHub all releases](https://img.shields.io/github/downloads/yushundong/PyGDebias/total)
-[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+![GitHub](https://img.shields.io/github/license/yushundong/pygdebias)
+
+- [*PyGDebias*: Attributed Network Datasets and Fairness-Aware Graph Mining Algorithms](#pygdebias-attributed-network-datasets-and-fairness-aware-graph-mining-algorithms)
+  - [1. Citation](#1-citation)
+  - [2. API Cheatsheet](#2-api-cheatsheet)
+  - [3. Installations](#3-installations)
+    - [3.1 Manually](#31-manually)
+    - [3.2 `pip`/`conda` (**currently not available**)](#32-pipconda-currently-not-available)
+  - [4. Usage \& Examples](#4-usage--examples)
+  - [5. Collected Datasets](#5-collected-datasets)
+  - [6. Collected Algorithms](#6-collected-algorithms)
+  - [7. Performance Leaderboards](#7-performance-leaderboards)
+      - [7.1  Group Fairness](#71--group-fairness)
+        - [7.1.1 GNN-based ones:](#711-gnn-based-ones)
+        - [7.1.2 Non-GNN-based ones:](#712-non-gnn-based-ones)
+      - [7.2 Counterfactual Fairness](#72-counterfactual-fairness)
+      - [7.3 Individual Fairness](#73-individual-fairness)
+      - [7.4 Degree-Related Fairness](#74-degree-related-fairness)
+  - [How to contribute](#how-to-contribute)
+  - [Authors \& Acknowledgements](#authors--acknowledgements)
+  - [10. Contact](#10-contact)
+  - [11. References](#11-references)
+
 
 -------------------
 
 # *PyGDebias*: Attributed Network Datasets and Fairness-Aware Graph Mining Algorithms
-
-
-
-
-
 
 
 Graph mining algorithms have been playing a critical role in a plethora of areas. However, most of the existing ones lack fairness consideration. Consequently, they may deliver biased predictions toward certain demographic subgroups or individuals. To better understand existing debiasing techniques and facilitate the deployment of fairness-aware graph mining algorithms, we developed this library *PyGDebias* featured for built-in datasets and implementations of popular fairness-aware graph mining algorithms for the study of algorithmic fairness on graphs.
@@ -25,7 +44,7 @@ Graph mining algorithms have been playing a critical role in a plethora of areas
 Specifically, this open-source library *PyGDebias* aims to provide a systematic schema to load datasets and compare different debiasing techniques for graph learning algorithms. Specifically, 26 graph datasets (including 24 commonly used ones and two newly constructed ones, AMiner-L and AMiner-S) are collected, and 13 algorithms are implemented in this library.
 
 
-## Citation
+## 1. Citation
 
 Our survey paper "Fairness in Graph Mining: A Survey" has been released on arxiv [\[PDF\]](http://yushundong.github.io/files/fairness_survey.pdf). If you find *PyGDebias* helpful, we would appreciate citations to the following paper:
 
@@ -44,10 +63,7 @@ or:
 Dong, Y., Ma, J., Chen, C., & Li, J. (2022). Fairness in Graph Mining: A Survey. arXiv preprint arXiv:2204.09888.
 ```
 
-
-
-
-## API Cheatsheet
+## 2. API Cheatsheet
 
 We summarize the basic API of the implemented graph mining algorithms as below.
 
@@ -57,7 +73,36 @@ We summarize the basic API of the implemented graph mining algorithms as below.
 
 
 
-## Usage & Examples
+## 3. Installations
+
+Here, we provide guidelines for setting up the library. There are basically 2 ways to install it
+
+TODO: requirements.txt at the end
+
+next step: datasets (command preprocessing)
+
+### 3.1 Manually
+
+```bash
+# Set up the environment
+conda create -n PyGDebias python=3.8
+conda activate PyGDebias
+
+# Installation
+git clone https://github.com/yushundong/PyGDebias.git && cd PyGDebias
+pip install -r requirements.txt
+# Enjoy it!
+```
+
+### 3.2 `pip`/`conda` (**currently not available**)
+
+```bash
+pip install PyGdebias
+# or use conda insdead
+conda install PyGdebias
+```
+
+## 4. Usage & Examples
 
 
 
@@ -81,82 +126,83 @@ model.predict()
 
 
 
-## Collected Datasets
+## 5. Collected Datasets
 
 26 graph datasets are collected in this library, including 24 commonly used ones and two newly constructed ones (Aminer-L and Aminer-S).
 We provide their descriptions as follows.
--  Facebook: Facebook has anonymized features for each node representative of various attributes of a person’s Facebook profile.
--  Pokec_z & Pokec_n:  The two datasets are sampled from Pokec by province. Pokec contains anonymized data of the whole social network in 2012, in which the profiles contain gender, age, hobbies, interest, education, working field and etc.
--    NBA: This dataset is an extension of a Kaggle dataset containing around 400 NBA basketball players. Features include the performance statistics of players in the 2016-2017 season and other various information e.g., nationality, age, and salary.
--   German: The dataset is a credit graph which has 1,000 nodes representing clients in a German bank that are connected based on the similarity of their credit accounts.
--   Credit: Credit contains individuals which are connected based on the similarity of their spending and payment patterns.
-- Recidivism: Recidivism has 18,876 nodes representing defendants who got released on bail at the U.S state courts during 1990-2009, where defendants are connected based on the similarity of past criminal records and demographics.
--  Google+: The dataset is created by data collected from a social networking platform developed by Google.
--  AMiner-L & AMiner-S: **AMiner-L** and **AMiner-S** are co-author networks with sensitive attributes ready for algorithmic fairness study on graphs. Specifically, we construct AMiner-L (titled 'LCC' in our built-in data loader) and AMiner-S (titled 'LCC_small' in our built-in data loader) based on the AMiner network [1]. To construct the two datasets, we first filter out the nodes in the AMiner network with incomplete information. Then we adopt two different approaches to sample a connected network from the filtered dataset: AMiner-L is a subgraph sampled with random walk, while AMiner-S is the largest connected component of the filtered AMiner network. In both datasets, nodes represent the researchers in different fields, and edges denote the co-authorship between researchers. The sensitive attribute is the continent of the affiliation each researcher belongs to, and the labels of nodes represent the primary research field of each researcher. 
--    Cora: The Cora dataset is a collection of computer science research papers categorized into different topics.
--  Citeseer: The CiteSeer dataset is a digital library of scientific articles, primarily focused on computer science, featuring citation relationships and widely utilized for research in information retrieval and citation network analysis.
--   Pubmed: Pubmed contains citation networks that consider articles as nodes and descriptions of articles as their nodal attributes.
--   Amazon: The dataset constitutes a respective knowledge graph with entities and relations crawled from Amazon. The collection consists of four different domains: CDs and Vinyl, Clothing, Cell Phones, and Beauty.
--    Yelp: The Yelp dataset is a large collection of user-generated reviews and associated ratings for businesses, encompassing various industries and geographical locations.
--    Ciao: The Ciao dataset is a comprehensive collection of product reviews and ratings from the Ciao shopping website.
--    DBLP: The DBLP dataset is a bibliographic database containing computer science research publications, authors, and their relationships.
-- Filmtrust: The Filmtrust dataset is a collection of movie ratings and trust relationships between users.
--   Lastfm: The Last.fm dataset is a music dataset that contains user listening histories, artist information, and user preferences.
--   ML100k: The ML-100K dataset is a widely used benchmark dataset in the field of recommender systems, containing movie ratings and user information for evaluating collaborative filtering algorithms.
--    ML1m: The ML-1M dataset is a movie rating dataset that contains one million ratings from users on various movies.
--   ML20m: The ML-20M dataset is a larger movie rating dataset consisting of 20 million ratings from users on a vast collection of movies.
-- Oklahoma: Oklahoma is a dataset composed of social networks of the University of Oklahoma. A link represents a friendship relation in
+
+-  **Facebook**: Facebook has anonymized features for each node representative of various attributes of a person’s Facebook profile.
+-  **Pokec_z & Pokec_n**:  The two datasets are sampled from Pokec by province. Pokec contains anonymized data of the whole social network in 2012, in which the profiles contain gender, age, hobbies, interest, education, working field and etc.
+-    **NBA**: This dataset is an extension of a Kaggle dataset containing around 400 NBA basketball players. Features include the performance statistics of players in the 2016-2017 season and other various information e.g., nationality, age, and salary.
+-   **German**: The dataset is a credit graph which has 1,000 nodes representing clients in a German bank that are connected based on the similarity of their credit accounts.
+-   **Credit**: Credit contains individuals which are connected based on the similarity of their spending and payment patterns.
+- **Recidivism**: Recidivism has 18,876 nodes representing defendants who got released on bail at the U.S state courts during 1990-2009, where defendants are connected based on the similarity of past criminal records and demographics.
+-  **Google+**: The dataset is created by data collected from a social networking platform developed by Google.
+-  **AMiner-L** & **AMiner-S**: **AMiner-L** and **AMiner-S** are co-author networks with sensitive attributes ready for algorithmic fairness study on graphs. Specifically, we construct AMiner-L (titled 'LCC' in our built-in data loader) and AMiner-S (titled 'LCC_small' in our built-in data loader) based on the AMiner network [1]. To construct the two datasets, we first filter out the nodes in the AMiner network with incomplete information. Then we adopt two different approaches to sample a connected network from the filtered dataset: AMiner-L is a subgraph sampled with random walk, while AMiner-S is the largest connected component of the filtered AMiner network. In both datasets, nodes represent the researchers in different fields, and edges denote the co-authorship between researchers. The sensitive attribute is the continent of the affiliation each researcher belongs to, and the labels of nodes represent the primary research field of each researcher. 
+-    **Cora**: The Cora dataset is a collection of computer science research papers categorized into different topics.
+-  **Citeseer**: The CiteSeer dataset is a digital library of scientific articles, primarily focused on computer science, featuring citation relationships and widely utilized for research in information retrieval and citation network analysis.
+-   **Pubmed**: Pubmed contains citation networks that consider articles as nodes and descriptions of articles as their nodal attributes.
+-   **Amazon**: The dataset constitutes a respective knowledge graph with entities and relations crawled from Amazon. The collection consists of four different domains: CDs and Vinyl, Clothing, Cell Phones, and Beauty.
+-    **Yelp**: The Yelp dataset is a large collection of user-generated reviews and associated ratings for businesses, encompassing various industries and geographical locations.
+-    **Ciao**: The Ciao dataset is a comprehensive collection of product reviews and ratings from the Ciao shopping website.
+-    **DBLP**: The DBLP dataset is a bibliographic database containing computer science research publications, authors, and their relationships.
+- **Filmtrust**: The Filmtrust dataset is a collection of movie ratings and trust relationships between users.
+-   **Lastfm**: The Last.fm dataset is a music dataset that contains user listening histories, artist information, and user preferences.
+-   **ML100k**: The ML-100K dataset is a widely used benchmark dataset in the field of recommender systems, containing movie ratings and user information for evaluating collaborative filtering algorithms.
+-    **ML1m**: The ML-1M dataset is a movie rating dataset that contains one million ratings from users on various movies.
+-   **ML20m**: The ML-20M dataset is a larger movie rating dataset consisting of 20 million ratings from users on a vast collection of movies.
+- **Oklahoma**: Oklahoma is a dataset composed of social networks of the University of Oklahoma. A link represents a friendship relation in
 social media, and every user has a profile for vertex features, including student/faculty status, gender, and major,
--   UNC: UNC is a dataset of social networks in the University of North Carolina at Chapel Hill.
+-   **UNC**: UNC is a dataset of social networks in the University of North Carolina at Chapel Hill.
 
 
 We provide their statistics as follows.
 
-|            |               #Nodes               |   #Edges   | #Features |
-| :--------: | :--------------------------------: | :--------: | :-------: |
-|  Facebook  |               1,045                |   53,498   |    573    |
-|  Pokec_z   |               67,796               |  882,765   |    276    |
-|  Pokec_n   |               66,569               |  729,129   |    265    |
-|    NBA     |                403                 |   16,570   |    95     |
-|   German   |               1,000                |   24,970   |    27     |
-|   Credit   |               30,000               |  200,526   |    13     |
-| Recidivism |               18,876               |  403,977   |    18     |
-|  Google+   |              290,468               |   3,601    |   2,532   |
-|  AMiner-L  |              129,726               |  591,039   |   5,694   |
-|  AMiner-S  |               39,424               |   52,460   |   5,694   |
-|    Cora    |               2,708                |   4,751    |   1,433   |
-|  Citeseer  |               3,312                |   4,194    |   3,703   |
-|   Pubmed   |               19,717               |   88,648   |    500    |
-|   Amazon   |       2,549 (item) 2 (genre)       |   2,549    |    N/A    |
-|    Yelp    |       2,834 (item) 2 (genre)       |   2,834    |    N/A    |
-|    Ciao    |  7,375 (user)  106,797 (product)   |   57,544   |    N/A    |
-|    DBLP    |  22,166 (user)  296,277 (product)  |  355,813   |    N/A    |
-| Filmtrust  |     1,508 (user) 2,071 (item)      |   35,497   |    N/A    |
-|   Lastfm   | 1,892 (customer) 17,632 (producer) |   92,800   |    N/A    |
-|   ML100k   |      943 (user) 1,682 (item)       |  100,000   |     4     |
-|    ML1m    |     6,040 (user) 3,952 (item)      | 1,000,209  |     4     |
-|   ML20m    |    138,493 (user) 27,278 (item)    | 20,000,263 |    N/A    |
-|  Oklahoma  |               3,111                |   73,230   |    N/A    |
-|    UNC     |               4,018                |   65,287   |    N/A    |
+|                |               #Nodes               |   #Edges   | #Features |
+| :------------: | :--------------------------------: | :--------: | :-------: |
+|  **Facebook**  |               1,045                |   53,498   |    573    |
+|  **Pokec_z**   |               67,796               |  882,765   |    276    |
+|  **Pokec_n**   |               66,569               |  729,129   |    265    |
+|    **NBA**     |                403                 |   16,570   |    95     |
+|   **German**   |               1,000                |   24,970   |    27     |
+|   **Credit**   |               30,000               |  200,526   |    13     |
+| **Recidivism** |               18,876               |  403,977   |    18     |
+|  **Google**+   |              290,468               |   3,601    |   2,532   |
+|  **AMiner-L**  |              129,726               |  591,039   |   5,694   |
+|  **AMiner-S**  |               39,424               |   52,460   |   5,694   |
+|    **Cora**    |               2,708                |   4,751    |   1,433   |
+|  **Citeseer**  |               3,312                |   4,194    |   3,703   |
+|   **Pubmed**   |               19,717               |   88,648   |    500    |
+|   **Amazon**   |       2,549 (item) 2 (genre)       |   2,549    |    N/A    |
+|    **Yelp**    |       2,834 (item) 2 (genre)       |   2,834    |    N/A    |
+|    **Ciao**    |  7,375 (user)  106,797 (product)   |   57,544   |    N/A    |
+|    **DBLP**    |  22,166 (user)  296,277 (product)  |  355,813   |    N/A    |
+| **Filmtrust**  |     1,508 (user) 2,071 (item)      |   35,497   |    N/A    |
+|   **Lastfm**   | 1,892 (customer) 17,632 (producer) |   92,800   |    N/A    |
+|   **ML100k**   |      943 (user) 1,682 (item)       |  100,000   |     4     |
+|    **ML1m**    |     6,040 (user) 3,952 (item)      | 1,000,209  |     4     |
+|   **ML20m**    |    138,493 (user) 27,278 (item)    | 20,000,263 |    N/A    |
+|  **Oklahoma**  |               3,111                |   73,230   |    N/A    |
+|    **UNC**     |               4,018                |   65,287   |    N/A    |
 
 
 
 
-## Collected Algorithms
+## 6. Collected Algorithms
 
 13 different methods in total are implemented in this library. We provide an overview of their characteristics as follows.
-- FairGNN: FairGNN is a GNN model designed to address fairness issues in graph-based tasks by incorporating fairness regularization techniques, ensuring equitable treatment of different groups in the learned representations and predictions.
-- EDITS: EDITS approximates the inputs’ discrimination via Wasserstein distance and directly minimizes it between sensitive and nonsensitive groups by pruning the graph topology and node features.
-- CrossWalk:  CrossWalk is a method that enhances fairness in graph algorithms by biasing random walks to cross group boundaries and extends the range of the weighting including multi-hop neighbors.
-- UGE: UGE learns node embeddings from an underlying bias-free graph, which is not influenced by sensitive node attributes to deal with the unbiased graph embedding problem.
-- FairVGNN: FairVGNN is an advanced model that intelligently masks feature channels linked to sensitive attributes and dynamically fine-tunes encoder weights to reduce the impact of sensitive information, resulting in a fairer and unbiased machine learning algorithm.
-- FairEdit: NIFTY goes beyond simply removing biases from the input graph during training. It takes a proactive approach by introducing artificial nodes and edges to address biases comprehensively, resulting in a more balanced and unbiased learning process.
-- NIFTY: NIFTY is a groundbreaking approach designed to improve counterfactual fairness and stability of node representations. It achieves this through the utilization of a novel triplet-based objective function and layer-wise weight normalization using the Lipschitz constant, ensuring enhanced performance and reliability.
-- GEAR: GEAR tackles graph unfairness through two key mechanisms: counterfactual graph augmentation and an adversarial learning approach that focuses on learning embeddings that are insensitive to sensitive attributes. These techniques collectively contribute to the effective mitigation of unfairness in graph-based models.
-- InFoRM: InFoRM utilizes the similarity matrix of nodes to assess the individual fairness of GNNs. By incorporating a variant of the (d1, d2)-Lipschitz property, it addresses the challenge of achieving individual fairness solely based on node features, considering the interconnectedness of nodes in a graph.
-- REDRESS: REDRESS introduces a plug-and-play framework that leverages individual fairness measures from a ranking perspective. This approach optimizes the training of Graph Neural Networks (GNNs) to simultaneously maximize utility and promote ranking-based individual fairness. By learning to rank, the framework ensures consistent relative ranking orders of node pairs in both input and output spaces.
-- GUIDE: GUIDE is an innovative GNN framework that leverages the similarity matrix of individuals to learn personalized attention mechanisms. This enables the achievement of individual fairness while minimizing disparities at the group level.
-- RawlsGCN: RawlsGCN integrates the Rawlsian difference principle into GCN, mitigating degree-related unfairness and improving its overall performance.
+- **FairGNN**: FairGNN is a GNN model designed to address fairness issues in graph-based tasks by incorporating fairness regularization techniques, ensuring equitable treatment of different groups in the learned representations and predictions.
+- **EDITS**: EDITS approximates the inputs’ discrimination via Wasserstein distance and directly minimizes it between sensitive and nonsensitive groups by pruning the graph topology and node features.
+- **CrossWalk**:  CrossWalk is a method that enhances fairness in graph algorithms by biasing random walks to cross group boundaries and extends the range of the weighting including multi-hop neighbors.
+- **UGE**: UGE learns node embeddings from an underlying bias-free graph, which is not influenced by sensitive node attributes to deal with the unbiased graph embedding problem.
+- **FairVGNN**: FairVGNN is an advanced model that intelligently masks feature channels linked to sensitive attributes and dynamically fine-tunes encoder weights to reduce the impact of sensitive information, resulting in a fairer and unbiased machine learning algorithm.
+- **FairEdit**: NIFTY goes beyond simply removing biases from the input graph during training. It takes a proactive approach by introducing artificial nodes and edges to address biases comprehensively, resulting in a more balanced and unbiased learning process.
+- **NIFTY**: NIFTY is a groundbreaking approach designed to improve counterfactual fairness and stability of node representations. It achieves this through the utilization of a novel triplet-based objective function and layer-wise weight normalization using the Lipschitz constant, ensuring enhanced performance and reliability.
+- **GEAR**: GEAR tackles graph unfairness through two key mechanisms: counterfactual graph augmentation and an adversarial learning approach that focuses on learning embeddings that are insensitive to sensitive attributes. These techniques collectively contribute to the effective mitigation of unfairness in graph-based models.
+- **InFoRM**: InFoRM utilizes the similarity matrix of nodes to assess the individual fairness of GNNs. By incorporating a variant of the (d1, d2)-Lipschitz property, it addresses the challenge of achieving individual fairness solely based on node features, considering the interconnectedness of nodes in a graph.
+- **REDRESS**: REDRESS introduces a plug-and-play framework that leverages individual fairness measures from a ranking perspective. This approach optimizes the training of Graph Neural Networks (GNNs) to simultaneously maximize utility and promote ranking-based individual fairness. By learning to rank, the framework ensures consistent relative ranking orders of node pairs in both input and output spaces.
+- **GUIDE**: GUIDE is an innovative GNN framework that leverages the similarity matrix of individuals to learn personalized attention mechanisms. This enables the achievement of individual fairness while minimizing disparities at the group level.
+- **RawlsGCN**: RawlsGCN integrates the Rawlsian difference principle into GCN, mitigating degree-related unfairness and improving its overall performance.
 
 
 |    Methods    |       Debiasing Technique        |       Fairness Notions        |                         Paper & Code                         |
@@ -177,15 +223,15 @@ We provide their statistics as follows.
 
 
 
-## Performance Leaderboards
+## 7. Performance Leaderboards
 
 We summarize the performances of the implemented 13 graph mining algorithms/frameworks by fairness notions, including group fairness, individual fairness, counterfactual fairness, and degree-related fairness.
 
 
 
-#### (I) Group Fairness
+#### 7.1  Group Fairness
 
-(1) GNN-based ones:
+##### 7.1.1 GNN-based ones:
 
 We present the evaluation results of both utility (including AUCROC, F1 score, and accuracy) and fairness (including $\Delta_{SP}$ and $\Delta_{EO}$) on Credit and Recidivism below.
 
@@ -201,7 +247,7 @@ We present the evaluation results of both utility (including AUCROC, F1 score, a
 
 
 
-(2) Non-GNN-based ones:
+##### 7.1.2 Non-GNN-based ones:
 
 We present the evaluation results of fairness (including classification accuracy on the learned embeddings) on Pokec_z and Pokec_n below.
 
@@ -213,7 +259,7 @@ We present the evaluation results of fairness (including classification accuracy
 
 
 
-#### (II) Counterfactual Fairness
+#### 7.2 Counterfactual Fairness
 
 We present the evaluation results of both utility (including AUCROC, F1 score, and accuracy) and fairness (including $\Delta_{SP}$, $\Delta_{EO}$, $\delta_{CF}$, and $R^2$) on Credit and Recidivism below.
 
@@ -226,7 +272,7 @@ We present the evaluation results of both utility (including AUCROC, F1 score, a
 
 
 
-#### (III) Individual Fairness
+#### 7.3 Individual Fairness
 
 We present the evaluation results of both utility (including AUCROC) and fairness (including IF, GDIF, and Ranking-based IF) on Credit and Recidivism below.
 
@@ -240,7 +286,7 @@ We present the evaluation results of both utility (including AUCROC) and fairnes
 
 
 
-#### (IV) Degree-Related Fairness
+#### 7.4 Degree-Related Fairness
 
 We present the evaluation results of both utility (including accuracy) and fairness (including bias according to Rawlsian difference principle) on Amazon-Photo dataset below.
 
@@ -259,13 +305,11 @@ Yushun Dong, Song Wang, Zaiyi Zheng, Zhenyu Lei, Jing Ma, Chen Chen, Jundong Li
 
 We extend our heartfelt appreciation to everyone who has contributed to and will contribute to this work. 
 
-## Contact
+## 10. Contact
 
 Reach out to us by submitting an issue report or sending an email to yd6eb@virginia.edu.
 
-#### 
-
-## References
+## 11. References
 
 
 
@@ -322,4 +366,3 @@ Reach out to us by submitting an issue report or sending an email to yd6eb@virgi
 
 
 [14] [Kang, J., Zhu, Y., Xia, Y., Luo, J., & Tong, H. (2022, April). Rawlsgcn: Towards rawlsian difference principle on graph convolutional network. In Proceedings of the ACM Web Conference 2022 (pp. 1214-1225).](https://dl.acm.org/doi/abs/10.1145/3485447.3512169?casa_token=zVE-m1U23lsAAAAA:QajB3yyevB2wpOtMGVK_Bf53pA48r56Vm8iyDQjlV4FlOEnWD3gbNeo3FxE8SXtLC2yC8lzMVmA)
-
