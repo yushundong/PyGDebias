@@ -1,5 +1,5 @@
 <div  align="center">    
-<img src="./pygdebias.png" width = "300" height = "100" alt="图片名称" align=center />
+<img src="./pygdebias.png" width = "600" height = "200" alt="pygdebias" align=center />
 </div>
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/yushundong/PyGDebias)
