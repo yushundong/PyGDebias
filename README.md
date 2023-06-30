@@ -6,7 +6,7 @@
 ![GitHub forks](https://img.shields.io/github/forks/yushundong/pygdebias)
 ![GitHub watchers](https://img.shields.io/github/watchers/yushundong/pygdebias)
 ![GitHub all releases](https://img.shields.io/github/downloads/yushundong/PyGDebias/total)
-[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+![GitHub](https://img.shields.io/github/license/yushundong/pygdebias)
 
 -------------------
 
