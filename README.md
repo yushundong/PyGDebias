@@ -34,7 +34,8 @@
       - [7.2 Counterfactual Fairness](#72-counterfactual-fairness)
       - [7.3 Individual Fairness](#73-individual-fairness)
       - [7.4 Degree-Related Fairness](#74-degree-related-fairness)
-  - [How to contribute](#how-to-contribute)
+  - [Folder Structure](#folder-structure)
+  - [How to Contribute](#how-to-contribute)
   - [Authors \& Acknowledgements](#authors--acknowledgements)
   - [10. Contact](#10-contact)
   - [11. References](#11-references)
@@ -300,14 +301,14 @@ We present the evaluation results of both utility (including accuracy) and fairn
 | RawlsGCN | **0.8708 ± 0.0134** |                 **0.0782±0.0071**                 |
 
 ## Folder Structure
-.
-├── LICENSE
-├── PyGDebias # all algorithms in this directory
-├── README.md
-├── dataloading.py
-├── dataset
-├── docs # some files related to the README
-└── metrics # metrics for evaluating
+.  
+├── LICENSE  
+├── PyGDebias # all algorithms in this directory  
+├── README.md  
+├── dataloading.py  
+├── dataset  
+├── docs # some files related to the README  
+└── metrics # metrics for evaluating  
 
 
 ## How to Contribute
