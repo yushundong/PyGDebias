@@ -51,7 +51,6 @@ Graph mining algorithms have been playing a critical role in a plethora of areas
 
 Specifically, this open-source library *PyGDebias* aims to provide a systematic schema to load datasets and compare different debiasing techniques for graph learning algorithms. Specifically, 26 graph datasets (including 24 commonly used ones and two newly constructed ones, AMiner-L and AMiner-S) are collected, and 13 algorithms are implemented in this library.
 
-
 ## 1. Citation
 
 Our survey paper "Fairness in Graph Mining: A Survey" has been released on arxiv [\[PDF\]](http://yushundong.github.io/files/fairness_survey.pdf). If you find *PyGDebias* helpful, we would appreciate citations to the following paper:
@@ -300,9 +299,18 @@ We present the evaluation results of both utility (including accuracy) and fairn
 |   GCN    |   0.8262 ±0.0090    |                   0.5033±0.1552                   |
 | RawlsGCN | **0.8708 ± 0.0134** |                 **0.0782±0.0071**                 |
 
+## Folder Structure
+.
+├── LICENSE
+├── PyGDebias # all algorithms in this directory
+├── README.md
+├── dataloading.py
+├── dataset
+├── docs # some files related to the README
+└── metrics # metrics for evaluating
 
 
-## How to contribute
+## How to Contribute
 You are welcome to become part of this project. See [contribute guide](./docs/contribute.md) for more information.
 
 ## Authors & Acknowledgements
