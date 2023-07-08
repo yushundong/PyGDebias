@@ -502,6 +502,7 @@ def process_cora_citerseer(dataset_name):
 
     print(adj.shape)
     print(features.shape)
+    node_num = features.shape[0]
 
 
     features = torch.FloatTensor(features)
@@ -516,7 +517,7 @@ def process_cora_citerseer(dataset_name):
     idx_val = torch.LongTensor(idx_val)
     idx_test = torch.LongTensor(idx_test)
 
-    features = torch.cat([features, sens], -1)
+    features = torch.cat([features, sens.unsqueeze(-1)], -1)
     return adj, features, None, idx_train, idx_val, idx_test, sens, -1
 
 def process_german_bail_credit(dataset_name,return_tensor_sparse=True):
@@ -781,7 +782,7 @@ def process_LCC(dataset_name, return_tensor_sparse=True):
     features=torch.FloatTensor(sp.coo_matrix((features['data'], (features['row'], features['col'])),
                   shape=(labels.shape[0], np.max(features['col'])+1),
                   dtype=np.float32).todense())
-    features = torch.cat([features, sens], -1)
+    features = torch.cat([features, sens.unsqueeze(-1)], -1)
     adj=mx_to_torch_sparse_tensor(adj, is_sparse=True, return_tensor_sparse=return_tensor_sparse)
     return adj, features, labels, idx_train, idx_val, idx_test, sens, -1
 
