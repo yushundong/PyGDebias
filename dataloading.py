@@ -722,11 +722,11 @@ def process_german_bail_credit(dataset_name,return_tensor_sparse=True):
 
 
 def process_LCC(dataset_name, return_tensor_sparse=True):
-    if dataset_name=='LCC':
+    if dataset_name=='AMiner-L':
         path='./dataset/raw_LCC'
         name='LCC'
-    elif dataset_name=='LCC_small':
-        path='./dataset/raw_small'
+    elif dataset_name=='AMiner-S':
+        path='./dataset/raw_Small'
         name='Small'
     else:
         raise NotImplementedError
@@ -1031,7 +1031,7 @@ def process_lastfm():
     U=range(m) # list of customers
     P=range(n) # list of producers
 
-    return V
+    return V, U, {}
 
 
 def process_ml(dataset_name):
@@ -1147,7 +1147,7 @@ def load_data(dataset_name,  return_tensor_sparse=True):
         return process_german_bail_credit(dataset_name,  return_tensor_sparse)
     elif dataset_name=='google+':
         return process_google(return_tensor_sparse)
-    elif dataset_name=='LCC' or dataset_name=='LCC_small':
+    elif dataset_name=='AMiner-L' or dataset_name=='AMiner-S':
         return process_LCC(dataset_name,  return_tensor_sparse)
 
 
