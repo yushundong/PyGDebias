@@ -1102,11 +1102,7 @@ def process_ml(dataset_name):
         for i in range(data.shape[0]):
             rating_matrix[int(data.iloc[i,0])-1,movieid2id[int(data.iloc[i,1])]]=int(data.iloc[i,2]*10)
 
-        np.save('./dataset/{}/rating_matrix.npy'.format(dataset_name),rating_matrix)
-
-
-
-        #data=open('./dataset/{}/ratings.dat'.format(dataset_name))
+        return rating_matrix
 
 def process_oklahoma_unc(dataset_name):
     from scipy.io import loadmat
@@ -1115,22 +1111,23 @@ def process_oklahoma_unc(dataset_name):
     elif dataset_name=='unc28':
         dataset_name='UNC28'
 
-    file=open('./dataset/oklahoma&unc/{}/{}.mat'.format(dataset_name,dataset_name),'rb')
-
-    data=loadmat(file)
-    print(data)
 
     feats=pkl.load(open('./dataset/oklahoma&unc/{}/{}_feat.pkl'.format(dataset_name,dataset_name), 'rb'))
+    sens=pkl.load(open('./dataset/oklahoma&unc/{}/{}_user_sen.pkl'.format(dataset_name,dataset_name), 'rb'))
+    sens=[sens[idx] for idx in range(feats.shape[0])]
+    train_items=pkl.load(open('./dataset/oklahoma&unc/UNC28/UNC28_train_items.pkl', 'rb'))
+    test_items=pkl.load(open('./dataset/oklahoma&unc/UNC28/UNC28_test_set.pkl', 'rb'))
 
-    print(feats.shape)
+    adj=np.zeros([feats.shape[0], feats.shape[0]])
 
-    #for one in file.readlines():
-    #    print(one)
-
-    matrix=loadmat(open('./dataset/oklahoma&unc/{}/{}.mat'.format(dataset_name,dataset_name),'rb'))
-
-
-
+    for item in [train_items, test_items]:
+        for key, value in item.items():
+            for one in value:
+                adj[key][one]=1
+        features = torch.FloatTensor(feats)
+    sens = torch.FloatTensor(sens)
+    features = torch.cat([features, sens.unsqueeze(-1)], -1)
+    return adj, features, train_items, test_items, sens
 
 
 def load_data(dataset_name,  return_tensor_sparse=True):
@@ -1170,4 +1167,5 @@ def load_data(dataset_name,  return_tensor_sparse=True):
         return process_ml(dataset_name)
     elif dataset_name=='oklahoma' or dataset_name=='unc28':
         return process_oklahoma_unc(dataset_name)
+
 
