@@ -838,6 +838,10 @@ def process_amazon_yelp_ml1m(dataname):
     genre_count_mean_reciprocal = (np.array(genre_count_mean_reciprocal)).reshape((num_genre, 1))
     genre_error_weight = np.dot(item_genre, genre_count_mean_reciprocal)
 
+
+    return item_genre, genre_error_weight
+
+
 def process_epinion_ciao(dataset_name):
     from scipy.io import loadmat
     class data_handler():
@@ -1169,3 +1173,4 @@ def load_data(dataset_name,  return_tensor_sparse=True):
         return process_oklahoma_unc(dataset_name)
 
 
+process_amazon_yelp_ml1m('amazon')
