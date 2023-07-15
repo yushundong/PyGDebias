@@ -1,3 +1,5 @@
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 import numpy as np
 import torch
 import pandas as pd
@@ -10,10 +12,17 @@ import pickle
 from os.path import join, dirname, realpath
 import csv
 import pickle as pkl
+import requests
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+import tensorflow as tf
 
+"""
+NotLoaded: LCC, Filmtrust, Lastfm, UNC, oklahoma
+"""
 
-class dataset(object):
-    def __init__(self) -> None:
+class Dataset(object):
+    def __init__(self, root: str = './dataset') -> None:
         self.adj_ = None
         self.features_ = None
         self.labels_ = None
@@ -21,7 +30,18 @@ class dataset(object):
         self.val_mask_ = None
         self.test_mask_ = None
         self.sens_ = None
+
+        self.root = root
+        if not os.path.exists(self.root):
+            os.makedirs(self.root)
+        self.path_name = ''
     
+    def download(self, url: str, filename: str):
+        r = requests.get(url)
+        assert r.status_code == 200
+        open(os.path.join(self.root, self.path_name, filename), 'wb').write(r.content)
+        
+
     def adj(self, datatype: str = 'torch.sparse'):
         assert str(type(self.adj_)) == "<class 'torch.Tensor'>"
         if self.adj_ is None:
@@ -131,21 +151,39 @@ def mx_to_torch_sparse_tensor(sparse_mx, is_sparse=False, return_tensor_sparse=T
     return torch.sparse.FloatTensor(indices, values, shape)
 
 
-class Google(dataset):
+class Google(Dataset):
     def __init__(self) -> None:
         super().__init__()
+        self.path_name = 'google'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+                        
         id='111058843129764709244'
-        edges_file=open('./dataset/gplus/{}.edges'.format(id))
+        # download if not downloaded locally
+        if not os.path.exists(os.path.join(self.root, self.path_name, '{}.edges'.format(id))):
+            url='https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/gplus/{}.edges'.format(id)
+            filename = '{}.edges'.format(id)
+            self.download(url, filename)
+        if not os.path.exists(os.path.join(self.root, self.path_name, '{}.feat'.format(id))):
+            url='https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/gplus/{}.feat'.format(id)
+            filename = '{}.feat'.format(id)
+            self.download(url, filename)
+        if not os.path.exists(os.path.join(self.root, self.path_name, '{}.featnames'.format(id))):
+            url='https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/gplus/{}.featnames'.format(id)
+            filename = '{}.featnames'.format(id)
+            self.download(url, filename)
+
+        edges_file=open(os.path.join(self.root, self.path_name, '{}.edges'.format(id)))
         edges=[]
         for line in edges_file:
             edges.append([int(one) for one in line.strip('\n').split(' ')])
 
-        feat_file=open('./dataset/gplus/{}.feat'.format(id))
+        feat_file=open(os.path.join(self.root, self.path_name, '{}.feat'.format(id)))
         feats=[]
         for line in feat_file:
             feats.append([int(one) for one in line.strip('\n').split(' ')])
 
-        feat_name_file = open('./dataset/gplus/{}.featnames'.format(id))
+        feat_name_file = open(os.path.join(self.root, self.path_name, '{}.featnames'.format(id)))
         feat_name = []
         for line in feat_name_file:
             feat_name.append(line.strip('\n').split(' '))
@@ -153,10 +191,7 @@ class Google(dataset):
         for name in feat_name:
             if name[1] not in names:
                 names[name[1]]=name[1]
-            if 'gender' in name[1]:
-                print(name)
 
-        #print(feat_name)
         feats=np.array(feats)
 
         node_mapping={}
@@ -164,11 +199,6 @@ class Google(dataset):
             node_mapping[feats[j][0]]=j
 
         feats=feats[:,1:]
-
-        print(feats.shape)
-        for i in range(len(feat_name)):
-            if feats[:,i].sum()>100:
-                print(i, feat_name[i], feats[:,i].sum())
 
         feats=np.array(feats,dtype=float)
 
@@ -184,9 +214,6 @@ class Google(dataset):
 
         edges=np.array(edges)
         #edges=torch.tensor(edges)
-        #edges=torch.stack([torch.tensor(one) for one in edges],0)
-
-        print(len(edges))
         
         node_num=feats.shape[0]
         adj=np.zeros([node_num,node_num])
@@ -212,19 +239,36 @@ class Google(dataset):
         self.adj_=mx_to_torch_sparse_tensor(adj)
 
 
-class Facebook(dataset):
+class Facebook(Dataset):
     def __init__(self, path: str = './dataset/facebook/') -> None:
         super().__init__()
-        edges_file=open('./dataset/facebook/facebook/107.edges')
+        self.path_name = 'facebook'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, '107.edges')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/facebook/facebook/107.edges'
+            filename = '107.edges'
+            self.download(url, filename)
+        if not os.path.exists(os.path.join(self.root, self.path_name, '107.feat')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/facebook/facebook/107.feat'
+            filename = '107.feat'
+            self.download(url, filename)
+        if not os.path.exists(os.path.join(self.root, self.path_name, '107.featnames')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/facebook/facebook/107.featnames'
+            filename = '107.featnames'
+            self.download(url, filename)
+        
+        edges_file=open(os.path.join(self.root, self.path_name, '107.edges'))
         edges=[]
         for line in edges_file:
             edges.append([int(one) for one in line.strip('\n').split(' ')])
-
-        feat_file=open('./dataset/facebook/facebook/107.feat')
+        
+        feat_file=open(os.path.join(self.root, self.path_name, '107.feat'))
         feats=[]
         for line in feat_file:
             feats.append([int(one) for one in line.strip('\n').split(' ')])
-
+        
+        feat_name_file = open(os.path.join(self.root, self.path_name, '107.featnames'))
         feat_name_file = open('./dataset/facebook/facebook/107.featnames')
         feat_name = []
         for line in feat_name_file:
@@ -233,10 +277,7 @@ class Facebook(dataset):
         for name in feat_name:
             if name[1] not in names:
                 names[name[1]]=name[1]
-            if 'gender' in name[1]:
-                print(name)
 
-        print(feat_name)
         feats=np.array(feats)
 
         node_mapping={}
@@ -245,9 +286,6 @@ class Facebook(dataset):
 
         feats=feats[:,1:]
 
-        print(feats.shape)
-        #for i in range(len(feat_name)):
-        #    print(i, feat_name[i], feats[:,i].sum())
 
         sens=feats[:,264]
         labels=feats[:,220]
@@ -259,7 +297,6 @@ class Facebook(dataset):
         edges=np.array(edges)
         #edges=torch.tensor(edges)
         #edges=torch.stack([torch.tensor(one) for one in edges],0)
-        print(len(edges))
 
         node_num=feats.shape[0]
         adj=np.zeros([node_num,node_num])
@@ -287,7 +324,7 @@ class Facebook(dataset):
 
 
 
-class Nba(dataset):
+class Nba(Dataset):
     def __init__(self, dataset_name='nba', predict_attr_specify=None, return_tensor_sparse=True):
         super().__init__()
         if dataset_name!='nba':
@@ -323,11 +360,6 @@ class Nba(dataset):
                                                                                             seed=seed, test_idx=test_idx)
 
         #adj=adj.todense()
-        print(adj.shape)
-        print(features.shape)
-        print(sens.shape)
-        print(labels.shape)
-        print(idx_train.shape)
         adj=mx_to_torch_sparse_tensor(adj, is_sparse=True,return_tensor_sparse=return_tensor_sparse)
         
         self.adj_ = adj
@@ -341,9 +373,18 @@ class Nba(dataset):
     def load_pokec(self, dataset, sens_attr, predict_attr, path="../dataset/pokec/", label_number=1000, sens_number=500,
                    seed=19, test_idx=False):
         """Load data"""
-        print('Loading {} dataset from {}'.format(dataset, path))
 
-        idx_features_labels = pd.read_csv(os.path.join(path, "{}.csv".format(dataset)))
+        self.path_name = 'nba'
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'nba.csv')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/NBA/nba.csv'
+            filename = 'nba.csv'
+            self.download(url, filename)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'nba_relationship.txt')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/NBA/nba_relationship.txt'
+            filename = 'nba_relationship.txt'
+            self.download(url, filename)
+
+        idx_features_labels = pd.read_csv(os.path.join(self.root, self.path_name, 'nba.csv'))
         header = list(idx_features_labels.columns)
         header.remove("user_id")
 
@@ -356,12 +397,11 @@ class Nba(dataset):
         # build graph
         idx = np.array(idx_features_labels["user_id"], dtype=np.int64)
         idx_map = {j: i for i, j in enumerate(idx)}
-        edges_unordered = np.genfromtxt(os.path.join(path, "{}_relationship.txt".format(dataset)), dtype=np.int64)
+        edges_unordered = np.genfromtxt(os.path.join(self.root, self.path_name, 'nba_relationship.txt'), dtype=np.int64)
 
         edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
                          dtype=np.int64).reshape(edges_unordered.shape)
 
-        print(len(edges))
 
 
         adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
@@ -410,7 +450,7 @@ class Nba(dataset):
         return adj, features, labels, idx_train, idx_val, idx_test, sens, idx_sens_train
 
 
-class Pokec_z(dataset):
+class Pokec_z(Dataset):
     def __init__(self, dataset_name='pokec_z', predict_attr_specify=None, return_tensor_sparse=True):
         super().__init__()
         if dataset_name!='nba':
@@ -445,12 +485,7 @@ class Pokec_z(dataset):
                                                                                             sens_number=sens_number,
                                                                                             seed=seed, test_idx=test_idx)
 
-        #adj=adj.todense()
-        print(adj.shape)
-        print(features.shape)
-        print(sens.shape)
-        print(labels.shape)
-        print(idx_train.shape)
+        #adj=adj.todense(
         adj=mx_to_torch_sparse_tensor(adj, is_sparse=True,return_tensor_sparse=return_tensor_sparse)
         
         self.adj_ = adj
@@ -464,9 +499,18 @@ class Pokec_z(dataset):
     def load_pokec(self, dataset, sens_attr, predict_attr, path="../dataset/pokec/", label_number=1000, sens_number=500,
                    seed=19, test_idx=False):
         """Load data"""
-        print('Loading {} dataset from {}'.format(dataset, path))
 
-        idx_features_labels = pd.read_csv(os.path.join(path, "{}.csv".format(dataset)))
+        self.path_name = 'pokec_z'
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'pokec_z.csv')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/pokec_z/pokec_z.csv'
+            filename = 'pokec_z.csv'
+            self.download(url, filename)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'pokec_z_relationship.txt')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/pokec_z/pokec_z_relationship.txt'
+            filename = 'pokec_z_relationship.txt'
+            self.download(url, filename)
+
+        idx_features_labels = pd.read_csv(os.path.join(self.root, self.path_name, 'pokec_z.csv'))
         header = list(idx_features_labels.columns)
         header.remove("user_id")
 
@@ -479,12 +523,10 @@ class Pokec_z(dataset):
         # build graph
         idx = np.array(idx_features_labels["user_id"], dtype=np.int64)
         idx_map = {j: i for i, j in enumerate(idx)}
-        edges_unordered = np.genfromtxt(os.path.join(path, "{}_relationship.txt".format(dataset)), dtype=np.int64)
+        edges_unordered = np.genfromtxt(os.path.join(self.root, self.path_name, 'pokec_z_relationship.txt'), dtype=np.int64)
 
         edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
                          dtype=np.int64).reshape(edges_unordered.shape)
-
-        print(len(edges))
 
 
         adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
@@ -532,7 +574,7 @@ class Pokec_z(dataset):
 
         return adj, features, labels, idx_train, idx_val, idx_test, sens, idx_sens_train
 
-class Pokec_n(dataset):
+class Pokec_n(Dataset):
     def __init__(self, dataset_name='pokec_n', predict_attr_specify=None, return_tensor_sparse=True):
         super().__init__()
         if dataset_name!='nba':
@@ -567,12 +609,6 @@ class Pokec_n(dataset):
                                                                                             sens_number=sens_number,
                                                                                             seed=seed, test_idx=test_idx)
 
-        #adj=adj.todense()
-        print(adj.shape)
-        print(features.shape)
-        print(sens.shape)
-        print(labels.shape)
-        print(idx_train.shape)
         adj=mx_to_torch_sparse_tensor(adj, is_sparse=True,return_tensor_sparse=return_tensor_sparse)
         
         self.adj_ = adj
@@ -586,9 +622,18 @@ class Pokec_n(dataset):
     def load_pokec(self, dataset, sens_attr, predict_attr, path="../dataset/pokec/", label_number=1000, sens_number=500,
                    seed=19, test_idx=False):
         """Load data"""
-        print('Loading {} dataset from {}'.format(dataset, path))
 
-        idx_features_labels = pd.read_csv(os.path.join(path, "{}.csv".format(dataset)))
+        self.path_name = 'pokec_n'
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'pokec_n.csv')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/pokec_n/pokec_n.csv'
+            filename = 'pokec_n.csv'
+            self.download(url, filename)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'pokec_n_relationship.txt')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/pokec_n/pokec_n_relationship.txt'
+            filename = 'pokec_n_relationship.txt'
+            self.download(url, filename)
+
+        idx_features_labels = pd.read_csv(os.path.join(self.root, self.path_name, 'pokec_n.csv'))
         header = list(idx_features_labels.columns)
         header.remove("user_id")
 
@@ -601,12 +646,10 @@ class Pokec_n(dataset):
         # build graph
         idx = np.array(idx_features_labels["user_id"], dtype=np.int64)
         idx_map = {j: i for i, j in enumerate(idx)}
-        edges_unordered = np.genfromtxt(os.path.join(path, "{}_relationship.txt".format(dataset)), dtype=np.int64)
+        edges_unordered = np.genfromtxt(os.path.join(self.root, self.path_name, 'pokec_n_relationship.txt'), dtype=np.int64)
 
         edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
                          dtype=np.int64).reshape(edges_unordered.shape)
-
-        print(len(edges))
 
 
         adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
@@ -657,31 +700,44 @@ class Pokec_n(dataset):
 
 
 
-class Twitter(dataset):
+class Twitter(Dataset):
     def __init__(self):
         super().__init__()
-        edges_file=open('./dataset/twitter/twitter/428333.edges')
+        self.path_name = 'twitter'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, '428333.edges')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/twitter/twitter/428333.edges'
+            filename = '428333.edges'
+            self.download(url, filename)
+        if not os.path.exists(os.path.join(self.root, self.path_name, '428333.feat')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/twitter/twitter/428333.feat'
+            filename = '428333.feat'
+            self.download(url, filename)
+        if not os.path.exists(os.path.join(self.root, self.path_name, '428333.featnames')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/twitter/twitter/428333.featnames'
+            filename = '428333.featnames'
+            self.download(url, filename)
+
+        edges_file=open(os.path.join(self.root, self.path_name, '428333.edges'))
         edges=[]
         for line in edges_file:
             edges.append([int(one) for one in line.strip('\n').split(' ')])
-
-        feat_file=open('./dataset/twitter/twitter/428333.feat')
+        
+        feat_file = open(os.path.join(self.root, self.path_name, '428333.feat'))
         feats=[]
         for line in feat_file:
             feats.append([int(one) for one in line.strip('\n').split(' ')])
 
-        feat_name_file = open('./dataset/twitter/twitter/428333.featnames')
+        feat_name_file = open(os.path.join(self.root, self.path_name, '428333.featnames'))
         feat_name = []
         for line in feat_name_file:
             feat_name.append(line.strip('\n').split(' '))
 
-        print(feat_name)
         names={}
         for name in feat_name:
             if name[1] not in names:
                 names[name[1]]=name[1]
-            if 'pol' in name[1]:
-                print(name)
 
 
         feats=np.array(feats)
@@ -692,10 +748,6 @@ class Twitter(dataset):
 
         feats=feats[:,1:]
 
-        print(feats.shape)
-        for i in range(len(feat_name)):
-            if feats[:,i].sum()>30:
-                print(i, feat_name[i], feats[:,i].sum())
 
         sens=feats[:,264]
         labels=feats[:,220]
@@ -739,7 +791,7 @@ class Twitter(dataset):
         self.sens_=sens   
 
 
-class Cora(dataset):
+class Cora(Dataset):
     def __init__(self) -> None:
         super().__init__()
         self.cora_label = {
@@ -753,8 +805,6 @@ class Cora(dataset):
         }
         test_ratio=0.1
         G, adj, features, sensitive, test_edges_true, test_edges_false, _ = self.cora(test_ratio=test_ratio)
-        print(adj.shape)
-        print(features.shape)
 
 
         features = torch.FloatTensor(features)
@@ -831,7 +881,20 @@ class Cora(dataset):
 
     def cora(self, feat_path="./dataset/cora/cora.content", edge_path="./dataset/cora/cora.cites",
              test_ratio=0.1):
-        idx_features_labels = np.genfromtxt(feat_path, dtype=np.dtype(str))
+
+        self.path_name = 'cora'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'cora.content')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/cora/cora.content'
+            file_name = 'cora.content'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'cora.cites')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/cora/cora.cites'
+            file_name = 'cora.cites'
+            self.download(url, file_name)
+        idx_features_labels = np.genfromtxt(os.path.join(self.root, self.path_name, 'cora.content'), dtype=np.dtype(str))
         idx_features_labels = idx_features_labels[idx_features_labels[:, 0].astype(np.int32).argsort()]
 
         idx = np.array(idx_features_labels[:, 0], dtype=np.int32)
@@ -839,25 +902,18 @@ class Cora(dataset):
         X = np.array(idx_features_labels[:, 1:-1], dtype=np.float32)
         sensitive = np.array(list(map(self.cora_label.get, idx_features_labels[:, -1])))
 
-
-        G = nx.read_edgelist(edge_path, nodetype=int)
+        G = nx.read_edgelist(os.path.join(self.root, self.path_name, 'cora.cites'), nodetype=int)
         G, test_edges_true, test_edges_false = self.build_test(G, nodelist, test_ratio)
         for edge in G.edges():
             G[edge[0]][edge[1]]['weight'] = 1
         adj = nx.adjacency_matrix(G, nodelist=sorted(G.nodes()))
 
-        print(len(G.edges))
-
-        print(G)
-        print(adj.shape)
-        print(X.shape)
-        print(sensitive.shape)
 
         return G, adj, X, sensitive, test_edges_true, test_edges_false, nodelist
 
 
 
-class Citeseer(dataset):
+class Citeseer(Dataset):
     def __init__(self) -> None:
         super().__init__()
         self.cora_label = {
@@ -874,8 +930,6 @@ class Citeseer(dataset):
         G, adj, features, sensitive, test_edges_true, test_edges_false, _ = self.citeseer(test_ratio=test_ratio)
 
 
-        print(adj.shape)
-        print(features.shape)
         node_num = features.shape[0]
 
 
@@ -952,11 +1006,21 @@ class Citeseer(dataset):
 
 
     def citeseer(self,data_dir="./dataset/citeseer",  test_ratio=0.1):
-        names = ['x', 'y', 'tx', 'ty', 'allx', 'ally', 'graph']
+        names = ['x', 'y', 'tx', 'ty', 'allx', 'ally', 'graph', 'test.index']
         objects = []
+        self.path_name = 'citeseer'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        
 
         for i in range(len(names)):
-            with open(os.path.join(data_dir, "ind.citeseer.{}".format(names[i])), 'rb') as rf:
+            if not os.path.exists(os.path.join(self.root, self.path_name, 'ind.citeseer.{}'.format(names[i]))):
+                url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/citeseer/ind.citeseer.{}'.format(names[i])
+                file_name = 'ind.citeseer.{}'.format(names[i])
+                self.download(url, file_name)
+
+        for i in range(len(names)-1):
+            with open(os.path.join(self.root, self.path_name, "ind.citeseer.{}".format(names[i])), 'rb') as rf:
                 u = pkl._Unpickler(rf)
                 u.encoding = 'latin1'
                 cur_data = u.load()
@@ -968,7 +1032,7 @@ class Citeseer(dataset):
         sensitive = np.where(sensitive.toarray() == 1)[1]
 
         G = nx.from_dict_of_lists(graph)
-        test_idx_reorder = self.parse_index_file(os.path.join(data_dir, "ind.citeseer.test.index"))
+        test_idx_reorder = self.parse_index_file(os.path.join(self.root, self.path_name, "ind.citeseer.test.index"))
         test_idx_range = np.sort(test_idx_reorder)
 
         missing_idx = set(range(min(test_idx_range), max(test_idx_range) + 1)) - set(test_idx_range)
@@ -979,7 +1043,6 @@ class Citeseer(dataset):
         nodelist = {idx: node for idx, node in zip(range(G.number_of_nodes()), list(nodes))}
 
         G, test_edges_true, test_edges_false = self.build_test(G, nodelist, test_ratio)
-        print(len(G.edges))
         for edge in G.edges():
             G[edge[0]][edge[1]]['weight'] = 1
 
@@ -987,7 +1050,7 @@ class Citeseer(dataset):
 
         return G, adj, X, sensitive, test_edges_true, test_edges_false, nodelist
 
-class German(dataset):
+class German(Dataset):
     def __init__(self):
         super(German, self).__init__()
         adj, features, labels, edges, sens, idx_train, idx_val, idx_test,sens_idx =self.load_german('german')
@@ -1016,7 +1079,21 @@ class German(dataset):
     def load_german(self, dataset, sens_attr="Gender", predict_attr="GoodCustomer", path="./dataset/german/",
                     label_number=100):
         # print('Loading {} dataset from {}'.format(dataset, path))
-        idx_features_labels = pd.read_csv(os.path.join(path, "{}.csv".format(dataset)))
+        self.path_name = 'german'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'german.csv')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/german/german.csv'
+            file_name = 'german.csv'
+            self.download(url, self.path_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'german_edges.txt')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/german/german_edges.txt'
+            file_name = 'german_edges.txt'
+            self.download(url, self.path_name)
+
+
+        idx_features_labels = pd.read_csv(os.path.join(self.root, self.path_name, "{}.csv".format(dataset)))
         header = list(idx_features_labels.columns)
         header.remove(predict_attr)
         header.remove('OtherLoansAtStore')
@@ -1027,7 +1104,7 @@ class German(dataset):
         idx_features_labels['Gender'][idx_features_labels['Gender'] == 'Female'] = 1
         idx_features_labels['Gender'][idx_features_labels['Gender'] == 'Male'] = 0
 
-        edges_unordered = np.genfromtxt(f'{path}/{dataset}_edges.txt').astype('int')
+        edges_unordered = np.genfromtxt(os.path.join(self.root, self.path_name,f'{dataset}_edges.txt')).astype('int')
 
 
         features = sp.csr_matrix(idx_features_labels[header], dtype=np.float32)
@@ -1038,8 +1115,6 @@ class German(dataset):
         idx_map = {j: i for i, j in enumerate(idx)}
         edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
                          dtype=int).reshape(edges_unordered.shape)
-
-        print(len(edges))
 
         adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
                             shape=(labels.shape[0], labels.shape[0]),
@@ -1073,7 +1148,7 @@ class German(dataset):
 
         return adj, features, labels, edges, sens, idx_train, idx_val, idx_test, 0
 
-class Bail(dataset):
+class Bail(Dataset):
     def __init__(self):
         super(Bail, self).__init__()
         adj, features, labels, edges, sens, idx_train, idx_val, idx_test,sens_idx = self.load_bail('bail')
@@ -1101,14 +1176,27 @@ class Bail(dataset):
     
     def load_bail(self, dataset, sens_attr="WHITE", predict_attr="RECID", path="./dataset/bail/", label_number=100):
         # print('Loading {} dataset from {}'.format(dataset, path))
-        idx_features_labels = pd.read_csv(os.path.join(path, "{}.csv".format(dataset)))
+        self.path_name = 'bail'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'bail.csv')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/bail/bail.csv'
+            file_name = 'bail.csv'
+            self.download(url, self.path_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'bail_edges.txt')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/bail/bail_edges.txt'
+            file_name = 'bail_edges.txt'
+            self.download(url, self.path_name)
+
+        idx_features_labels = pd.read_csv(os.path.join(self.root, self.path_name, "{}.csv".format(dataset)))
         header = list(idx_features_labels.columns)
         header.remove(predict_attr)
 
 
         # build relationship
 
-        edges_unordered = np.genfromtxt(f'{path}/{dataset}_edges.txt').astype('int')
+        edges_unordered = np.genfromtxt(os.path.join(self.root, self.path_name, f'{dataset}_edges.txt')).astype('int')
 
 
         features = sp.csr_matrix(idx_features_labels[header], dtype=np.float32)
@@ -1118,7 +1206,6 @@ class Bail(dataset):
         idx_map = {j: i for i, j in enumerate(idx)}
         edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
                          dtype=int).reshape(edges_unordered.shape)
-        print(len(edges))
 
         adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
                             shape=(labels.shape[0], labels.shape[0]),
@@ -1154,7 +1241,7 @@ class Bail(dataset):
         return adj, features, labels, edges, sens, idx_train, idx_val, idx_test, 0
 
 
-class Credit(dataset):
+class Credit(Dataset):
     def __init__(self):
         super(Credit, self).__init__()
         adj, features, labels, edges, sens, idx_train, idx_val, idx_test,sens_idx = self.load_credit('credit')
@@ -1185,14 +1272,27 @@ class Credit(dataset):
         from scipy.spatial import distance_matrix
 
         # print('Loading {} dataset from {}'.format(dataset, path))
-        idx_features_labels = pd.read_csv(os.path.join(path, "{}.csv".format(dataset)))
+        self.path_name = 'credit'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'credit.csv')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/credit/credit.csv'
+            file_name = 'credit.csv'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'credit_edges.txt')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/credit/credit_edges.txt'
+            file_name = 'credit_edges.txt'
+            self.download(url, file_name)
+
+        idx_features_labels = pd.read_csv(os.path.join(self.root, self.path_name, "{}.csv".format(dataset)))
         header = list(idx_features_labels.columns)
         header.remove(predict_attr)
         header.remove('Single')
 
 
         # build relationship
-        edges_unordered = np.genfromtxt(f'{path}/{dataset}_edges.txt').astype('int')
+        edges_unordered = np.genfromtxt(os.path.join(self.root, self.path_name, f'{dataset}_edges.txt')).astype('int')
 
 
         features = sp.csr_matrix(idx_features_labels[header], dtype=np.float32)
@@ -1202,7 +1302,6 @@ class Credit(dataset):
         edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
                          dtype=int).reshape(edges_unordered.shape)
 
-        print(len(edges))
 
         adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
                             shape=(labels.shape[0], labels.shape[0]),
@@ -1238,14 +1337,32 @@ class Credit(dataset):
 
 
 
-class LCC(dataset):
+class LCC(Dataset):
     def __init__(self):
         super(LCC, self).__init__()
         path='./dataset/raw_LCC'
         name='LCC'
+        self.path_name='LCC'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'edgelist_{}.txt'.format(name))):
+            url = ''
+            file_name = 'edgelist_{}.txt'.format(name)
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'labels_{}.txt'.format(name))):
+            url = ''
+            file_name = 'labels_{}.txt'.format(name)
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'sens_{}.txt'.format(name))):
+            url = ''
+            file_name = 'sens_{}.txt'.format(name)
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'features_{}.txt'.format(name))):
+            url = ''
+            file_name = 'X_{}.npz'.format(name)
+            self.download(url, file_name)
 
-
-        edgelist=csv.reader(open(path+'/edgelist_{}.txt'.format(name)))
+        edgelist=csv.reader(open(os.path.join(self.root, self.path_name, 'edgelist_{}.txt'.format(name))))
 
         edges=[]
         for line in edgelist:
@@ -1254,15 +1371,14 @@ class LCC(dataset):
 
 
         edges=np.array(edges)
-        print(len(edges))
 
-        labels_file=csv.reader(open(path+'/labels_{}.txt'.format(name)))
+        labels_file=csv.reader(open(os.path.join(self.root, self.path_name, 'labels_{}.txt'.format(name))))
         labels=[]
         for line in labels_file:
             labels.append(float(line[0].split('\t')[1]))
         labels=np.array(labels)
 
-        sens_file=csv.reader(open(path+'/sens_{}.txt'.format(name)))
+        sens_file=csv.reader(open(os.path.join(self.root, self.path_name, 'sens_{}.txt'.format(name))))
         sens=[]
         for line in sens_file:
             sens.append([float(line[0].split('\t')[1])])
@@ -1290,7 +1406,7 @@ class LCC(dataset):
         idx_test = torch.LongTensor(idx_test)
         labels = torch.LongTensor(labels)
         sens = torch.FloatTensor(sens)
-        features=np.load(path+'/X_{}.npz'.format(name))
+        features=np.load(os.path.join(self.root, self.path_name, 'X_{}.npz'.format(name)))
 
 
         features=torch.FloatTensor(sp.coo_matrix((features['data'], (features['row'], features['col'])),
@@ -1307,13 +1423,33 @@ class LCC(dataset):
         self.sens_=sens
 
 
-class LCC_small(dataset):
+class LCC_small(Dataset):
     def __init__(self):
         super(LCC_small, self).__init__()
         path='./dataset/raw_small'
         name='Small'
+        self.path_name='raw_small'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'edgelist_{}.txt'.format(name))):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/raw_Small/edgelist_Small.txt'
+            file_name = 'edgelist_{}.txt'.format(name)
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'labels_{}.txt'.format(name))):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/raw_Small/labels_Small.txt'
+            file_name = 'labels_{}.txt'.format(name)
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'sens_{}.txt'.format(name))):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/raw_Small/sens_Small.txt'
+            file_name = 'sens_{}.txt'.format(name)
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'features_{}.txt'.format(name))):
+            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/raw_Small/X_Small.npz'
+            file_name = 'X_{}.npz'.format(name)
+            self.download(url, file_name)
+        
 
-        edgelist=csv.reader(open(path+'/edgelist_{}.txt'.format(name)))
+        edgelist=csv.reader(open(os.path.join(self.root, self.path_name, 'edgelist_{}.txt'.format(name))))
 
         edges=[]
         for line in edgelist:
@@ -1322,15 +1458,14 @@ class LCC_small(dataset):
 
 
         edges=np.array(edges)
-        print(len(edges))
 
-        labels_file=csv.reader(open(path+'/labels_{}.txt'.format(name)))
+        labels_file=csv.reader(open(os.path.join(self.root, self.path_name, 'labels_{}.txt'.format(name))))
         labels=[]
         for line in labels_file:
             labels.append(float(line[0].split('\t')[1]))
         labels=np.array(labels)
 
-        sens_file=csv.reader(open(path+'/sens_{}.txt'.format(name)))
+        sens_file=csv.reader(open(os.path.join(self.root, self.path_name, 'sens_{}.txt'.format(name))))
         sens=[]
         for line in sens_file:
             sens.append([float(line[0].split('\t')[1])])
@@ -1358,13 +1493,13 @@ class LCC_small(dataset):
         idx_test = torch.LongTensor(idx_test)
         labels = torch.LongTensor(labels)
         sens = torch.FloatTensor(sens)
-        features=np.load(path+'/X_{}.npz'.format(name))
+        features=np.load(os.path.join(self.root, self.path_name, 'X_{}.npz'.format(name)))
 
 
         features=torch.FloatTensor(sp.coo_matrix((features['data'], (features['row'], features['col'])),
                     shape=(labels.shape[0], np.max(features['col'])+1),
                     dtype=np.float32).todense())
-        features = torch.cat([features, sens.unsqueeze(-1)], -1)
+        features = torch.cat([features, sens], -1)
         adj=mx_to_torch_sparse_tensor(adj, is_sparse=True)
         self.adj_=adj
         self.features_=features
@@ -1374,18 +1509,43 @@ class LCC_small(dataset):
         self.idx_test_=idx_test
         self.sens_=sens
 
-class Amazon(dataset):
+class Amazon(Dataset):
     def __init__(self):
         super(Amazon, self).__init__()
         dataname='Amazon-2'
+        self.path_name = 'amazon'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'training_df.pkl')):
+            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Amazon-2/training_df.pkl'
+            file_name = 'training_df.pkl'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'valiing_df.pkl')):
+            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Amazon-2/valiing_df.pkl'
+            file_name = 'valiing_df.pkl'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'key_genre.pkl')):
+            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Amazon-2/key_genre.pkl'
+            file_name = 'key_genre.pkl'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'item_idd_genre_list.pkl')):
+            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Amazon-2/item_idd_genre_list.pkl'
+            file_name = 'item_idd_genre_list.pkl'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'genre_count.pkl')):
+            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Amazon-2/genre_count.pkl'
+            file_name = 'genre_count.pkl'
+            self.download(url, file_name)
 
-        train_df = pkl.load(open('./dataset/' + dataname + '/training_df.pkl','rb'))
-        vali_df = pkl.load(open('./dataset/' + dataname + '/valiing_df.pkl','rb'))  # for validation
+
+
+        train_df = pkl.load(open(os.path.join(self.root, self.path_name, 'training_df.pkl'),'rb'))
+        vali_df = pkl.load(open(os.path.join(self.root, self.path_name, 'valiing_df.pkl'), 'rb')) # for validation
         # vali_df = pkl.load(open('./' + dataname + '/testing_df.pkl'))  # for testing
-        key_genre = pkl.load(open('./dataset/' + dataname + '/key_genre.pkl','rb'))
-        item_idd_genre_list = pkl.load(open('./dataset/' + dataname + '/item_idd_genre_list.pkl','rb'))
+        key_genre = pkl.load(open(os.path.join(self.root, self.path_name, 'key_genre.pkl'),'rb'))
+        item_idd_genre_list = pkl.load(open(os.path.join(self.root, self.path_name, 'item_idd_genre_list.pkl'),'rb'))
         #genre_item_vector = pkl.load(open('./' + dataname + '/genre_item_vector.pkl','rb'))
-        genre_count = pkl.load(open('./dataset/' + dataname + '/genre_count.pkl','rb'))
+        genre_count = pkl.load(open(os.path.join(self.root, self.path_name, 'genre_count.pkl'),'rb'))
         #user_genre_count = pkl.load(open('./' + dataname + '/user_genre_count.pkl','rb'))
 
         num_item = len(train_df['item_id'].unique())
@@ -1400,13 +1560,6 @@ class Amazon(dataset):
                 if g in key_genre:
                     tmp.append(g)
             item_genre_list.append(tmp)
-
-        print(num_item)
-        print(num_genre)
-        print(len(item_genre_list))
-
-        print('number of positive feedback: ' + str(len(train_df)))
-        print('estimated number of training samples: ' + str(5* len(train_df)))
 
 
         # genreate item_genre matrix
@@ -1446,18 +1599,44 @@ class Amazon(dataset):
         else:
             raise ValueError('datatype should be torch.tensor or np.array')
 
-class Yelp(dataset):
+class Yelp(Dataset):
     def __init__(self):
         super(Yelp, self).__init__()
-        dataname = Yelp
+        dataname = 'Yelp'
 
-        train_df = pkl.load(open('./dataset/' + dataname + '/training_df.pkl','rb'))
-        vali_df = pkl.load(open('./dataset/' + dataname + '/valiing_df.pkl','rb'))  # for validation
+        self.path_name = 'yelp'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'training_df.pkl')):
+            url = ''
+            file_name = 'training_df.pkl'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'valiing_df.pkl')):
+            url = ''
+            file_name = 'valiing_df.pkl'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'key_genre.pkl')):
+            url = ''
+            file_name = 'key_genre.pkl'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'item_idd_genre_list.pkl')):
+            url = ''
+            file_name = 'item_idd_genre_list.pkl'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'genre_count.pkl')):
+            url = ''
+            file_name = 'genre_count.pkl'
+            self.download(url, file_name)
+
+
+
+        train_df = pkl.load(open(os.path.join(self.root, self.path_name, 'training_df.pkl'),'rb'))
+        vali_df = pkl.load(open(os.path.join(self.root, self.path_name, 'valiing_df.pkl'), 'rb')) # for validation
         # vali_df = pkl.load(open('./' + dataname + '/testing_df.pkl'))  # for testing
-        key_genre = pkl.load(open('./dataset/' + dataname + '/key_genre.pkl','rb'))
-        item_idd_genre_list = pkl.load(open('./dataset/' + dataname + '/item_idd_genre_list.pkl','rb'))
+        key_genre = pkl.load(open(os.path.join(self.root, self.path_name, 'key_genre.pkl'),'rb'))
+        item_idd_genre_list = pkl.load(open(os.path.join(self.root, self.path_name, 'item_idd_genre_list.pkl'),'rb'))
         #genre_item_vector = pkl.load(open('./' + dataname + '/genre_item_vector.pkl','rb'))
-        genre_count = pkl.load(open('./dataset/' + dataname + '/genre_count.pkl','rb'))
+        genre_count = pkl.load(open(os.path.join(self.root, self.path_name, 'genre_count.pkl'),'rb'))
         #user_genre_count = pkl.load(open('./' + dataname + '/user_genre_count.pkl','rb'))
 
         num_item = len(train_df['item_id'].unique())
@@ -1472,13 +1651,6 @@ class Yelp(dataset):
                 if g in key_genre:
                     tmp.append(g)
             item_genre_list.append(tmp)
-
-        print(num_item)
-        print(num_genre)
-        print(len(item_genre_list))
-
-        print('number of positive feedback: ' + str(len(train_df)))
-        print('estimated number of training samples: ' + str(5* len(train_df)))
 
 
         # genreate item_genre matrix
@@ -1554,9 +1726,6 @@ class data_handler():
         self.n_users = max(R[:, 0])
         self.n_prod = max(R[:, 1])
 
-        print(R.shape)
-        print(self.n_users)
-        print(self.n_prod)
 
         # print self.n_users
         # print self.n_prod
@@ -1577,7 +1746,6 @@ class data_handler():
         prod_cat = dict(zip(zip(R_train[:, 1], R_train[:, 2]), ones))
         prod_cat_old = {}
 
-        # print prod_cat
         # Making the mu matrix
         mu = np.zeros(6)
         for cat in cat_id:
@@ -1585,19 +1753,31 @@ class data_handler():
             mu[cat_map[cat]] = np.mean(cat_rating)
 
 
-        print(W.shape)
-
         return R_train, R_test, W, prod_cat, mu
 
     def get_stats(self):
         return self.n_users, self.n_prod, self.n_cat
 
 
-class Epinion(dataset):
+class Epinion(Dataset):
     def __init__(self):
         super(Epinion, self).__init__()
+        self.path_name = 'epinion'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'rating_with_timestamp.mat')):
+            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Epinion%26Ciao/rating_with_timestamp.mat'
+            file_name = 'rating_with_timestamp.mat'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'trust.mat')):
+            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Epinion%26Ciao/trust.mat'
+            file_name = 'trust.mat'
+            self.download(url, file_name)
+        
+        rating_path = os.path.join(self.root, self.path_name, 'rating_with_timestamp.mat')
+        trust_path = os.path.join(self.root, self.path_name, 'trust.mat')
 
-        data = data_handler("./dataset/Epinion&Ciao/rating_with_timestamp.mat", "./dataset/Epinion&Ciao/trust.mat", 'epinion')
+        data = data_handler(rating_path, trust_path, 'epinion')
 
         R_train, R_test, W, PF_pair, mu = data.load_matrices()
         self.R_train_ = R_train
@@ -1661,11 +1841,25 @@ class Epinion(dataset):
             raise ValueError('datatype should be torch.tensor or np.array')
 
 
-class Ciao(dataset):
+class Ciao(Dataset):
     def __init__(self):
         super(Ciao, self).__init__()
+        self.path_name = 'ciao'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'rating_with_timestamp.mat')):
+            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Epinion%26Ciao/ciao/rating_with_timestamp.mat'
+            file_name = 'rating_with_timestamp.mat'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'trust.mat')):
+            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Epinion%26Ciao/ciao/trust.mat'
+            file_name = 'trust.mat'
+            self.download(url, file_name)
+        
+        rating_path = os.path.join(self.root, self.path_name, 'rating_with_timestamp.mat')
+        trust_path = os.path.join(self.root, self.path_name, 'trust.mat')
 
-        data = data_handler("./dataset/Epinion&Ciao/ciao/rating_with_timestamp.mat", "./dataset/Epinion&Ciao/ciao/trust.mat", "ciao")
+        data = data_handler(rating_path, trust_path, "ciao")
 
         R_train, R_test, W, PF_pair, mu = data.load_matrices()
         self.R_train_ = R_train
@@ -1729,18 +1923,30 @@ class Ciao(dataset):
             raise ValueError('datatype should be torch.tensor or np.array')
 
 
-class Dblp(dataset):
+class Dblp(Dataset):
     def __init__(self):
         super(Dblp, self).__init__()
         dataset_path = './dataset/dblp/'
+        self.path_name = 'dblp'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'author-author.csv')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/dblp/author-author.csv'
+            file_name = 'author-author.csv'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'countries.csv')):
+            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/dblp/countries.csv'
+            file_name = 'countries.csv'
+            self.download(url, file_name)
+
 
         with open(
-                join(dataset_path, "author-author.csv"), mode="r", encoding="ISO-8859-1"
+                join(self.root, self.path_name, "author-author.csv"), mode="r", encoding="ISO-8859-1"
         ) as file_name:
             edges = np.genfromtxt(file_name, delimiter=",", dtype=int)
 
         with open(
-                join(dataset_path, "countries.csv"), mode="r", encoding="ISO-8859-1"
+                join(self.root, self.path_name, "countries.csv"), mode="r", encoding="ISO-8859-1"
         ) as file_name:
             attributes = np.genfromtxt(file_name, delimiter=",", dtype=str)
 
@@ -1800,10 +2006,23 @@ class Dblp(dataset):
             raise ValueError('datatype should be torch.tensor or np.array')
 
 
-class Filmtrust(dataset):
+class Filmtrust(Dataset):
     def __init__(self):
         super(Filmtrust, self).__init__()
-        trust_file = open('./dataset/filmtrust/trust.txt')
+        self.path_name = 'filmtrust'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'trust.txt')):
+            url = ''
+            file_name = 'trust.txt'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'ratings.txt')):
+            url = ''
+            file_name = 'ratings.txt'
+            self.download(url, file_name)
+
+
+        trust_file = open(join(self.root, self.path_name, "trust.txt"))
         user_id=[]
         for line in trust_file.readlines():
             rating = line.strip().split(' ')
@@ -1812,7 +2031,7 @@ class Filmtrust(dataset):
         user_num=max(user_id)
 
 
-        ratings_file=open('./dataset/filmtrust/ratings.txt')
+        ratings_file=open(join(self.root, self.path_name, "ratings.txt"))
         user_id=[]
         item_id=[]
         rating_value=[]
@@ -1822,10 +2041,6 @@ class Filmtrust(dataset):
             item_id.append(int(rating[1]))
             rating_value.append(float(rating[2]))
 
-        print(max(user_id))
-        print(max(item_id))
-        print(len(rating_value))
-
         rating_matrix = np.zeros([user_num,max(item_id)])
 
         for uid, iid, value in zip(user_id,item_id,rating_value):
@@ -1833,7 +2048,7 @@ class Filmtrust(dataset):
 
 
 
-        trust_file = open('./dataset/filmtrust/trust.txt')
+        trust_file = open(join(self.root, self.path_name, "trust.txt"))
         trust_matrix=np.zeros([user_num,user_num])
         for line in trust_file.readlines():
             rating=line.strip().split(' ')
@@ -1868,20 +2083,21 @@ class Filmtrust(dataset):
         else:
             raise ValueError('datatype should be torch.tensor or np.array')
 
-class Lastfm(dataset):
+class Lastfm(Dataset):
     def __init__(self):
         super(Lastfm, self).__init__()
-        V=np.loadtxt('./dataset/lastfm/LF.csv',delimiter=',')
-        print("relevance scoring data loaded")
+        self.path_name = 'lastfm'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'LF.csv')):
+            url = ''
+            file_name = 'LF.csv'
+            self.download(url, file_name)
+
+        V=np.loadtxt(os.path.join(self.root, self.path_name, 'LF.csv'),delimiter=',')
 
         m=V.shape[0] # number of customers
         n=V.shape[1] # number of producers
-
-        print(m)
-        print(n)
-        print(V)
-
-        print((V!=0).sum())
 
         U=range(m) # list of customers
         P=range(n) # list of producers
@@ -1912,29 +2128,36 @@ class Lastfm(dataset):
         else:
             raise ValueError('datatype should be torch.tensor or np.array')
 
-class Ml_1m(dataset):
+class Ml_1m(Dataset):
     def __init__(self):
         super(Lm, self).__init__()
         dataset_name='ml-1m'
         user_num=6040
         item_num=3952
-        data=open('./dataset/{}/ratings.dat'.format(dataset_name))
-        rating_matrix=np.zeros([user_num,item_num])
+        self.path_name = 'ml-1m'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'ratings.dat')):
+            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/ml-1m/ratings.dat'
+            file_name = 'ratings.dat'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'users.dat')):
+            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/ml-1m/users.dat'
+            file_name = 'users.dat'
+            self.download(url, file_name)
 
-        print(len(data.readlines()))
+        data=open(join(self.root, self.path_name, "ratings.dat"))
+        rating_matrix=np.zeros([user_num,item_num])
 
         for line in data.readlines():
             rating=line.strip().split('::')
             rating_matrix[int(rating[0])-1,int(rating[1])-1]=float(rating[2])
 
-
-        user_info=open('./dataset/{}/users.dat'.format(dataset_name))
+        user_info=open(join(self.root, self.path_name, "users.dat"))
         user_feat=[]
         for line in user_info:
             infor=line.strip().split('::')
-            print(infor)
             user_feat.append(infor[1:])
-        print(user_feat)
         user_sens=[0 if one[0]=='F' else 1 for one in user_feat]
 
         self.rating_matrix_=rating_matrix
@@ -1963,30 +2186,36 @@ class Ml_1m(dataset):
         else:
             raise ValueError('datatype should be torch.tensor or np.array')
 
-class Ml_100k(dataset):
+class Ml_100k(Dataset):
     def __init__(self):
         super(Ml1m, self).__init__()
         dataset_name='ml-100k'
-        data=open('./dataset/{}/u.data'.format(dataset_name))
+        self.path_name = 'ml-100k'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'u.data')):
+            url = ''
+            file_name = 'u.data'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'u.user')):
+            url = ''
+            file_name = 'u.user'
+            self.download(url, file_name)
+        data=open(join(self.root, self.path_name, "u.data"))
         user_num=943
         item_num=1682
 
         rating_matrix=np.zeros([user_num,item_num])
 
-        print(len(data.readlines()))
-
         for line in data.readlines():
             rating=line.strip().split('\t')
             rating_matrix[int(rating[0])-1,int(rating[1])-1]=float(rating[2])
 
-        user_info=open('./dataset/{}/u.user'.format(dataset_name))
+        user_info=open(join(self.root, self.path_name, "u.user"))
         user_feat=[]
         for line in user_info:
             infor=line.strip().split('|')
-            #print(infor)
             user_feat.append(infor[1:])
-
-        print(user_feat)
 
         user_sens=[0 if one[1]=='F' else 1 for one in user_feat]
 
@@ -2015,17 +2244,26 @@ class Ml_100k(dataset):
         else:
             raise ValueError('datatype should be torch.tensor or np.array')
 
-class Ml_20m(dataset):
+class Ml_20m(Dataset):
     def __init__(self):
         super(Ml1m, self).__init__()
         dataset_name='ml-20m'
         user_num=138493
         item_num=27278
-        data = pd.read_csv('./dataset/{}/ratings.csv'.format(dataset_name))
+        self.path_name = 'ml-20m'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'ratings.csv')):
+            url = ''
+            file_name = 'ratings.csv'
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'movies.csv')):
+            url = ''
+            file_name = 'movies.csv'
+            self.download(url, file_name)
+        data = pd.read_csv(os.path.join(self.root, self.path_name, 'ratings.csv'))
 
-        movies = pd.read_csv('./dataset/{}/movies.csv'.format(dataset_name))
-        print(movies)
-        print(data.shape[0])
+        movies = pd.read_csv(os.path.join(self.root, self.path_name, 'movies.csv'))
         movieid2id=dict()
         for i in range(movies.shape[0]):
             movieid2id[int(movies.iloc[i,0])]=i
@@ -2035,7 +2273,7 @@ class Ml_20m(dataset):
         for i in range(data.shape[0]):
             rating_matrix[int(data.iloc[i,0])-1,movieid2id[int(data.iloc[i,1])]]=int(data.iloc[i,2]*10)
 
-        np.save('./dataset/{}/rating_matrix.npy'.format(dataset_name),rating_matrix)
+        np.save(os.path.join(self.root, self.path_name, 'rating_matrix.npy'),rating_matrix)
         self.rating_matrix_=rating_matrix
         self.rating_matrix_ = torch.tensor(self.rating_matrix_)
     
@@ -2049,7 +2287,7 @@ class Ml_20m(dataset):
         else:
             raise ValueError('datatype should be torch.tensor or np.array')
 
-class Oklahoma(dataset):
+class Oklahoma(Dataset):
     def __init__(self):
         super(Oklahoma, self).__init__()
         dataset_name='oklahoma'
@@ -2058,13 +2296,31 @@ class Oklahoma(dataset):
             dataset_name='Oklahoma97'
         elif dataset_name=='unc28':
             dataset_name='UNC28'
+        self.path_name = 'oklahoma'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, '{}_feat.pkl'.format(dataset_name))):
+            url = ''
+            file_name = '{}_feat.pkl'.format(dataset_name)
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, '{}_user_sen.pkl'.format(dataset_name))):
+            url = ''
+            file_name = '{}_user_sen.pkl'.format(dataset_name)
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, '{}_train_items.pkl'.format(dataset_name))):
+            url = ''
+            file_name = '{}_train_items.pkl'.format(dataset_name)
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, '{}_test_set.pkl'.format(dataset_name))):
+            url = ''
+            file_name = '{}_test_set.pkl'.format(dataset_name)
+            self.download(url, file_name)
 
-
-        feats=pkl.load(open('./dataset/oklahoma&unc/{}/{}_feat.pkl'.format(dataset_name,dataset_name), 'rb'))
-        sens=pkl.load(open('./dataset/oklahoma&unc/{}/{}_user_sen.pkl'.format(dataset_name,dataset_name), 'rb'))
+        feats=pkl.load(open(join(self.root, self.path_name, '{}_feat.pkl'.format(dataset_name)), 'rb'))
+        sens=pkl.load(open(join(self.root, self.path_name, '{}_user_sen.pkl'.format(dataset_name)), 'rb'))
         sens=[sens[idx] for idx in range(feats.shape[0])]
-        train_items=pkl.load(open('./dataset/oklahoma&unc/UNC28/UNC28_train_items.pkl', 'rb'))
-        test_items=pkl.load(open('./dataset/oklahoma&unc/UNC28/UNC28_test_set.pkl', 'rb'))
+        train_items=pkl.load(open(join(self.root, self.path_name, '{}_train_items.pkl'.format(dataset_name)), 'rb'))
+        test_items=pkl.load(open(join(self.root, self.path_name, '{}_test_set.pkl'.format(dataset_name)), 'rb'))
 
         adj=np.zeros([feats.shape[0], feats.shape[0]])
 
@@ -2136,7 +2392,7 @@ class Oklahoma(dataset):
             raise ValueError('datatype should be torch.tensor or np.array')
 
 
-class UNC(dataset):
+class UNC(Dataset):
     def __init__(self):
         super(UNC, self).__init__()
         from scipy.io import loadmat
@@ -2147,11 +2403,31 @@ class UNC(dataset):
             dataset_name='UNC28'
 
 
-        feats=pkl.load(open('./dataset/oklahoma&unc/{}/{}_feat.pkl'.format(dataset_name,dataset_name), 'rb'))
-        sens=pkl.load(open('./dataset/oklahoma&unc/{}/{}_user_sen.pkl'.format(dataset_name,dataset_name), 'rb'))
+        self.path_name = 'unc28'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, '{}_feat.pkl'.format(dataset_name))):
+            url = ''
+            file_name = '{}_feat.pkl'.format(dataset_name)
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, '{}_user_sen.pkl'.format(dataset_name))):
+            url = ''
+            file_name = '{}_user_sen.pkl'.format(dataset_name)
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, '{}_train_items.pkl'.format(dataset_name))):
+            url = ''
+            file_name = '{}_train_items.pkl'.format(dataset_name)
+            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, '{}_test_set.pkl'.format(dataset_name))):
+            url = ''
+            file_name = '{}_test_set.pkl'.format(dataset_name)
+            self.download(url, file_name)
+
+        feats=pkl.load(open(join(self.root, self.path_name, '{}_feat.pkl'.format(dataset_name)), 'rb'))
+        sens=pkl.load(open(join(self.root, self.path_name, '{}_user_sen.pkl'.format(dataset_name)), 'rb'))
         sens=[sens[idx] for idx in range(feats.shape[0])]
-        train_items=pkl.load(open('./dataset/oklahoma&unc/UNC28/UNC28_train_items.pkl', 'rb'))
-        test_items=pkl.load(open('./dataset/oklahoma&unc/UNC28/UNC28_test_set.pkl', 'rb'))
+        train_items=pkl.load(open(join(self.root, self.path_name, '{}_train_items.pkl'.format(dataset_name)), 'rb'))
+        test_items=pkl.load(open(join(self.root, self.path_name, '{}_test_set.pkl'.format(dataset_name)), 'rb'))
 
         adj=np.zeros([feats.shape[0], feats.shape[0]])
 
