@@ -252,10 +252,14 @@ def compute_bpr_loss(pos_score, neg_score, pos_weights):
 def compute_entropy_loss(pos_score, neg_score, pos_weights):
     """Compute cross entropy loss for link prediction
     """
+
+
     neg_weights = torch.ones(len(neg_score)).to(neg_score.device)
     weights = torch.cat([pos_weights, neg_weights])
     scores = torch.cat([pos_score, neg_score])
     labels = torch.cat([torch.ones(pos_score.shape[0]), torch.zeros(neg_score.shape[0])]).to(neg_score.device)
+
+
 
     return F.binary_cross_entropy_with_logits(scores, labels, weights)
 
@@ -565,8 +569,8 @@ def construct_link_prediction_data_by_node(data_name='movielens', adj=None, feat
 
 
 class UGE():
-    def fit(self,adj, feats, labels,idx_train, sens, model='gcn', debias_method='uge-w', debias_attr='gender', reg_weight=0.5, loss='entropy',lr=0.01,
-            weight_decay=5e-4, dim1=64, dim2=16, predictor='dot', seed=0, device=0, epochs=50):
+    def fit(self,adj, feats, labels,idx_train, sens, model='gcn', debias_method='uge-w', debias_attr='gender', reg_weight=0.5, loss='entropy',lr=0.01/20,
+            weight_decay=5e-4, dim1=64, dim2=32, predictor='dot', seed=0, device=0, epochs=50):
         self.labels=labels
         self.sens=sens.squeeze()
         self.model=model
@@ -672,6 +676,10 @@ class UGE():
             else:
                 raise AssertionError(f"unknown loss: {self.loss}")
 
+            #print(train_pos_score)
+            #print(train_neg_score)
+            #print(train_weights)
+
             # backward
             optimizer.zero_grad()
             loss.backward()
@@ -680,26 +688,46 @@ class UGE():
             dur.append(time.time() - cur)
             cur = time.time()
 
-            if e % 20 == 20:
+            #if e % 50 == 49:
                 # evaluation on test set
                 # print ('evaluating at epoch {}...'.format(e))
-                model.eval()
-                with torch.no_grad():
-                    test_pos_score = pred(test_pos_g, h)
-                    test_neg_score = pred(test_neg_g, h)
-                    test_auc, test_ndcg = compute_metric(test_pos_score, test_neg_score)
-                    train_auc, train_ndcg = compute_metric(train_pos_score, train_neg_score)
+                #model.eval()
+                #with torch.no_grad():
+                    #test_pos_score = pred(test_pos_g, h)
+                    #test_neg_score = pred(test_neg_g, h)
+                    #test_auc, test_ndcg = compute_metric(test_pos_score, test_neg_score)
+                    #train_auc, train_ndcg = compute_metric(train_pos_score, train_neg_score)
 
-                print(
-                    "-- Epoch {:05d} | Loss {:.4f} | Train AUC {:.4f} | Train NDCG {:.4f} | Test AUC {:.4f} | Test NDCG {:.4f} | Time {:.4f}".format(
-                        e, loss.item(), train_auc, train_ndcg, test_auc, test_ndcg, dur[-1]))
+                #print(
+                #    "-- Epoch {:05d} | Loss {:.4f} | Train AUC {:.4f} | Train NDCG {:.4f} | Test AUC {:.4f} | Test NDCG {:.4f} | Time {:.4f}".format(
+                #        e, loss.item(), train_auc, train_ndcg, test_auc, test_ndcg, dur[-1]))
 
         # Save learned embedding dynamically
         self.embs = h.detach().cpu().numpy()
-        self.lgreg = LogisticRegression(random_state=0, class_weight='balanced', max_iter=500).fit(
+
+        print(self.embs.shape)
+        print(labels.shape)
+
+        self.lgreg = LogisticRegression(penalty='none',random_state=1, class_weight='balanced',solver='lbfgs', max_iter=50000).fit(
             self.embs[idx_train], labels[idx_train])
+
+
+
         self.lgreg_sens = LogisticRegression(random_state=0, class_weight='balanced', max_iter=500).fit(
             self.embs[idx_train], self.sens[idx_train])
+
+
+        pred = self.lgreg.predict(self.embs[idx_train])
+        print(pred)
+        print(self.labels[idx_train])
+
+        F1 = f1_score(self.labels[idx_train], pred, average='micro')
+        ACC=accuracy_score(self.labels[idx_train], pred,)
+        AUCROC=roc_auc_score(self.labels[idx_train], pred)
+
+
+        print(F1, ACC)
+
 
 
 
@@ -737,6 +765,11 @@ class UGE():
         pred = self.lgreg.predict_proba(self.embs[idx_val])
         loss_fn=torch.nn.BCELoss()
         self.val_loss=loss_fn(torch.FloatTensor(pred).softmax(-1)[:,-1], torch.tensor(self.labels[idx_val]).float()).item()
+
+        print(F1, ACC)
+        print(SP, EO)
+
+
         return ACC, AUCROC, F1, ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1, SP, EO
 
 
