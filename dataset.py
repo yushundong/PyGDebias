@@ -16,10 +16,18 @@ import requests
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 import tensorflow as tf
+import zipfile
+import io
+import gdown
 
 """
 NotLoaded: LCC, Filmtrust, Lastfm, UNC, oklahoma
 """
+
+
+import requests
+
+
 
 class Dataset(object):
     def __init__(self, root: str = './dataset') -> None:
@@ -40,7 +48,12 @@ class Dataset(object):
         r = requests.get(url)
         assert r.status_code == 200
         open(os.path.join(self.root, self.path_name, filename), 'wb').write(r.content)
-        
+    
+    def download_zip(self, url: str):
+        r = requests.get(url)
+        assert r.status_code == 200
+        foofile = zipfile.ZipFile(io.BytesIO(r.content))
+        foofile.extractall(os.path.join(self.root, self.path_name))     
 
     def adj(self, datatype: str = 'torch.sparse'):
         assert str(type(self.adj_)) == "<class 'torch.Tensor'>"
@@ -501,16 +514,20 @@ class Pokec_z(Dataset):
         """Load data"""
 
         self.path_name = 'pokec_z'
-        if not os.path.exists(os.path.join(self.root, self.path_name, 'pokec_z.csv')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/pokec_z/pokec_z.csv'
-            filename = 'pokec_z.csv'
-            self.download(url, filename)
-        if not os.path.exists(os.path.join(self.root, self.path_name, 'pokec_z_relationship.txt')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/pokec_z/pokec_z_relationship.txt'
-            filename = 'pokec_z_relationship.txt'
-            self.download(url, filename)
+        self.url = 'https://drive.google.com/u/0/uc?id=1FOYOIdFp6lI9LH5FJAzLhjFCMAxT6wb4&export=download'
+        self.destination = os.path.join(self.root, self.path_name, 'pokec_z.zip')
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'region_job.csv')):
+            gdown.download(self.url, self.destination, quiet=False)
+            with zipfile.ZipFile(self.destination, 'r') as zip_ref:
+                zip_ref.extractall(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'region_job_relationship.txt')):
+            gdown.download(self.url, self.destination, quiet=False)
+            with zipfile.ZipFile(self.destination, 'r') as zip_ref:
+                zip_ref.extractall(os.path.join(self.root, self.path_name))
 
-        idx_features_labels = pd.read_csv(os.path.join(self.root, self.path_name, 'pokec_z.csv'))
+        idx_features_labels = pd.read_csv(os.path.join(self.root, self.path_name, 'region_job.csv'))
         header = list(idx_features_labels.columns)
         header.remove("user_id")
 
@@ -523,7 +540,7 @@ class Pokec_z(Dataset):
         # build graph
         idx = np.array(idx_features_labels["user_id"], dtype=np.int64)
         idx_map = {j: i for i, j in enumerate(idx)}
-        edges_unordered = np.genfromtxt(os.path.join(self.root, self.path_name, 'pokec_z_relationship.txt'), dtype=np.int64)
+        edges_unordered = np.genfromtxt(os.path.join(self.root, self.path_name, 'region_job_relationship.txt'), dtype=np.int64)
 
         edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
                          dtype=np.int64).reshape(edges_unordered.shape)
@@ -624,16 +641,20 @@ class Pokec_n(Dataset):
         """Load data"""
 
         self.path_name = 'pokec_n'
-        if not os.path.exists(os.path.join(self.root, self.path_name, 'pokec_n.csv')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/pokec_n/pokec_n.csv'
-            filename = 'pokec_n.csv'
-            self.download(url, filename)
-        if not os.path.exists(os.path.join(self.root, self.path_name, 'pokec_n_relationship.txt')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/pokec_n/pokec_n_relationship.txt'
-            filename = 'pokec_n_relationship.txt'
-            self.download(url, filename)
+        self.url = 'https://drive.google.com/u/0/uc?id=1wWm6hyCUjwnr0pWlC6OxZIj0H0ZSnGWs&export=download'
+        self.destination = os.path.join(self.root, self.path_name, 'pokec_n.zip')
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'region_job_2.csv')):
+            gdown.download(self.url, self.destination, quiet=False)
+            with zipfile.ZipFile(self.destination, 'r') as zip_ref:
+                zip_ref.extractall(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'region_job_2_relationship.txt')):
+            gdown.download(self.url, self.destination, quiet=False)
+            with zipfile.ZipFile(self.destination, 'r') as zip_ref:
+                zip_ref.extractall(os.path.join(self.root, self.path_name))
 
-        idx_features_labels = pd.read_csv(os.path.join(self.root, self.path_name, 'pokec_n.csv'))
+        idx_features_labels = pd.read_csv(os.path.join(self.root, self.path_name, 'region_job_2.csv'))
         header = list(idx_features_labels.columns)
         header.remove("user_id")
 
@@ -646,7 +667,7 @@ class Pokec_n(Dataset):
         # build graph
         idx = np.array(idx_features_labels["user_id"], dtype=np.int64)
         idx_map = {j: i for i, j in enumerate(idx)}
-        edges_unordered = np.genfromtxt(os.path.join(self.root, self.path_name, 'pokec_n_relationship.txt'), dtype=np.int64)
+        edges_unordered = np.genfromtxt(os.path.join(self.root, self.path_name, 'region_job_2_relationship.txt'), dtype=np.int64)
 
         edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
                          dtype=np.int64).reshape(edges_unordered.shape)
@@ -1345,24 +1366,26 @@ class LCC(Dataset):
         self.path_name='LCC'
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
-        if not os.path.exists(os.path.join(self.root, self.path_name, 'edgelist_{}.txt'.format(name))):
-            url = ''
-            file_name = 'edgelist_{}.txt'.format(name)
-            self.download(url, file_name)
-        if not os.path.exists(os.path.join(self.root, self.path_name, 'labels_{}.txt'.format(name))):
-            url = ''
-            file_name = 'labels_{}.txt'.format(name)
-            self.download(url, file_name)
-        if not os.path.exists(os.path.join(self.root, self.path_name, 'sens_{}.txt'.format(name))):
-            url = ''
-            file_name = 'sens_{}.txt'.format(name)
-            self.download(url, file_name)
-        if not os.path.exists(os.path.join(self.root, self.path_name, 'features_{}.txt'.format(name))):
-            url = ''
-            file_name = 'X_{}.npz'.format(name)
-            self.download(url, file_name)
+        self.url = 'https://drive.google.com/u/0/uc?id=1wYb0wP8XgWsAhGPt_o3fpMZDM-yIATFQ&export=download'
+        self.destination = os.path.join(self.root, self.path_name, 'raw_LCC.zip')
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'raw_LCC/edgelist_{}.txt'.format(name))):
+            gdown.download(self.url, self.destination, quiet=False)
+            with zipfile.ZipFile(self.destination, 'r') as zip_ref:
+                zip_ref.extractall(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'raw_LCC/labels_{}.txt'.format(name))):
+            gdown.download(self.url, self.destination, quiet=False)
+            with zipfile.ZipFile(self.destination, 'r') as zip_ref:
+                zip_ref.extractall(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'raw_LCC/sens_{}.txt'.format(name))):
+            gdown.download(self.url, self.destination, quiet=False)
+            with zipfile.ZipFile(self.destination, 'r') as zip_ref:
+                zip_ref.extractall(os.path.join(self.root, self.path_name))
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'raw_LCC/X_{}.npz'.format(name))):
+            gdown.download(self.url, self.destination, quiet=False)
+            with zipfile.ZipFile(self.destination, 'r') as zip_ref:
+                zip_ref.extractall(os.path.join(self.root, self.path_name))
 
-        edgelist=csv.reader(open(os.path.join(self.root, self.path_name, 'edgelist_{}.txt'.format(name))))
+        edgelist=csv.reader(open(os.path.join(self.root, self.path_name, 'raw_LCC/edgelist_{}.txt'.format(name))))
 
         edges=[]
         for line in edgelist:
@@ -1372,13 +1395,13 @@ class LCC(Dataset):
 
         edges=np.array(edges)
 
-        labels_file=csv.reader(open(os.path.join(self.root, self.path_name, 'labels_{}.txt'.format(name))))
+        labels_file=csv.reader(open(os.path.join(self.root, self.path_name, 'raw_LCC/labels_{}.txt'.format(name))))
         labels=[]
         for line in labels_file:
             labels.append(float(line[0].split('\t')[1]))
         labels=np.array(labels)
 
-        sens_file=csv.reader(open(os.path.join(self.root, self.path_name, 'sens_{}.txt'.format(name))))
+        sens_file=csv.reader(open(os.path.join(self.root, self.path_name, 'raw_LCC/sens_{}.txt'.format(name))))
         sens=[]
         for line in sens_file:
             sens.append([float(line[0].split('\t')[1])])
@@ -1406,13 +1429,13 @@ class LCC(Dataset):
         idx_test = torch.LongTensor(idx_test)
         labels = torch.LongTensor(labels)
         sens = torch.FloatTensor(sens)
-        features=np.load(os.path.join(self.root, self.path_name, 'X_{}.npz'.format(name)))
+        features=np.load(os.path.join(self.root, self.path_name, 'raw_LCC/X_{}.npz'.format(name)))
 
 
         features=torch.FloatTensor(sp.coo_matrix((features['data'], (features['row'], features['col'])),
                     shape=(labels.shape[0], np.max(features['col'])+1),
                     dtype=np.float32).todense())
-        features = torch.cat([features, sens.unsqueeze(-1)], -1)
+        features = torch.cat([features, sens], -1)
         adj=mx_to_torch_sparse_tensor(adj, is_sparse=True)
         self.adj_=adj
         self.features_=features
@@ -1607,36 +1630,31 @@ class Yelp(Dataset):
         self.path_name = 'yelp'
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
-        if not os.path.exists(os.path.join(self.root, self.path_name, 'training_df.pkl')):
-            url = ''
-            file_name = 'training_df.pkl'
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'Yelp/training_df.pkl')):
+            url = 'https://drive.google.com/u/0/uc?id=1H0gfETzTNG9rWpSOR4wg2hctcIEJHrz1&export=download'
+            self.download_zip(url)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'Yelp/valiing_df.pkl')):
+            url = 'https://drive.google.com/u/0/uc?id=1H0gfETzTNG9rWpSOR4wg2hctcIEJHrz1&export=download'
+            self.download_zip(url)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'Yelp/key_genre.pkl')):
+            url = 'https://drive.google.com/file/d/1H0gfETzTNG9rWpSOR4wg2hctcIEJHrz1/view?usp=sharing/training_df.pk'
             self.download(url, file_name)
-        if not os.path.exists(os.path.join(self.root, self.path_name, 'valiing_df.pkl')):
-            url = ''
-            file_name = 'valiing_df.pkl'
-            self.download(url, file_name)
-        if not os.path.exists(os.path.join(self.root, self.path_name, 'key_genre.pkl')):
-            url = ''
-            file_name = 'key_genre.pkl'
-            self.download(url, file_name)
-        if not os.path.exists(os.path.join(self.root, self.path_name, 'item_idd_genre_list.pkl')):
-            url = ''
-            file_name = 'item_idd_genre_list.pkl'
-            self.download(url, file_name)
-        if not os.path.exists(os.path.join(self.root, self.path_name, 'genre_count.pkl')):
-            url = ''
-            file_name = 'genre_count.pkl'
-            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'Yelp/item_idd_genre_list.pkl')):
+            url = 'https://drive.google.com/u/0/uc?id=1H0gfETzTNG9rWpSOR4wg2hctcIEJHrz1&export=download'
+            self.download_zip(url)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'Yelp/genre_count.pkl')):
+            url = 'https://drive.google.com/u/0/uc?id=1H0gfETzTNG9rWpSOR4wg2hctcIEJHrz1&export=download'
+            self.download_zip(url)
 
 
 
-        train_df = pkl.load(open(os.path.join(self.root, self.path_name, 'training_df.pkl'),'rb'))
-        vali_df = pkl.load(open(os.path.join(self.root, self.path_name, 'valiing_df.pkl'), 'rb')) # for validation
+        train_df = pkl.load(open(os.path.join(self.root, self.path_name, 'Yelp/training_df.pkl'),'rb'))
+        vali_df = pkl.load(open(os.path.join(self.root, self.path_name, 'Yelp/valiing_df.pkl'), 'rb')) # for validation
         # vali_df = pkl.load(open('./' + dataname + '/testing_df.pkl'))  # for testing
-        key_genre = pkl.load(open(os.path.join(self.root, self.path_name, 'key_genre.pkl'),'rb'))
-        item_idd_genre_list = pkl.load(open(os.path.join(self.root, self.path_name, 'item_idd_genre_list.pkl'),'rb'))
+        key_genre = pkl.load(open(os.path.join(self.root, self.path_name, 'Yelp/key_genre.pkl'),'rb'))
+        item_idd_genre_list = pkl.load(open(os.path.join(self.root, self.path_name, 'Yelp/item_idd_genre_list.pkl'),'rb'))
         #genre_item_vector = pkl.load(open('./' + dataname + '/genre_item_vector.pkl','rb'))
-        genre_count = pkl.load(open(os.path.join(self.root, self.path_name, 'genre_count.pkl'),'rb'))
+        genre_count = pkl.load(open(os.path.join(self.root, self.path_name, 'Yelp/genre_count.pkl'),'rb'))
         #user_genre_count = pkl.load(open('./' + dataname + '/user_genre_count.pkl','rb'))
 
         num_item = len(train_df['item_id'].unique())
@@ -2012,17 +2030,17 @@ class Filmtrust(Dataset):
         self.path_name = 'filmtrust'
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
-        if not os.path.exists(os.path.join(self.root, self.path_name, 'trust.txt')):
-            url = ''
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'filmtrust/trust.txt')):
+            url = 'https://drive.google.com/u/0/uc?id=1VQTcVOwNuak0_6YvQri9aXQxrtIuVP86&export=download'
             file_name = 'trust.txt'
-            self.download(url, file_name)
-        if not os.path.exists(os.path.join(self.root, self.path_name, 'ratings.txt')):
-            url = ''
+            self.download_zip(url)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'filmtrust/ratings.txt')):
+            url = 'https://drive.google.com/u/0/uc?id=1VQTcVOwNuak0_6YvQri9aXQxrtIuVP86&export=download'
             file_name = 'ratings.txt'
-            self.download(url, file_name)
+            self.download_zip(url)
 
 
-        trust_file = open(join(self.root, self.path_name, "trust.txt"))
+        trust_file = open(join(self.root, self.path_name, "filmtrust/trust.txt"))
         user_id=[]
         for line in trust_file.readlines():
             rating = line.strip().split(' ')
@@ -2031,7 +2049,7 @@ class Filmtrust(Dataset):
         user_num=max(user_id)
 
 
-        ratings_file=open(join(self.root, self.path_name, "ratings.txt"))
+        ratings_file=open(join(self.root, self.path_name, "filmtrust/ratings.txt"))
         user_id=[]
         item_id=[]
         rating_value=[]
@@ -2048,7 +2066,7 @@ class Filmtrust(Dataset):
 
 
 
-        trust_file = open(join(self.root, self.path_name, "trust.txt"))
+        trust_file = open(join(self.root, self.path_name, "filmtrust/trust.txt"))
         trust_matrix=np.zeros([user_num,user_num])
         for line in trust_file.readlines():
             rating=line.strip().split(' ')
@@ -2087,14 +2105,16 @@ class Lastfm(Dataset):
     def __init__(self):
         super(Lastfm, self).__init__()
         self.path_name = 'lastfm'
+        self.url = 'https://drive.google.com/u/0/uc?id=1paK8y0Ii4r6Z2x3H4PqdnAW9N3siMTnh&export=download'
+        self.destination = join(self.root, self.path_name, 'lastfm.zip')
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
         if not os.path.exists(os.path.join(self.root, self.path_name, 'LF.csv')):
-            url = ''
-            file_name = 'LF.csv'
-            self.download(url, file_name)
+            gdown.download(self.url, self.destination, quiet=False)
+            with zipfile.ZipFile(self.destination, 'r') as zip_ref:
+                zip_ref.extractall(os.path.join(self.root, self.path_name))
 
-        V=np.loadtxt(os.path.join(self.root, self.path_name, 'LF.csv'),delimiter=',')
+        V=np.loadtxt(os.path.join(self.root, self.path_name, 'lastfm/LF.csv'),delimiter=',')
 
         m=V.shape[0] # number of customers
         n=V.shape[1] # number of producers
@@ -2297,30 +2317,25 @@ class Oklahoma(Dataset):
         elif dataset_name=='unc28':
             dataset_name='UNC28'
         self.path_name = 'oklahoma'
+
+        self.url = 'https://drive.google.com/u/0/uc?id=1tNcxgtEQX3dtDKqwDMswJEvxpKBpov75&export=download'
+        self.destination = os.path.join(self.root, self.path_name, 'oklahoma.zip')
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
-        if not os.path.exists(os.path.join(self.root, self.path_name, '{}_feat.pkl'.format(dataset_name))):
-            url = ''
-            file_name = '{}_feat.pkl'.format(dataset_name)
-            self.download(url, file_name)
-        if not os.path.exists(os.path.join(self.root, self.path_name, '{}_user_sen.pkl'.format(dataset_name))):
-            url = ''
-            file_name = '{}_user_sen.pkl'.format(dataset_name)
-            self.download(url, file_name)
-        if not os.path.exists(os.path.join(self.root, self.path_name, '{}_train_items.pkl'.format(dataset_name))):
-            url = ''
-            file_name = '{}_train_items.pkl'.format(dataset_name)
-            self.download(url, file_name)
-        if not os.path.exists(os.path.join(self.root, self.path_name, '{}_test_set.pkl'.format(dataset_name))):
-            url = ''
-            file_name = '{}_test_set.pkl'.format(dataset_name)
-            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'Oklahoma97/{}_feat.pkl'.format(dataset_name))):
+            self.download_zip(self.url)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'Oklahoma97/{}_user_sen.pkl'.format(dataset_name))):
+            self.download_zip(self.url)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'Oklahoma97/{}_train_items.pkl'.format(dataset_name))):
+            self.download_zip(self.url)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'Oklahoma97/{}_test_set.pkl'.format(dataset_name))):
+            self.download_zip(self.url)
 
-        feats=pkl.load(open(join(self.root, self.path_name, '{}_feat.pkl'.format(dataset_name)), 'rb'))
-        sens=pkl.load(open(join(self.root, self.path_name, '{}_user_sen.pkl'.format(dataset_name)), 'rb'))
+        feats=pkl.load(open(join(self.root, self.path_name, 'Oklahoma97/{}_feat.pkl'.format(dataset_name)), 'rb'))
+        sens=pkl.load(open(join(self.root, self.path_name, 'Oklahoma97/{}_user_sen.pkl'.format(dataset_name)), 'rb'))
         sens=[sens[idx] for idx in range(feats.shape[0])]
-        train_items=pkl.load(open(join(self.root, self.path_name, '{}_train_items.pkl'.format(dataset_name)), 'rb'))
-        test_items=pkl.load(open(join(self.root, self.path_name, '{}_test_set.pkl'.format(dataset_name)), 'rb'))
+        train_items=pkl.load(open(join(self.root, self.path_name, 'Oklahoma97/{}_train_items.pkl'.format(dataset_name)), 'rb'))
+        test_items=pkl.load(open(join(self.root, self.path_name, 'Oklahoma97/{}_test_set.pkl'.format(dataset_name)), 'rb'))
 
         adj=np.zeros([feats.shape[0], feats.shape[0]])
 
@@ -2333,8 +2348,8 @@ class Oklahoma(Dataset):
         features = torch.FloatTensor(feats)
         sens = torch.FloatTensor(sens)
         features = torch.cat([features, sens.unsqueeze(-1)], -1)
-        train_items = torch.LongTensor(train_items)
-        test_items = torch.LongTensor(test_items)
+        train_items = train_items
+        test_items = test_items
 
         self.features_=features
         self.train_items_=train_items
@@ -2361,25 +2376,21 @@ class Oklahoma(Dataset):
         else:
             raise ValueError('datatype should be torch.tensor or np.array')
     
-    def train_items(self, datatype: str = 'torch.tensor'):
+    def train_items(self, datatype: str = 'dict'):
         if self.train_items_ is None:
             return self.train_items_
-        if datatype == 'torch.tensor':
+        if datatype == 'dict':
             return self.train_items_
-        elif datatype == 'np.array':
-            return self.train_items_.numpy()
         else:
             raise ValueError('datatype should be torch.tensor or np.array')
     
-    def test_items(self, datatype: str = 'torch.tensor'):
+    def test_items(self, datatype: str = 'dict'):
         if self.test_items_ is None:
             return self.test_items_
-        if datatype == 'torch.tensor':
+        if datatype == 'dict':
             return self.test_items_
-        elif datatype == 'np.array':
-            return self.test_items_.numpy()
         else:
-            raise ValueError('datatype should be torch.tensor or np.array')
+            raise ValueError('datatype should be dict')
     
     def sens(self, datatype: str = 'torch.tensor'):
         if self.sens_ is None:
@@ -2404,30 +2415,24 @@ class UNC(Dataset):
 
 
         self.path_name = 'unc28'
+        self.url = 'https://drive.google.com/u/0/uc?id=17Tqxi3BD1u5OPximt_Kb_ZcX-0DyuRfl&export=download'
+        self.destination = os.path.join(self.root, self.path_name, 'unc28.zip')
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
-        if not os.path.exists(os.path.join(self.root, self.path_name, '{}_feat.pkl'.format(dataset_name))):
-            url = ''
-            file_name = '{}_feat.pkl'.format(dataset_name)
-            self.download(url, file_name)
-        if not os.path.exists(os.path.join(self.root, self.path_name, '{}_user_sen.pkl'.format(dataset_name))):
-            url = ''
-            file_name = '{}_user_sen.pkl'.format(dataset_name)
-            self.download(url, file_name)
-        if not os.path.exists(os.path.join(self.root, self.path_name, '{}_train_items.pkl'.format(dataset_name))):
-            url = ''
-            file_name = '{}_train_items.pkl'.format(dataset_name)
-            self.download(url, file_name)
-        if not os.path.exists(os.path.join(self.root, self.path_name, '{}_test_set.pkl'.format(dataset_name))):
-            url = ''
-            file_name = '{}_test_set.pkl'.format(dataset_name)
-            self.download(url, file_name)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'UNC28/{}_feat.pkl'.format(dataset_name))):
+            self.download_zip(self.url)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'UNC28/{}_user_sen.pkl'.format(dataset_name))):
+            self.download_zip(self.url)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'UNC28/{}_train_items.pkl'.format(dataset_name))):
+            self.download_zip(self.url)
+        if not os.path.exists(os.path.join(self.root, self.path_name, 'UNC28/{}_test_set.pkl'.format(dataset_name))):
+            self.download_zip(self.url)
 
-        feats=pkl.load(open(join(self.root, self.path_name, '{}_feat.pkl'.format(dataset_name)), 'rb'))
-        sens=pkl.load(open(join(self.root, self.path_name, '{}_user_sen.pkl'.format(dataset_name)), 'rb'))
+        feats=pkl.load(open(join(self.root, self.path_name, 'UNC28/{}_feat.pkl'.format(dataset_name)), 'rb'))
+        sens=pkl.load(open(join(self.root, self.path_name, 'UNC28/{}_user_sen.pkl'.format(dataset_name)), 'rb'))
         sens=[sens[idx] for idx in range(feats.shape[0])]
-        train_items=pkl.load(open(join(self.root, self.path_name, '{}_train_items.pkl'.format(dataset_name)), 'rb'))
-        test_items=pkl.load(open(join(self.root, self.path_name, '{}_test_set.pkl'.format(dataset_name)), 'rb'))
+        train_items=pkl.load(open(join(self.root, self.path_name, 'UNC28/{}_train_items.pkl'.format(dataset_name)), 'rb'))
+        test_items=pkl.load(open(join(self.root, self.path_name, 'UNC28/{}_test_set.pkl'.format(dataset_name)), 'rb'))
 
         adj=np.zeros([feats.shape[0], feats.shape[0]])
 
@@ -2440,8 +2445,8 @@ class UNC(Dataset):
         features = torch.FloatTensor(feats)
         sens = torch.FloatTensor(sens)
         features = torch.cat([features, sens.unsqueeze(-1)], -1)
-        train_items = torch.LongTensor(train_items)
-        test_items = torch.LongTensor(test_items)
+        train_items = train_items
+        test_items = test_items
 
         self.features_=features
         self.train_items_=train_items
@@ -2468,25 +2473,21 @@ class UNC(Dataset):
         else:
             raise ValueError('datatype should be torch.tensor or np.array')
     
-    def train_items(self, datatype: str = 'torch.tensor'):
+    def train_items(self, datatype: str = 'dict'):
         if self.train_items_ is None:
             return self.train_items_
-        if datatype == 'torch.tensor':
+        if datatype == 'dict':
             return self.train_items_
-        elif datatype == 'np.array':
-            return self.train_items_.numpy()
         else:
             raise ValueError('datatype should be torch.tensor or np.array')
     
-    def test_items(self, datatype: str = 'torch.tensor'):
+    def test_items(self, datatype: str = 'dict'):
         if self.test_items_ is None:
             return self.test_items_
-        if datatype == 'torch.tensor':
+        if datatype == 'dict':
             return self.test_items_
-        elif datatype == 'np.array':
-            return self.test_items_.numpy()
         else:
-            raise ValueError('datatype should be torch.tensor or np.array')
+            raise ValueError('datatype should be dict')
     
     def sens(self, datatype: str = 'torch.tensor'):
         if self.sens_ is None:
@@ -2499,23 +2500,23 @@ class UNC(Dataset):
             raise ValueError('datatype should be torch.tensor or np.array')
 
 
-google = Google()
-facebook = Facebook()
-oklahoma = Oklahoma()
-unc = UNC()
-twitter = Twitter()
-lastfm = Lastfm()
-nba = Nba()
-ml_1m = Ml_1m()
-ml_20m = Ml_20m()
-ml_100k = Ml_100k()
-german = German()
-bail = Bail()
-credit = Credit()
-cora = Cora()
-pokec_n = Pokec_n()
-pokec_z = Pokec_z()
-filmtrust = Filmtrust()
-citeseer = Citeseer()
-yelp = Yelp()
-amazon = Amazon()
+# google = Google()
+# facebook = Facebook()
+# oklahoma = Oklahoma()
+# unc = UNC()
+# twitter = Twitter()
+# lastfm = Lastfm()
+# nba = Nba()
+# ml_1m = Ml_1m()
+# ml_20m = Ml_20m()
+# ml_100k = Ml_100k()
+# german = German()
+# bail = Bail()
+# credit = Credit()
+# cora = Cora()
+# pokec_n = Pokec_n()
+# pokec_z = Pokec_z()
+# filmtrust = Filmtrust()
+# citeseer = Citeseer()
+# yelp = Yelp()
+# amazon = Amazon()
