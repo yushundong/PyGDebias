@@ -569,7 +569,7 @@ class InFoRM_GNN(nn.Module):
     def predict(self):
 
         self.model.eval()
-        output = self.model(self.features, self.edge_index)
+        output = self.model(self.features, self.edge_index).squeeze()
 
         # Report
         output_preds = (output.squeeze() > 0).type_as(self.labels)
@@ -578,14 +578,19 @@ class InFoRM_GNN(nn.Module):
         auc_roc_test = roc_auc_score(self.labels.cpu().numpy()[self.idx_test.cpu().numpy()],
                                      output.detach().cpu().numpy()[self.idx_test.cpu().numpy()])
 
+        print(output)
+        print(output_preds)
+
         F1 = f1_score(self.labels.cpu().numpy()[self.idx_test.cpu().numpy()], output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()], average='micro')
-        ACC=accuracy_score(output.detach().cpu().numpy()[self.idx_test.cpu().numpy()], output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],)
-        AUCROC=roc_auc_score(self.labels[idx_test], output_preds)
+        ACC=accuracy_score(self.labels.detach().cpu().numpy()[self.idx_test.cpu().numpy()], output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],)
+        AUCROC=roc_auc_score(self.labels.cpu().numpy()[self.idx_test.cpu().numpy()], output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()])
 
 
         # counterfactual_fairness = 1 - (output_preds.eq(counter_output_preds)[self.idx_test].sum().item() / self.idx_test.shape[0])
         # robustness_score = 1 - (output_preds.eq(noisy_output_preds)[self.idx_test].sum().item() / self.idx_test.shape[0])
 
+
+        output=output.unsqueeze(1)
         individual_unfairness = torch.trace(torch.mm(output.t(), torch.sparse.mm(self.lap.to(self.device), output))).item()
         f_u1 = torch.trace(torch.mm(output.t(), torch.sparse.mm(self.lap_1, output))) / self.m_u1
         f_u1 = f_u1.item()

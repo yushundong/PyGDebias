@@ -34,7 +34,7 @@ from scipy.sparse.csgraph import laplacian
 import networkx as nx
 import scipy.sparse as sp
 import networkx as nx
-
+from sklearn.metrics import f1_score, roc_auc_score, accuracy_score
 
 
 class JK(nn.Module):
@@ -690,27 +690,28 @@ class GUIDE(nn.Module):
 
     def predict(self):
 
+
         self.model.eval()
         output = self.model.body(self.features, self.edge_index)
 
         self.eval()
         output, attention_weights = self.forward(output, self.sim_edge_index.to(self.device), self.sim_edge_weight.to(self.device), return_attention_weights=True )
+        print(output.shape)
 
-        attention_weights = torch.sparse_coo_tensor(attention_weights[0], attention_weights[1])
-        attention_weights = attention_weights.detach()
-        attention_weights = attention_weights.coalesce()
+        #attention_weights = torch.sparse_coo_tensor(attention_weights[0], attention_weights[1])
+        #attention_weights = attention_weights.detach()
+        #attention_weights = attention_weights.coalesce()
 
 
         # Report
         output_preds = (output.squeeze()>0).type_as(self.labels)
-        auc_roc_test = roc_auc_score(self.labels.cpu().numpy()[self.idx_test.cpu().numpy()], output.detach().cpu().numpy()[self.idx_test.cpu().numpy()])
-
 
 
         F1 = f1_score(self.labels.cpu().numpy()[self.idx_test.cpu().numpy()], output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()], average='micro')
-        ACC=accuracy_score(output.detach().cpu().numpy()[self.idx_test.cpu().numpy()], output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],)
-        AUCROC=roc_auc_score(self.labels[idx_test], output_preds)
+        ACC=accuracy_score(self.labels.detach().cpu().numpy()[self.idx_test.cpu().numpy()], output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],)
+        AUCROC=roc_auc_score(self.labels.cpu().numpy()[self.idx_test.cpu().numpy()], output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()])
 
+        output=output
         individual_unfairness = torch.trace( torch.mm( output.t(), torch.sparse.mm(self.lap, output) ) ).item()
         f_u1 = torch.trace(torch.mm(output.t(), torch.sparse.mm(self.lap_1, output)))/self.m_u1
         f_u1 = f_u1.item()
@@ -722,7 +723,6 @@ class GUIDE(nn.Module):
         # print report
         print("---Testing---")
 
-        print("The AUCROC of estimator: {:.4f}".format(auc_roc_test))
         print(f'Total Individual Unfairness: {individual_unfairness}')
         print(f'Individual Unfairness for Group 1: {f_u1}')
         print(f'Individual Unfairness for Group 2: {f_u2}')
