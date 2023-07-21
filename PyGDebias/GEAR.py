@@ -332,7 +332,7 @@ class CFDA(nn.Module):
         S_agg_cat = torch.floor(S_agg / ((S_agg_max + 0.000001 - S_agg_min) / self.s_num)).long()  # n x 1
 
         print("start training counterfactual augmentation module!")
-        for epoch in range(2000):
+        for epoch in range(500): #2000
             for i in range(3):
                 optimizer_1.zero_grad()
 
@@ -625,6 +625,9 @@ class Subgraph:
 
     def __init__(self, x, edge_index, path, maxsize=50, n_order=10):
         self.x = x
+
+
+
         self.path = path
         self.edge_index = np.array(edge_index)
         self.edge_num = edge_index[0].size(0)
@@ -668,19 +671,28 @@ class Subgraph:
         return self.x[idx]
 
     def build(self, postfix=""):
+
+
+
         # Extract subgraphs for all nodes
-        if os.path.isfile(self.path + '_subgraph' + postfix) and os.stat(
-                self.path + '_subgraph' + postfix).st_size != 0:
-            print("loading subgraphs from" + self.path + '_subgraph' + postfix)
-            self.subgraph = torch.load(self.path + '_subgraph' + postfix)
-            return
+        #if os.path.isfile(self.path + '_subgraph' + postfix) and os.stat(
+        #        self.path + '_subgraph' + postfix).st_size != 0:
+        #    print("loading subgraphs from" + self.path + '_subgraph' + postfix)
+        #    self.subgraph = torch.load(self.path + '_subgraph' + postfix)
+        #    return
+
 
         self.neighbor = self.ppr.search_all(self.node_num, self.path)
+
         self.process_adj_list()
+
+
         for i in range(self.node_num):  # for every node in the graph
             nodes = self.neighbor[i][:self.maxsize]
             x = self.adjust_x(nodes)
             edge = self.adjust_edge(nodes)
+
+
             self.subgraph[i] = Data(x, edge)
         torch.save(self.subgraph, self.path + '_subgraph' + postfix)  # JM: subgraph[i]: center node i's subgraph
         print('save subgraphs in ' + self.path + '_subgraph' + postfix)
@@ -1151,7 +1163,7 @@ def analyze_dependency(sens, adj, ypred_tst, idx_select, type='mean'):
 
 
 class GEAR(torch.nn.Module):
-    def __init__(self, features, hidden_size=1024, proj_hidden=16, num_class=1, encoder_hidden_size=1024, encoder_base_model='gcn', experiment_type='train'):
+    def __init__(self, adj, features, labels, idx_train, idx_val, idx_test, sens, sens_idx, hidden_size=1024, proj_hidden=16, num_class=1, encoder_hidden_size=1024, encoder_base_model='gcn', experiment_type='train'):
         super(GEAR, self).__init__()
         self.encoder = Encoder(features.shape[1], encoder_hidden_size, base_model=encoder_base_model)
         self.hidden_size = hidden_size
@@ -1186,6 +1198,8 @@ class GEAR(torch.nn.Module):
 
         self.reset_parameters()
 
+        self.preprocess(adj, features, labels, idx_train, idx_val, idx_test, sens, sens_idx)
+
     def reset_parameters(self):
         reset(self.encoder)
 
@@ -1197,7 +1211,12 @@ class GEAR(torch.nn.Module):
 
     def forward(self, x, edge_index, batch=None, index=None):
         r""" Return node and subgraph representations of each node before and after being shuffled """
+
+        #print(x.shape)
         hidden = self.encoder(x, edge_index)  # node representation：(No. of subgraphs (=batch size) x subgraph size) x hidden_size
+
+
+
         if index is None:
             return hidden
 
@@ -1248,14 +1267,20 @@ class GEAR(torch.nn.Module):
                                 raw_data_info=raw_data_info)  # generate
             sys.exit()  # stop here
 
-        num_node = self.data.x.size(0)
+        #num_node = self.data.x.size(0)
 
         # Subgraph: Setting up the subgraph extractor
         self.subgraph_size = subgraph_size
         self.ppr_path = './graphFair_subgraph/' + dataset
         self.n_order = n_order
+
+
         self.subgraph = Subgraph(self.data.x, self.data.edge_index, self.ppr_path, self.subgraph_size, n_order)
         self.subgraph.build()
+
+        #batch, index = self.subgraph.search([0])
+        #print(batch.x.shape)
+        #print(1 / 0)
 
         # counterfactual graph generation (may not true)
         self.cf_subgraph_list = []
@@ -1278,6 +1303,7 @@ class GEAR(torch.nn.Module):
                 data_cf_save = {'data_cf': data_cf}
                 pickle.dump(data_cf_save, f)
                 print('saved counterfactual augmentation data in: ', path_cf_ag)
+
 
         cf_subgraph = Subgraph(data_cf.x, data_cf.edge_index, self.ppr_path, self.subgraph_size, n_order)
         cf_subgraph.build(postfix='_cf' + str(0))
@@ -1304,13 +1330,14 @@ class GEAR(torch.nn.Module):
                     data_cf_save = {'data_cf': data_cf}
                     pickle.dump(data_cf_save, f)
                     print('saved counterfactual augmentation data in: ', path_cf_ag)
+
             cf_subgraph = Subgraph(data_cf.x, data_cf.edge_index, self.ppr_path, self.subgraph_size, n_order)
             cf_subgraph.build(postfix='_cf' + str(si + 1))
             self.cf_subgraph_list.append(cf_subgraph)
 
 
 
-    def fit(self, epochs=1000, lr=0.001, batch_size=100, weight_decay=1e-5, sim_coeff=0.6, encoder_name="None", dataset_name="None", device='cuda'):
+    def fit(self, epochs=500, lr=0.001, batch_size=100, weight_decay=1e-5, sim_coeff=0.6, encoder_name="None", dataset_name="None", device='cuda'):
 
         self.batch_size = batch_size
 
@@ -1348,6 +1375,8 @@ class GEAR(torch.nn.Module):
 
                 # forward: factual subgraph
                 batch, index = self.subgraph.search(sample_idx)
+
+
                 z = self(batch.x.cuda(), batch.edge_index.cuda(), batch.batch.cuda(), index.cuda())  # center node rep, subgraph rep
                 #assert 1==0
                 # projector
@@ -1359,7 +1388,12 @@ class GEAR(torch.nn.Module):
                 sim_loss_smps = 0.0
                 for si in range(len(self.cf_subgraph_list)):
                     cf_subgraph = self.cf_subgraph_list[si]
+
+
+
                     batch_cf, index_cf = cf_subgraph.search(sample_idx)
+
+
                     z_cf = self.forward(batch_cf.x.cuda(), batch_cf.edge_index.cuda(), batch_cf.batch.cuda(),
                                  index_cf.cuda())  # center node rep, subgraph rep
 
@@ -1415,6 +1449,7 @@ class GEAR(torch.nn.Module):
                 val_s_loss = eval_results_val['loss_s']
                 if (val_c_loss + val_s_loss) < best_loss:
                     # print(f'{epoch} | {val_s_loss:.4f} | {val_c_loss:.4f}')
+                    self.val_loss=val_c_loss.item()+val_s_loss.item()
                     best_loss = val_c_loss + val_s_loss
                     torch.save(self.state_dict(),
                                f'models_save/weights_graphCF_{encoder_name}_{dataset_name}_exp' + '.pt')
@@ -1504,7 +1539,21 @@ class GEAR(torch.nn.Module):
 
 
 
+        labels = self.labels.detach().cpu().numpy()
+        idx_test = self.idx_test
 
+        F1 = f1_score(labels[idx_test], output_preds, average='micro')
+        ACC = accuracy_score(labels[idx_test], output_preds, )
+        AUCROC = roc_auc_score(labels[idx_test], output_preds)
+
+        ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1 = self.predict_sens_group(output_preds,
+                                                                                                       idx_test)
+
+        SP, EO = self.fair_metric(output_preds, self.labels[idx_test].detach().cpu().numpy(),
+                                  self.sens[idx_test].detach().cpu().numpy())
+
+
+        return ACC, AUCROC, F1, ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1, SP, EO
 
     def projection(self, z):
         z = self.fc1(z)
@@ -1542,6 +1591,17 @@ class GEAR(torch.nn.Module):
         equality = abs(sum(pred[idx_s0_y1])/sum(idx_s0_y1)-sum(pred[idx_s1_y1])/sum(idx_s1_y1))
 
         return parity.item(), equality.item()
+    def predict_sens_group(self, output, idx_test):
+        #pred = self.lgreg.predict(self.embs[idx_test])
+        pred=output
+        result=[]
+        for sens in [0,1]:
+            F1 = f1_score(self.labels[idx_test][self.sens[idx_test]==sens].detach().cpu().numpy(), pred[self.sens[idx_test]==sens], average='micro')
+            ACC=accuracy_score(self.labels[idx_test][self.sens[idx_test]==sens].detach().cpu().numpy(), pred[self.sens[idx_test]==sens],)
+            AUCROC=roc_auc_score(self.labels[idx_test][self.sens[idx_test]==sens].detach().cpu().numpy(), pred[self.sens[idx_test]==sens])
+            result.extend([ACC, AUCROC, F1])
+
+        return result
 
     def forwarding_predict(self, emb):
         # projector
