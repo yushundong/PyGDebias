@@ -1239,12 +1239,6 @@ class GEAR(torch.nn.Module):
         if raw_data_info is None:
             raw_data_info = {'adj': adj}
 
-        results_all_exp = {}
-
-        # for exp_i in range(0, exp_num):  # repeated experiments
-        # idx_train = idx_train_list[exp_i]
-        # idx_val = idx_val_list[exp_i]
-        # idx_test = idx_test_list[exp_i]
 
         # must sorted in ascending order
         self.idx_train, _ = torch.sort(idx_train)
@@ -1252,7 +1246,6 @@ class GEAR(torch.nn.Module):
         self.idx_test, _ = torch.sort(idx_test)
 
         edge_index = torch.tensor(adj.to_dense().nonzero(), dtype=torch.long)
-        num_class = labels.unique().shape[0] - 1
 
         # preprocess the input
         n = features.shape[0]
@@ -1274,13 +1267,9 @@ class GEAR(torch.nn.Module):
         self.ppr_path = './graphFair_subgraph/' + dataset
         self.n_order = n_order
 
-
         self.subgraph = Subgraph(self.data.x, self.data.edge_index, self.ppr_path, self.subgraph_size, n_order)
         self.subgraph.build()
 
-        #batch, index = self.subgraph.search([0])
-        #print(batch.x.shape)
-        #print(1 / 0)
 
         # counterfactual graph generation (may not true)
         self.cf_subgraph_list = []
