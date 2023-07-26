@@ -174,11 +174,11 @@ class Google(Dataset):
         id='111058843129764709244'
         # download if not downloaded locally
         if not os.path.exists(os.path.join(self.root, self.path_name, '{}.edges'.format(id))):
-            url='https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/gplus/{}.edges'.format(id)
+            url='https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/gplus/{}.edges'.format(id)
             filename = '{}.edges'.format(id)
             self.download(url, filename)
         if not os.path.exists(os.path.join(self.root, self.path_name, '{}.feat'.format(id))):
-            url='https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/gplus/{}.feat'.format(id)
+            url='https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/gplus/{}.feat'.format(id)
             filename = '{}.feat'.format(id)
             self.download(url, filename)
         if not os.path.exists(os.path.join(self.root, self.path_name, '{}.featnames'.format(id))):
@@ -259,15 +259,15 @@ class Facebook(Dataset):
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
         if not os.path.exists(os.path.join(self.root, self.path_name, '107.edges')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/facebook/facebook/107.edges'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/facebook/facebook/107.edges'
             filename = '107.edges'
             self.download(url, filename)
         if not os.path.exists(os.path.join(self.root, self.path_name, '107.feat')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/facebook/facebook/107.feat'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/facebook/facebook/107.feat'
             filename = '107.feat'
             self.download(url, filename)
         if not os.path.exists(os.path.join(self.root, self.path_name, '107.featnames')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/facebook/facebook/107.featnames'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/facebook/facebook/107.featnames'
             filename = '107.featnames'
             self.download(url, filename)
         
@@ -389,11 +389,11 @@ class Nba(Dataset):
 
         self.path_name = 'nba'
         if not os.path.exists(os.path.join(self.root, self.path_name, 'nba.csv')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/NBA/nba.csv'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/NBA/nba.csv'
             filename = 'nba.csv'
             self.download(url, filename)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'nba_relationship.txt')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/NBA/nba_relationship.txt'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/NBA/nba_relationship.txt'
             filename = 'nba_relationship.txt'
             self.download(url, filename)
 
@@ -728,15 +728,15 @@ class Twitter(Dataset):
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
         if not os.path.exists(os.path.join(self.root, self.path_name, '428333.edges')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/twitter/twitter/428333.edges'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/twitter/twitter/428333.edges'
             filename = '428333.edges'
             self.download(url, filename)
         if not os.path.exists(os.path.join(self.root, self.path_name, '428333.feat')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/twitter/twitter/428333.feat'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/twitter/twitter/428333.feat'
             filename = '428333.feat'
             self.download(url, filename)
         if not os.path.exists(os.path.join(self.root, self.path_name, '428333.featnames')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/twitter/twitter/428333.featnames'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/twitter/twitter/428333.featnames'
             filename = '428333.featnames'
             self.download(url, filename)
 
@@ -908,11 +908,11 @@ class Cora(Dataset):
             os.makedirs(os.path.join(self.root, self.path_name))
         
         if not os.path.exists(os.path.join(self.root, self.path_name, 'cora.content')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/cora/cora.content'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/cora/cora.content'
             file_name = 'cora.content'
             self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'cora.cites')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/cora/cora.cites'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/cora/cora.cites'
             file_name = 'cora.cites'
             self.download(url, file_name)
         idx_features_labels = np.genfromtxt(os.path.join(self.root, self.path_name, 'cora.content'), dtype=np.dtype(str))
@@ -1036,7 +1036,7 @@ class Citeseer(Dataset):
 
         for i in range(len(names)):
             if not os.path.exists(os.path.join(self.root, self.path_name, 'ind.citeseer.{}'.format(names[i]))):
-                url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/citeseer/ind.citeseer.{}'.format(names[i])
+                url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/citeseer/ind.citeseer.{}'.format(names[i])
                 file_name = 'ind.citeseer.{}'.format(names[i])
                 self.download(url, file_name)
 
@@ -1105,11 +1105,11 @@ class German(Dataset):
             os.makedirs(os.path.join(self.root, self.path_name))
         
         if not os.path.exists(os.path.join(self.root, self.path_name, 'german.csv')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/german/german.csv'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/german/german.csv'
             file_name = 'german.csv'
             self.download(url, self.path_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'german_edges.txt')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/german/german_edges.txt'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/german/german_edges.txt'
             file_name = 'german_edges.txt'
             self.download(url, self.path_name)
 
@@ -1202,11 +1202,11 @@ class Bail(Dataset):
             os.makedirs(os.path.join(self.root, self.path_name))
         
         if not os.path.exists(os.path.join(self.root, self.path_name, 'bail.csv')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/bail/bail.csv'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/bail/bail.csv'
             file_name = 'bail.csv'
             self.download(url, self.path_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'bail_edges.txt')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/bail/bail_edges.txt'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/bail/bail_edges.txt'
             file_name = 'bail_edges.txt'
             self.download(url, self.path_name)
 
@@ -1298,11 +1298,11 @@ class Credit(Dataset):
             os.makedirs(os.path.join(self.root, self.path_name))
         
         if not os.path.exists(os.path.join(self.root, self.path_name, 'credit.csv')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/credit/credit.csv'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/credit/credit.csv'
             file_name = 'credit.csv'
             self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'credit_edges.txt')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/credit/credit_edges.txt'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/credit/credit_edges.txt'
             file_name = 'credit_edges.txt'
             self.download(url, file_name)
 
@@ -1455,19 +1455,19 @@ class LCC_small(Dataset):
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
         if not os.path.exists(os.path.join(self.root, self.path_name, 'edgelist_{}.txt'.format(name))):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/raw_Small/edgelist_Small.txt'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/raw_Small/edgelist_Small.txt'
             file_name = 'edgelist_{}.txt'.format(name)
             self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'labels_{}.txt'.format(name))):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/raw_Small/labels_Small.txt'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/raw_Small/labels_Small.txt'
             file_name = 'labels_{}.txt'.format(name)
             self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'sens_{}.txt'.format(name))):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/raw_Small/sens_Small.txt'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/raw_Small/sens_Small.txt'
             file_name = 'sens_{}.txt'.format(name)
             self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'features_{}.txt'.format(name))):
-            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/raw_Small/X_Small.npz'
+            url = ' /raw_Small/X_Small.npz'
             file_name = 'X_{}.npz'.format(name)
             self.download(url, file_name)
         
@@ -1540,23 +1540,23 @@ class Amazon(Dataset):
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
         if not os.path.exists(os.path.join(self.root, self.path_name, 'training_df.pkl')):
-            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Amazon-2/training_df.pkl'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/Amazon-2/training_df.pkl'
             file_name = 'training_df.pkl'
             self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'valiing_df.pkl')):
-            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Amazon-2/valiing_df.pkl'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/Amazon-2/valiing_df.pkl'
             file_name = 'valiing_df.pkl'
             self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'key_genre.pkl')):
-            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Amazon-2/key_genre.pkl'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/Amazon-2/key_genre.pkl'
             file_name = 'key_genre.pkl'
             self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'item_idd_genre_list.pkl')):
-            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Amazon-2/item_idd_genre_list.pkl'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/Amazon-2/item_idd_genre_list.pkl'
             file_name = 'item_idd_genre_list.pkl'
             self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'genre_count.pkl')):
-            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Amazon-2/genre_count.pkl'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/Amazon-2/genre_count.pkl'
             file_name = 'genre_count.pkl'
             self.download(url, file_name)
 
@@ -1784,11 +1784,11 @@ class Epinion(Dataset):
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
         if not os.path.exists(os.path.join(self.root, self.path_name, 'rating_with_timestamp.mat')):
-            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Epinion%26Ciao/rating_with_timestamp.mat'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/Epinion%26Ciao/rating_with_timestamp.mat'
             file_name = 'rating_with_timestamp.mat'
             self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'trust.mat')):
-            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Epinion%26Ciao/trust.mat'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/Epinion%26Ciao/trust.mat'
             file_name = 'trust.mat'
             self.download(url, file_name)
         
@@ -1866,11 +1866,11 @@ class Ciao(Dataset):
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
         if not os.path.exists(os.path.join(self.root, self.path_name, 'rating_with_timestamp.mat')):
-            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Epinion%26Ciao/ciao/rating_with_timestamp.mat'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/Epinion%26Ciao/ciao/rating_with_timestamp.mat'
             file_name = 'rating_with_timestamp.mat'
             self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'trust.mat')):
-            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/Epinion%26Ciao/ciao/trust.mat'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/Epinion%26Ciao/ciao/trust.mat'
             file_name = 'trust.mat'
             self.download(url, file_name)
         
@@ -1949,11 +1949,11 @@ class Dblp(Dataset):
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
         if not os.path.exists(os.path.join(self.root, self.path_name, 'author-author.csv')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/dblp/author-author.csv'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/dblp/author-author.csv'
             file_name = 'author-author.csv'
             self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'countries.csv')):
-            url = 'https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/dblp/countries.csv'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/dblp/countries.csv'
             file_name = 'countries.csv'
             self.download(url, file_name)
 
@@ -2158,11 +2158,11 @@ class Ml_1m(Dataset):
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
         if not os.path.exists(os.path.join(self.root, self.path_name, 'ratings.dat')):
-            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/ml-1m/ratings.dat'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/ml-1m/ratings.dat'
             file_name = 'ratings.dat'
             self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'users.dat')):
-            url = 'https://github.com/yushundong/PyGDebias/raw/main/dataset/ml-1m/users.dat'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/ml-1m/users.dat'
             file_name = 'users.dat'
             self.download(url, file_name)
 
