@@ -23,7 +23,7 @@
   - [2. API Cheatsheet](#2-api-cheatsheet)
   - [3. Installations](#3-installations)
     - [3.1 Manually](#31-manually)
-    - [3.2 `pip`/`conda` (**currently not available**)](#32-pipconda-currently-not-available)
+    - [3.2 `pip`](#32-pip)
   - [4. Usage \& Examples](#4-usage--examples)
   - [5. Collected Datasets](#5-collected-datasets)
   - [6. Collected Algorithms](#6-collected-algorithms)
@@ -307,7 +307,7 @@ We present the evaluation results of both utility (including accuracy) and fairn
 ├── docs  
 ├── pygdebias  
 │   ├── __init__.py  
-│   ├── dataset    
+│   ├── datasets    
 │   ├── debiasing  
 │   └── metrics  
 ├── requirements.txt  
