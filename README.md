@@ -102,15 +102,8 @@ pip install -r requirements.txt -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116
 ### 3.2 `pip`/`conda` (**currently not available**)
 
 ```bash
-pip install PyGdebias
-
-# or locally
-git clone https://github.com/yushundong/PyGDebias.git
 pip install torch==1.12.0+cu116 -f https://download.pytorch.org/whl/torch_stable.html
-pip install PyGDebias/ -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f https://download.pytorch.org/whl/torch_stable.html
-
-# or use conda insdead
-conda install PyGdebias
+pip install pygdebias -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 ## 4. Usage & Examples
@@ -307,14 +300,19 @@ We present the evaluation results of both utility (including accuracy) and fairn
 | RawlsGCN | **0.8708 ± 0.0134** |                 **0.0782±0.0071**                 |
 
 ## Folder Structure
-.  
-├── LICENSE  
-├── PyGDebias # all algorithms in this directory  
-├── README.md  
-├── dataloading.py  
-├── dataset  
-├── docs # some files related to the README  
-└── metrics # metrics for evaluating  
+.
+├── LICENSE
+├── MANIFEST.in
+├── README.md
+├── docs
+├── pygdebias
+│   ├── __init__.py
+│   ├── dataset
+│   ├── debiasing
+│   └── metrics
+├── requirements.txt
+├── setup.cfg
+└── setup.py
 
 
 ## How to Contribute
