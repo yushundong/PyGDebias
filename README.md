@@ -300,19 +300,19 @@ We present the evaluation results of both utility (including accuracy) and fairn
 | RawlsGCN | **0.8708 ± 0.0134** |                 **0.0782±0.0071**                 |
 
 ## Folder Structure
-.
-├── LICENSE
-├── MANIFEST.in
-├── README.md
-├── docs
-├── pygdebias
-│   ├── __init__.py
-│   ├── dataset
-│   ├── debiasing
-│   └── metrics
-├── requirements.txt
-├── setup.cfg
-└── setup.py
+.  
+├── LICENSE  
+├── MANIFEST.in  
+├── README.md  
+├── docs  
+├── pygdebias  
+│   ├── __init__.py  
+│   ├── dataset    
+│   ├── debiasing  
+│   └── metrics  
+├── requirements.txt  
+├── setup.cfg  
+└── setup.py  
 
 
 ## How to Contribute
