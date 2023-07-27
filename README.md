@@ -99,7 +99,7 @@ pip install torch==1.12.0+cu116 -f https://download.pytorch.org/whl/torch_stable
 pip install -r requirements.txt -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
-### 3.2 `pip`/`conda` (**currently not available**)
+### 3.2 `pip`
 
 ```bash
 pip install torch==1.12.0+cu116 -f https://download.pytorch.org/whl/torch_stable.html
