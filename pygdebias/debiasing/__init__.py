@@ -1,6 +1,6 @@
 from .CrossWalk import CrossWalk as CrossWalk
 
-# from .EDITS import EDITS as EDITS
+from .EDITS import EDITS as EDITS
 
 from .FairEdit import FairEdit as FairEdit
 
@@ -26,4 +26,4 @@ from .REDRESS import REDRESS as REDRESS
 
 from .UGE import UGE as UGE
 
-__all__ = ['FairEdit', 'FairGNN', 'FairVGNN', 'FairWalk', 'GEAR', 'GNN', 'GUIDE', 'InFoRM_GNN', 'NIFTY', 'RawlsGCN', 'REDRESS', 'UGE', 'CrossWalk']
+__all__ = ['FairEdit', 'FairGNN', 'FairVGNN', 'FairWalk', 'GEAR', 'GNN', 'GUIDE', 'InFoRM_GNN', 'NIFTY', 'RawlsGCN', 'REDRESS', 'UGE', 'CrossWalk', 'EDITS']
