@@ -1,1 +1,2 @@
-recursive-include PyGDebias/dataset *
+include LICENSE
+include README.md

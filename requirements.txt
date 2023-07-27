@@ -43,7 +43,7 @@ colorlog==6.7.0
 cycler==0.11.0
 Cython==3.0.0b3
 cytoolz==0.12.0
-dataclasses==0.8
+dataclasses==0.6
 dgl-cu110==0.6.1
 dgllife==0.2.9
 dill==0.3.6
@@ -159,3 +159,7 @@ xxhash==3.2.0
 yapf==0.33.0
 yarl==1.8.2
 zipp==3.8.1
+torch_sparse==0.6.16+pt112cu116
+torch_scatter==2.1.0+pt112cu116
+torch_cluster==1.6.0+pt112cu116
+torch_spline_conv==1.2.1+pt112cu116
