@@ -1,0 +1,4 @@
+build
+dist
+pygdebias.egg-info
+*.ipynb
