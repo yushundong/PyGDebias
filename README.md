@@ -94,9 +94,9 @@ conda create -n PyGDebias python=3.9
 conda activate PyGDebias
 
 # Installation
-git clone https://github.com/yushundong/PyGDebias.git && cd PyGDebias
+git clone https://github.com/yushundong/PyGDebias.git
 pip install torch==1.12.0+cu116 -f https://download.pytorch.org/whl/torch_stable.html
-pip install -r requirements.txt -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f https://download.pytorch.org/whl/torch_stable.html
+pip install PyGDebias/ -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 ### 3.2 `pip`

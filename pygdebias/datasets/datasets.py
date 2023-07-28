@@ -1638,7 +1638,7 @@ class Yelp(Dataset):
             self.download_zip(url)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'Yelp/key_genre.pkl')):
             url = 'https://drive.google.com/file/d/1H0gfETzTNG9rWpSOR4wg2hctcIEJHrz1/view?usp=sharing/training_df.pk'
-            self.download(url, file_name)
+            self.download(url, 'training_df.pk')
         if not os.path.exists(os.path.join(self.root, self.path_name, 'Yelp/item_idd_genre_list.pkl')):
             url = 'https://drive.google.com/u/0/uc?id=1H0gfETzTNG9rWpSOR4wg2hctcIEJHrz1&export=download'
             self.download_zip(url)
@@ -2150,7 +2150,7 @@ class Lastfm(Dataset):
 
 class Ml_1m(Dataset):
     def __init__(self):
-        super(Lm, self).__init__()
+        super(Ml_1m, self).__init__()
         dataset_name='ml-1m'
         user_num=6040
         item_num=3952
@@ -2208,7 +2208,7 @@ class Ml_1m(Dataset):
 
 class Ml_100k(Dataset):
     def __init__(self):
-        super(Ml1m, self).__init__()
+        super(Ml_100k, self).__init__()
         dataset_name='ml-100k'
         self.path_name = 'ml-100k'
         if not os.path.exists(os.path.join(self.root, self.path_name)):
@@ -2266,7 +2266,7 @@ class Ml_100k(Dataset):
 
 class Ml_20m(Dataset):
     def __init__(self):
-        super(Ml1m, self).__init__()
+        super(Ml_20m, self).__init__()
         dataset_name='ml-20m'
         user_num=138493
         item_num=27278
