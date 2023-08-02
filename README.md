@@ -315,7 +315,7 @@ We present the evaluation results of both utility (including accuracy) and fairn
 You are welcome to become part of this project. See [contribute guide](./docs/contribute.md) for more information.
 
 ## Authors & Acknowledgements
-Yushun Dong, Song Wang, Zaiyi Zheng, Zhenyu Lei, Jing Ma, Chen Chen, Jundong Li
+Yushun Dong, Song Wang, Zaiyi Zheng, Zhenyu Lei, Alex Jing Huang, Jing Ma, Chen Chen, Jundong Li
 
 We extend our heartfelt appreciation to everyone who has contributed to and will contribute to this work. 
 
