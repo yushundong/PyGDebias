@@ -23,7 +23,7 @@
   - [2. API Cheatsheet](#2-api-cheatsheet)
   - [3. Installations](#3-installations)
     - [3.1 Manually](#31-manually)
-    - [3.2 `pip`/`conda` (**currently not available**)](#32-pipconda-currently-not-available)
+    - [3.2 `pip`](#32-pip)
   - [4. Usage \& Examples](#4-usage--examples)
   - [5. Collected Datasets](#5-collected-datasets)
   - [6. Collected Algorithms](#6-collected-algorithms)
@@ -90,27 +90,22 @@ Here, we provide guidelines for setting up the library. There are basically 2 wa
 
 ```bash
 # Set up the environment
-conda create -n PyGDebias python=3.9
-conda activate PyGDebias
+conda create -n pygdebias python=3.8
+conda activate pygdebias
 
 # Installation
-git clone https://github.com/yushundong/PyGDebias.git && cd PyGDebias
-pip install torch==1.12.0+cu116 -f https://download.pytorch.org/whl/torch_stable.html
-pip install -r requirements.txt -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f https://download.pytorch.org/whl/torch_stable.html
-```
-
-### 3.2 `pip`/`conda` (**currently not available**)
-
-```bash
-pip install PyGdebias
-
-# or locally
 git clone https://github.com/yushundong/PyGDebias.git
 pip install torch==1.12.0+cu116 -f https://download.pytorch.org/whl/torch_stable.html
 pip install PyGDebias/ -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f https://download.pytorch.org/whl/torch_stable.html
+```
 
-# or use conda insdead
-conda install PyGdebias
+### 3.2 `pip`
+
+```bash
+conda create -n pygdebias python=3.8
+conda activate pygdebias
+pip install torch==1.12.0+cu116 -f https://download.pytorch.org/whl/torch_stable.html
+pip install pygdebias -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 ## 4. Usage & Examples
@@ -309,12 +304,17 @@ We present the evaluation results of both utility (including accuracy) and fairn
 ## Folder Structure
 .  
 ├── LICENSE  
-├── PyGDebias # all algorithms in this directory  
+├── MANIFEST.in  
 ├── README.md  
-├── dataloading.py  
-├── dataset  
-├── docs # some files related to the README  
-└── metrics # metrics for evaluating  
+├── docs  
+├── pygdebias  
+│   ├── __init__.py  
+│   ├── datasets    
+│   ├── debiasing  
+│   └── metrics  
+├── requirements.txt  
+├── setup.cfg  
+└── setup.py  
 
 
 ## How to Contribute
