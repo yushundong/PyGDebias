@@ -15,7 +15,11 @@ import pickle as pkl
 import requests
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+<<<<<<< HEAD
 # import tensorflow as tf
+=======
+import tensorflow as tf
+>>>>>>> afd3c66288e34d381f0c590cd00b38e75f1d6e85
 import zipfile
 import io
 import gdown
@@ -63,11 +67,19 @@ class Dataset(object):
             return self.adj_
         elif datatype == 'scipy.sparse':
             return sp.coo_matrix(self.adj.to_dense())
+<<<<<<< HEAD
         # elif datatype == 'tf.sparse':
         #     self.adj_ = self.adj_.to_dense().numpy()
         #     self.adj_ = tf.convert_to_tensor(self.adj_)
         #     self.adj_ = tf.sparse.from_dense(self.adj_)
         #     return self.adj_
+=======
+        elif datatype == 'tf.sparse':
+            self.adj_ = self.adj_.to_dense().numpy()
+            self.adj_ = tf.convert_to_tensor(self.adj_)
+            self.adj_ = tf.sparse.from_dense(self.adj_)
+            return self.adj_
+>>>>>>> afd3c66288e34d381f0c590cd00b38e75f1d6e85
         elif datatype == 'np.array':
             return self.adj_.to_dense().numpy()
         else:
@@ -80,8 +92,13 @@ class Dataset(object):
             return self.features_
         elif datatype == 'np.array':
             return self.features_.numpy()
+<<<<<<< HEAD
         # elif datatype == 'tf.tensor':
         #     return tf.convert_to_tensor(self.features_.numpy())
+=======
+        elif datatype == 'tf.tensor':
+            return tf.convert_to_tensor(self.features_.numpy())
+>>>>>>> afd3c66288e34d381f0c590cd00b38e75f1d6e85
         else:
             raise ValueError('datatype should be torch.tensor, tf.tensor, or np.array')
     
@@ -92,8 +109,13 @@ class Dataset(object):
             return self.labels_
         elif datatype == 'np.array':
             return self.labels_.numpy()
+<<<<<<< HEAD
         # elif datatype == 'tf.tensor':
         #     return tf.convert_to_tensor(self.labels_.numpy())
+=======
+        elif datatype == 'tf.tensor':
+            return tf.convert_to_tensor(self.labels_.numpy())
+>>>>>>> afd3c66288e34d381f0c590cd00b38e75f1d6e85
         else:
             raise ValueError('datatype should be torch.tensor, tf.tensor, or np.array')
     
@@ -104,8 +126,13 @@ class Dataset(object):
             return self.train_mask_
         elif datatype == 'np.array':
             return self.train_mask_.numpy()
+<<<<<<< HEAD
         # elif datatype == 'tf.tensor':
         #     return tf.convert_to_tensor(self.train_mask_.numpy())
+=======
+        elif datatype == 'tf.tensor':
+            return tf.convert_to_tensor(self.train_mask_.numpy())
+>>>>>>> afd3c66288e34d381f0c590cd00b38e75f1d6e85
         else:
             raise ValueError('datatype should be torch.tensor, tf.tensor, or np.array')
     
@@ -116,8 +143,13 @@ class Dataset(object):
             return self.val_mask_
         elif datatype == 'np.array':
             return self.val_mask_.numpy()
+<<<<<<< HEAD
         # elif datatype == 'tf.tensor':
         #     return tf.convert_to_tensor(self.val_mask_.numpy())
+=======
+        elif datatype == 'tf.tensor':
+            return tf.convert_to_tensor(self.val_mask_.numpy())
+>>>>>>> afd3c66288e34d381f0c590cd00b38e75f1d6e85
         else:
             raise ValueError('datatype should be torch.tensor, tf.tensor, or np.array')
         
@@ -128,8 +160,13 @@ class Dataset(object):
             return self.test_mask_
         elif datatype == 'np.array':
             return self.test_mask_.numpy()
+<<<<<<< HEAD
         # elif datatype == 'tf.tensor':
         #     return tf.convert_to_tensor(self.test_mask_.numpy())
+=======
+        elif datatype == 'tf.tensor':
+            return tf.convert_to_tensor(self.test_mask_.numpy())
+>>>>>>> afd3c66288e34d381f0c590cd00b38e75f1d6e85
         else:
             raise ValueError('datatype should be torch.tensor, tf.tensor, or np.array')
     
@@ -140,8 +177,13 @@ class Dataset(object):
             return self.sens_
         elif datatype == 'np.array':
             return self.sens_.numpy()
+<<<<<<< HEAD
         # elif datatype == 'tf.tensor':
         #     return tf.convert_to_tensor(self.sens_.numpy())
+=======
+        elif datatype == 'tf.tensor':
+            return tf.convert_to_tensor(self.sens_.numpy())
+>>>>>>> afd3c66288e34d381f0c590cd00b38e75f1d6e85
         else:
             raise ValueError('datatype should be torch.tensor, tf.tensor, or np.array')
 
