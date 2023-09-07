@@ -113,9 +113,11 @@ pip install pygdebias -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f h
 
 
 ~~~python
-from datasets import NBA
-# Available choices: 'credit', 'german', 'recidivism', 'facebook', 'pokec_z', 'pokec_n', 'nba', 'twitter', 'google+', 'LCC', 'LCC_small', 'cora', 'citeseer', 'pubmed', 'amazon', 'yelp', 'epinion', 'ciao', 'dblp', 'filmtrust', 'lastfm', 'ml-100k', 'ml-1m', 'ml-20m', 'oklahoma', 'unc28'.
-adj, features, labels, idx_train, idx_val, idx_test, sens, sens_idx = NBA()
+from datasets import Nba
+# Available choices: 'Credit', 'German', 'Facebook', 'Pokec_z', 'Pokec_n', 'Nba', 'Twitter', 'Google', 'LCC', 'LCC_small', 'Cora', 'Citeseer', 'Pubmed', 'Amazon', 'Yelp', 'Epinion', 'Ciao', 'Dblp', 'Filmtrust', 'Lastfm', 'Ml-100k', 'Ml-1m', 'Ml-20m', 'Oklahoma', 'UNC', 'Bail'.
+
+nba = Nba()
+adj, features, idx_train, idx_val, idx_val, idx_test, labels, sens = nba.adj(), nba.features(), nba.train_mask(), nba.val_mask(), nba.test_mask(), labels(), sens()
 
 # Initiate the model (with default parameters).
 model = GUIDE()
