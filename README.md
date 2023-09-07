@@ -113,12 +113,9 @@ pip install pygdebias -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f h
 
 
 ~~~python
-from dataloading import load_data
-from PyGDebias.GUIDE import GUIDE
-
-# Load a dataset. 
+from datasets import NBA
 # Available choices: 'credit', 'german', 'recidivism', 'facebook', 'pokec_z', 'pokec_n', 'nba', 'twitter', 'google+', 'LCC', 'LCC_small', 'cora', 'citeseer', 'pubmed', 'amazon', 'yelp', 'epinion', 'ciao', 'dblp', 'filmtrust', 'lastfm', 'ml-100k', 'ml-1m', 'ml-20m', 'oklahoma', 'unc28'.
-adj, features, labels, idx_train, idx_val, idx_test, sens, sens_idx = load_data('credit')
+adj, features, labels, idx_train, idx_val, idx_test, sens, sens_idx = NBA()
 
 # Initiate the model (with default parameters).
 model = GUIDE()
