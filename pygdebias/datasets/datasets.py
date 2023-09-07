@@ -164,6 +164,7 @@ def mx_to_torch_sparse_tensor(sparse_mx, is_sparse=False, return_tensor_sparse=T
     return torch.sparse.FloatTensor(indices, values, shape)
 
 
+
 class Google(Dataset):
     def __init__(self) -> None:
         super().__init__()
@@ -174,7 +175,7 @@ class Google(Dataset):
         id='111058843129764709244'
         # download if not downloaded locally
         if not os.path.exists(os.path.join(self.root, self.path_name, '{}.edges'.format(id))):
-            url='https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/gplus/{}.edges'.format(id)
+            url='https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/gplus/111058843129764709244.edges'
             filename = '{}.edges'.format(id)
             self.download(url, filename)
         if not os.path.exists(os.path.join(self.root, self.path_name, '{}.feat'.format(id))):
@@ -182,7 +183,7 @@ class Google(Dataset):
             filename = '{}.feat'.format(id)
             self.download(url, filename)
         if not os.path.exists(os.path.join(self.root, self.path_name, '{}.featnames'.format(id))):
-            url='https://raw.githubusercontent.com/yushundong/PyGDebias/main/dataset/gplus/{}.featnames'.format(id)
+            url='https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/gplus/111058843129764709244.featnames'
             filename = '{}.featnames'.format(id)
             self.download(url, filename)
 
@@ -282,7 +283,6 @@ class Facebook(Dataset):
             feats.append([int(one) for one in line.strip('\n').split(' ')])
         
         feat_name_file = open(os.path.join(self.root, self.path_name, '107.featnames'))
-        feat_name_file = open('./dataset/facebook/facebook/107.featnames')
         feat_name = []
         for line in feat_name_file:
             feat_name.append(line.strip('\n').split(' '))
@@ -388,6 +388,8 @@ class Nba(Dataset):
         """Load data"""
 
         self.path_name = 'nba'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
         if not os.path.exists(os.path.join(self.root, self.path_name, 'nba.csv')):
             url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/NBA/nba.csv'
             filename = 'nba.csv'
@@ -519,7 +521,7 @@ class Pokec_z(Dataset):
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
         if not os.path.exists(os.path.join(self.root, self.path_name, 'region_job.csv')):
-            gdown.download(self.url, self.destination, quiet=False)
+            gdown.download(self.url, self.destination)
             with zipfile.ZipFile(self.destination, 'r') as zip_ref:
                 zip_ref.extractall(os.path.join(self.root, self.path_name))
         if not os.path.exists(os.path.join(self.root, self.path_name, 'region_job_relationship.txt')):
@@ -1107,11 +1109,11 @@ class German(Dataset):
         if not os.path.exists(os.path.join(self.root, self.path_name, 'german.csv')):
             url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/german/german.csv'
             file_name = 'german.csv'
-            self.download(url, self.path_name)
+            self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'german_edges.txt')):
             url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/german/german_edges.txt'
             file_name = 'german_edges.txt'
-            self.download(url, self.path_name)
+            self.download(url, file_name)
 
 
         idx_features_labels = pd.read_csv(os.path.join(self.root, self.path_name, "{}.csv".format(dataset)))
@@ -1204,11 +1206,11 @@ class Bail(Dataset):
         if not os.path.exists(os.path.join(self.root, self.path_name, 'bail.csv')):
             url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/bail/bail.csv'
             file_name = 'bail.csv'
-            self.download(url, self.path_name)
+            self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'bail_edges.txt')):
             url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/bail/bail_edges.txt'
             file_name = 'bail_edges.txt'
-            self.download(url, self.path_name)
+            self.download(url, file_name)
 
         idx_features_labels = pd.read_csv(os.path.join(self.root, self.path_name, "{}.csv".format(dataset)))
         header = list(idx_features_labels.columns)
@@ -1467,7 +1469,7 @@ class LCC_small(Dataset):
             file_name = 'sens_{}.txt'.format(name)
             self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'features_{}.txt'.format(name))):
-            url = ' /raw_Small/X_Small.npz'
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/raw_Small/X_Small.npz'
             file_name = 'X_{}.npz'.format(name)
             self.download(url, file_name)
         
@@ -2214,11 +2216,11 @@ class Ml_100k(Dataset):
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
         if not os.path.exists(os.path.join(self.root, self.path_name, 'u.data')):
-            url = ''
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/ml-100k/u.data'
             file_name = 'u.data'
             self.download(url, file_name)
         if not os.path.exists(os.path.join(self.root, self.path_name, 'u.user')):
-            url = ''
+            url = 'https://raw.githubusercontent.com/PyGDebias-Team/data/main/2023-7-26/ml-100k/u.user'
             file_name = 'u.user'
             self.download(url, file_name)
         data=open(join(self.root, self.path_name, "u.data"))
@@ -2273,14 +2275,18 @@ class Ml_20m(Dataset):
         self.path_name = 'ml-20m'
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
+        self.url = 'https://drive.google.com/u/0/uc?id=1uCD9PpMSTd9vq3CuUS9EYHpOMEeitkJM&export=download'
+        self.destination = './dataset/ml-20m/ml-20m.zip'
+        if not os.path.exists(os.path.join(self.root, self.path_name)):
+            os.makedirs(os.path.join(self.root, self.path_name))
         if not os.path.exists(os.path.join(self.root, self.path_name, 'ratings.csv')):
-            url = ''
-            file_name = 'ratings.csv'
-            self.download(url, file_name)
+            gdown.download(self.url, self.destination)
+            with zipfile.ZipFile(self.destination, 'r') as zip_ref:
+                zip_ref.extractall(os.path.join(self.root, self.path_name))
         if not os.path.exists(os.path.join(self.root, self.path_name, 'movies.csv')):
-            url = ''
-            file_name = 'movies.csv'
-            self.download(url, file_name)
+            gdown.download(self.url, self.destination)
+            with zipfile.ZipFile(self.destination, 'r') as zip_ref:
+                zip_ref.extractall(os.path.join(self.root, self.path_name))
         data = pd.read_csv(os.path.join(self.root, self.path_name, 'ratings.csv'))
 
         movies = pd.read_csv(os.path.join(self.root, self.path_name, 'movies.csv'))
