@@ -105,7 +105,7 @@ pip install PyGDebias/ -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f 
 conda create -n pygdebias python=3.8
 conda activate pygdebias
 pip install torch==1.12.0+cu116 -f https://download.pytorch.org/whl/torch_stable.html
-pip install pygdebias -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f https://download.pytorch.org/whl/torch_stable.html
+pip install pygdebias==1.0.1 -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
 ## 4. Usage & Examples
