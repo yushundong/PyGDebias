@@ -148,7 +148,6 @@ torchaudio==0.12.0+cu116
 torchnet==0.0.4
 torchtext==0.13.0
 torchvision==0.13.0+cu116
-typing_extensions==4.3.0
 urllib3==1.26.15
 visdom==0.2.3
 wandb==0.14.0
