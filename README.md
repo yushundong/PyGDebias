@@ -113,11 +113,12 @@ pip install pygdebias==1.0.1 -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.ht
 
 
 ~~~python
-from datasets import Nba
+from pygdebias.debiasing import GUIDE
+from pygdebias.datasets import Nba
 # Available choices: 'Credit', 'German', 'Facebook', 'Pokec_z', 'Pokec_n', 'Nba', 'Twitter', 'Google', 'LCC', 'LCC_small', 'Cora', 'Citeseer', 'Amazon', 'Yelp', 'Epinion', 'Ciao', 'Dblp', 'Filmtrust', 'Lastfm', 'Ml-100k', 'Ml-1m', 'Ml-20m', 'Oklahoma', 'UNC', 'Bail'.
 
 nba = Nba()
-adj, features, idx_train, idx_val, idx_val, idx_test, labels, sens = nba.adj(), nba.features(), nba.train_mask(), nba.val_mask(), nba.test_mask(), labels(), sens()
+adj, features, idx_train, idx_val, idx_val, idx_test, labels, sens = nba.adj(), nba.features(), nba.idx_train(), nba.idx_val(), nba.idx_test(), nba.labels(), nba.sens()
 
 # Initiate the model (with default parameters).
 model = GUIDE()
