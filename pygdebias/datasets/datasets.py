@@ -34,9 +34,9 @@ class Dataset(object):
         self.adj_ = None
         self.features_ = None
         self.labels_ = None
-        self.train_mask_ = None
-        self.val_mask_ = None
-        self.test_mask_ = None
+        self.idx_train_ = None
+        self.idx_val_ = None
+        self.idx_test_ = None
         self.sens_ = None
 
         self.root = root
@@ -90,33 +90,33 @@ class Dataset(object):
         else:
             raise ValueError("datatype should be torch.tensor, tf.tensor, or np.array")
 
-    def train_mask(self, datatype: str = "torch.tensor"):
-        if self.train_mask_ is None:
-            return self.train_mask_
+    def idx_val(self, datatype: str = "torch.tensor"):
+        if self.idx_val_ is None:
+            return self.idx_val_
         if datatype == "torch.tensor":
-            return self.train_mask_
+            return self.idx_val_
         elif datatype == "np.array":
-            return self.train_mask_.numpy()
+            return self.idx_val_.numpy()
         else:
             raise ValueError("datatype should be torch.tensor, tf.tensor, or np.array")
 
-    def val_mask(self, datatype: str = "torch.tensor"):
-        if self.val_mask_ is None:
-            return self.val_mask_
+    def idx_train(self, datatype: str = "torch.tensor"):
+        if self.idx_train_ is None:
+            return self.idx_train_
         if datatype == "torch.tensor":
-            return self.val_mask_
+            return self.idx_train_
         elif datatype == "np.array":
-            return self.val_mask_.numpy()
+            return self.idx_train_.numpy()
         else:
             raise ValueError("datatype should be torch.tensor, tf.tensor, or np.array")
 
-    def test_mask(self, datatype: str = "torch.tensor"):
-        if self.test_mask_ is None:
-            return self.test_mask_
+    def idx_test(self, datatype: str = "torch.tensor"):
+        if self.idx_test_ is None:
+            return self.idx_test_
         if datatype == "torch.tensor":
-            return self.test_mask_
+            return self.idx_test_
         elif datatype == "np.array":
-            return self.test_mask_.numpy()
+            return self.idx_test_.numpy()
         else:
             raise ValueError("datatype should be torch.tensor, tf.tensor, or np.array")
 
