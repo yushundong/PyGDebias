@@ -28,7 +28,7 @@ from collections import defaultdict
 
 
 class RawlsGCNGrad(nn.Module):
-    def __init__(self, nfeat, nhid, nclass, dropout):
+    def __init__(self, nfeat, nhid, nclass, dropout=0.5):
         super(RawlsGCNGrad, self).__init__()
         self.gc1 = GraphConvolution(nfeat, nhid)
         self.gc2 = GraphConvolution(nhid, nclass)
@@ -40,7 +40,9 @@ class RawlsGCNGrad(nn.Module):
         }
 
     def forward(self, x, adj):
-        pre_act_embs, embs = [], [x]  # adding input node features to make index padding consistent
+        pre_act_embs, embs = [], [
+            x
+        ]  # adding input node features to make index padding consistent
         x = self.gc1(x, adj)
         x.retain_grad()
         pre_act_embs.append(x)
@@ -69,11 +71,11 @@ class GraphConvolution(nn.Module):
         if bias:
             self.bias = Parameter(torch.FloatTensor(out_features))
         else:
-            self.register_parameter('bias', None)
+            self.register_parameter("bias", None)
         self.reset_parameters()
 
     def reset_parameters(self):
-        stdv = 1. / math.sqrt(self.weight.size(1))
+        stdv = 1.0 / math.sqrt(self.weight.size(1))
         self.weight.data.uniform_(-stdv, stdv)
         if self.bias is not None:
             self.bias.data.uniform_(-stdv, stdv)
@@ -87,9 +89,15 @@ class GraphConvolution(nn.Module):
             return output
 
     def __repr__(self):
-        return self.__class__.__name__ + ' (' \
-               + str(self.in_features) + ' -> ' \
-               + str(self.out_features) + ')'
+        return (
+            self.__class__.__name__
+            + " ("
+            + str(self.in_features)
+            + " -> "
+            + str(self.out_features)
+            + ")"
+        )
+
 
 class RawlsGCNGraph(nn.Module):
     def __init__(self, nfeat, nhid, nclass, dropout):
@@ -103,6 +111,7 @@ class RawlsGCNGraph(nn.Module):
         x = F.dropout(x, self.dropout, training=self.training)
         x = self.gc2(x, adj)
         return F.log_softmax(x, dim=1)
+
 
 class SinkhornKnopp:
     """
@@ -177,18 +186,22 @@ class SinkhornKnopp:
             mat = left_diag @ mat @ right_diag
         logger.info("Sinkhorn-Knopp - Maximum number of iterations reached.")
         return mat
+
+
 def feature_norm(features):
     min_values = features.min(axis=0)[0]
     max_values = features.max(axis=0)[0]
     return 2 * (features - min_values).div(max_values - min_values) - 1
-class GraphDataset:
-    def __init__(self, configs,adj, feats, labels):
-        #if not os.path.isfile("../data/{name}.pt".format(name=configs["name"])):
-            #raise FileNotFoundError("Dataset does not exist!")
-        # load data
-        #data = torch.load("../data/{name}.pt".format(name=configs["name"]))
 
-        #adj, feats, labels, idx_train, idx_val, idx_test, sens = process_pokec_nba('pokec_n',
+
+class GraphDataset:
+    def __init__(self, configs, adj, feats, labels):
+        # if not os.path.isfile("../data/{name}.pt".format(name=configs["name"])):
+        # raise FileNotFoundError("Dataset does not exist!")
+        # load data
+        # data = torch.load("../data/{name}.pt".format(name=configs["name"]))
+
+        # adj, feats, labels, idx_train, idx_val, idx_test, sens = process_pokec_nba('pokec_n',
         #                                                                           predict_attr_specify='gender')
         adj = sp.coo_matrix(adj.to_dense().numpy())
 
@@ -215,13 +228,9 @@ class GraphDataset:
         #    )
         # )
 
-        feats=feature_norm(feats)
-
-
+        feats = feature_norm(feats)
 
         self.features = torch.FloatTensor(np.array(feats))
-
-
 
         # self.labels = data["labels"]
         self.labels = labels
@@ -236,7 +245,6 @@ class GraphDataset:
 
         # free memory
 
-
     def random_split(self):
         # initialization
         mask = torch.empty(self.num_nodes, dtype=torch.bool).fill_(False)
@@ -249,7 +257,7 @@ class GraphDataset:
         if not self.is_ratio and self.split_by_class:
             self.train_idx = self.get_split_by_class(num_train_per_class=self.num_train)
         else:
-            self.train_idx = torch.randperm(self.num_nodes)[:self.num_train]
+            self.train_idx = torch.randperm(self.num_nodes)[: self.num_train]
 
         # get remaining indices
         mask[self.train_idx] = True
@@ -257,8 +265,8 @@ class GraphDataset:
         remaining = remaining[torch.randperm(remaining.size(0))]
 
         # get indices for validation and test
-        self.val_idx = remaining[:self.num_val]
-        self.test_idx = remaining[self.num_val:self.num_val + self.num_test]
+        self.val_idx = remaining[: self.num_val]
+        self.test_idx = remaining[self.num_val : self.num_val + self.num_test]
 
         # free memory
         del mask, remaining
@@ -279,31 +287,23 @@ class GraphDataset:
     @staticmethod
     def get_doubly_stochastic(mat):
         sk = SinkhornKnopp(max_iter=1000, epsilon=1e-2)
-        mat = matrix2tensor(
-            sk.fit(mat)
-        )
+        mat = matrix2tensor(sk.fit(mat))
         return mat
 
     @staticmethod
     def get_row_normalized(mat):
-        mat = matrix2tensor(
-            row_normalize(mat)
-        )
+        mat = matrix2tensor(row_normalize(mat))
         return mat
 
     @staticmethod
     def get_column_normalized(mat):
-        mat = matrix2tensor(
-            row_normalize(mat)
-        )
+        mat = matrix2tensor(row_normalize(mat))
         mat = torch.transpose(mat, 0, 1)
         return mat
 
     @staticmethod
     def get_symmetric_normalized(mat):
-        mat = matrix2tensor(
-            symmetric_normalize(mat)
-        )
+        mat = matrix2tensor(symmetric_normalize(mat))
         return mat
 
     def preprocess(self, type="laplacian"):
@@ -316,9 +316,13 @@ class GraphDataset:
                 row_normalize(self.raw_graph + sp.eye(self.raw_graph.shape[0]))
             )
         elif type == "doubly_stochastic_no_laplacian":
-            self.graph = self.get_doubly_stochastic(self.raw_graph + sp.eye(self.raw_graph.shape[0]))
+            self.graph = self.get_doubly_stochastic(
+                self.raw_graph + sp.eye(self.raw_graph.shape[0])
+            )
         elif type == "doubly_stochastic_laplacian":
-            self.graph = symmetric_normalize(self.raw_graph + sp.eye(self.raw_graph.shape[0]))
+            self.graph = symmetric_normalize(
+                self.raw_graph + sp.eye(self.raw_graph.shape[0])
+            )
             self.graph = self.get_doubly_stochastic(self.graph)
         else:
             raise ValueError(
@@ -404,6 +408,7 @@ class Evaluator:
             info += "\n"
         self.logger.info(info)
         return accuracy.cpu().item(), bias
+
 
 def encode_onehot(labels):
     """Encode label to a one-hot vector."""
@@ -502,18 +507,19 @@ def random_split(dataset):
 
     # get indices for validation and test
     val_idx = remaining[:num_val]
-    test_idx = remaining[num_val:num_val + num_test]
+    test_idx = remaining[num_val : num_val + num_test]
 
     print(train_idx.shape)
     print(val_idx.shape)
     print(test_idx.shape)
-    print(1/0)
+    print(1 / 0)
 
     return {
         "train_idx": train_idx,
         "val_idx": val_idx,
         "test_idx": test_idx,
     }
+
 
 class InProcessingTrainer:
     def __init__(self, configs, data, model, on_gpu, device):
@@ -792,13 +798,8 @@ class PreProcessingTrainer:
         return configs
 
 
-
-
-
-
-
-class RawlsGCN():
-    def generate_split(self,dataset):
+class RawlsGCN:
+    def generate_split(self, dataset):
         # set random seed
         if self.split_seed is not None:
             np.random.seed(self.split_seed)
@@ -809,7 +810,7 @@ class RawlsGCN():
         # generate splits
         return random_split(dataset)
 
-    def run_exp(self,dataset, split, configs):
+    def run_exp(self, dataset, split, configs):
         # set splits
         dataset.set_random_split(split)
 
@@ -840,31 +841,54 @@ class RawlsGCN():
         # train and test
         if self.model == "rawlsgcn_graph":
             trainer = PreProcessingTrainer(
-                configs=configs, data=dataset, model=model, on_gpu=self.cuda, device=self.device
+                configs=configs,
+                data=dataset,
+                model=model,
+                on_gpu=self.cuda,
+                device=self.device,
             )
         elif self.model == "rawlsgcn_grad":
             trainer = InProcessingTrainer(
-                configs=configs, data=dataset, model=model, on_gpu=self.cuda, device=self.device
+                configs=configs,
+                data=dataset,
+                model=model,
+                on_gpu=self.cuda,
+                device=self.device,
             )
         else:
             raise ValueError("Invalid model name!")
 
         return trainer
 
-    def fit(self,adj, feats, labels, idx_train, idx_val,idx_test, enable_cude=True, device_number=0, model='rawlsgcn_graph',
-            seed=0, num_epoch=100, lr=0.05, weight_decay=5e-4, hidden=64, dropout=0.5, loss='negative_log_likelihood' ):
-
-        self.enable_cuda=enable_cude
-        self.device_number=device_number
-        self.model=model
-        self.split_seed=seed
-        self.num_epoch=num_epoch
-        self.lr=lr
-        self.weight_decay=weight_decay
-        self.hidden=hidden
-        self.dropout=dropout
-        self.loss=loss
-        
+    def fit(
+        self,
+        adj,
+        feats,
+        labels,
+        idx_train,
+        idx_val,
+        idx_test,
+        enable_cude=True,
+        device_number=0,
+        model="rawlsgcn_graph",
+        seed=0,
+        num_epoch=100,
+        lr=0.05,
+        weight_decay=5e-4,
+        hidden=64,
+        dropout=0.5,
+        loss="negative_log_likelihood",
+    ):
+        self.enable_cuda = enable_cude
+        self.device_number = device_number
+        self.model = model
+        self.split_seed = seed
+        self.num_epoch = num_epoch
+        self.lr = lr
+        self.weight_decay = weight_decay
+        self.hidden = hidden
+        self.dropout = dropout
+        self.loss = loss
 
         self.cuda = self.enable_cuda and torch.cuda.is_available()
         if self.cuda:
@@ -888,25 +912,22 @@ class RawlsGCN():
 
         # get random splits
         #
-        split={
+        split = {
             "train_idx": idx_train,
             "val_idx": idx_val,
             "test_idx": idx_test,
         }
 
-        #split = generate_split(dataset)
+        # split = generate_split(dataset)
 
         # train
         if self.model == "rawlsgcn_grad":
             dataset.preprocess(type="laplacian")
         elif self.model == "rawlsgcn_graph":
-            #dataset.preprocess(type="doubly_stochastic_laplacian")
+            # dataset.preprocess(type="doubly_stochastic_laplacian")
             dataset.preprocess(type="laplacian")
         else:
             raise ValueError("Invalid model name!")
-
-
-
 
         configs = {
             "model": self.model,
@@ -915,10 +936,10 @@ class RawlsGCN():
             "weight_decay": self.weight_decay,
             "lr": self.lr,
             "loss": self.loss,
-            "seed": seed
+            "seed": seed,
         }
 
-        self.trainer=self.run_exp(dataset, split, configs)
+        self.trainer = self.run_exp(dataset, split, configs)
 
         self.trainer.train()
 
