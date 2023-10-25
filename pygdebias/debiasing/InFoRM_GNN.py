@@ -1,4 +1,3 @@
-
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
@@ -42,17 +41,26 @@ import scipy.sparse as sp
 
 import networkx as nx
 
+
 def avg_err(x_corresponding, x_similarity, x_sorted_scores, y_ranks, top_k):
     the_maxs, _ = torch.max(x_corresponding, 1)
-    the_maxs = the_maxs.reshape(the_maxs.shape[0], 1).repeat(1, x_corresponding.shape[1])
+    the_maxs = the_maxs.reshape(the_maxs.shape[0], 1).repeat(
+        1, x_corresponding.shape[1]
+    )
     c = 2 * torch.ones_like(x_corresponding)
-    x_corresponding = ( c.pow(x_corresponding) - 1) / c.pow(the_maxs)
+    x_corresponding = (c.pow(x_corresponding) - 1) / c.pow(the_maxs)
     the_ones = torch.ones_like(x_corresponding)
     new_x_corresponding = torch.cat((the_ones, 1 - x_corresponding), 1)
 
     for i in range(x_corresponding.shape[1] - 1):
-        x_corresponding = torch.mul(x_corresponding, new_x_corresponding[:, -x_corresponding.shape[1] - 1 - i : -1 - i])
-    the_range = torch.arange(0., x_corresponding.shape[1]).repeat(x_corresponding.shape[0], 1) + 1
+        x_corresponding = torch.mul(
+            x_corresponding,
+            new_x_corresponding[:, -x_corresponding.shape[1] - 1 - i : -1 - i],
+        )
+    the_range = (
+        torch.arange(0.0, x_corresponding.shape[1]).repeat(x_corresponding.shape[0], 1)
+        + 1
+    )
     score_rank = (1 / the_range[:, 0:]) * x_corresponding[:, 0:]
     final = torch.mean(torch.sum(score_rank, axis=1))
     print("Now Average ERR@k = ", final.item())
@@ -60,26 +68,39 @@ def avg_err(x_corresponding, x_similarity, x_sorted_scores, y_ranks, top_k):
     return final.item()
 
 
-
 def avg_ndcg(x_corresponding, x_similarity, x_sorted_scores, y_ranks, top_k):
     c = 2 * torch.ones_like(x_sorted_scores[:, :top_k])
     numerator = c.pow(x_sorted_scores[:, :top_k]) - 1
-    denominator = torch.log2(2 + torch.arange(x_sorted_scores[:, :top_k].shape[1], dtype=torch.float)).repeat(x_sorted_scores.shape[0], 1).cuda()
+    denominator = (
+        torch.log2(
+            2 + torch.arange(x_sorted_scores[:, :top_k].shape[1], dtype=torch.float)
+        )
+        .repeat(x_sorted_scores.shape[0], 1)
+        .cuda()
+    )
     idcg = torch.sum((numerator / denominator), 1)
     new_score_rank = torch.zeros(y_ranks.shape[0], y_ranks[:, :top_k].shape[1])
     numerator = c.pow(x_corresponding.cuda()[:, :top_k]) - 1
-    denominator = torch.log2(2 + torch.arange(new_score_rank[:, :top_k].shape[1], dtype=torch.float)).repeat(x_sorted_scores.shape[0], 1).cuda()
+    denominator = (
+        torch.log2(
+            2 + torch.arange(new_score_rank[:, :top_k].shape[1], dtype=torch.float)
+        )
+        .repeat(x_sorted_scores.shape[0], 1)
+        .cuda()
+    )
     ndcg_list = torch.sum((numerator / denominator), 1) / idcg
     avg_ndcg = torch.mean(ndcg_list)
     print("Now Average NDCG@k = ", avg_ndcg.item())
 
     return avg_ndcg.item()
 
+
 def sparse_mx_to_torch_sparse_tensor(sparse_mx):
     """Convert a scipy sparse matrix to a torch sparse tensor."""
     sparse_mx = sparse_mx.tocoo().astype(np.float32)
     indices = torch.from_numpy(
-        np.vstack((sparse_mx.row, sparse_mx.col)).astype(np.int64))
+        np.vstack((sparse_mx.row, sparse_mx.col)).astype(np.int64)
+    )
     values = torch.from_numpy(sparse_mx.data)
     shape = torch.Size(sparse_mx.shape)
     return torch.sparse.FloatTensor(indices, values, shape)
@@ -111,7 +132,7 @@ class JK_Body(nn.Module):
         super(JK_Body, self).__init__()
         self.conv1 = GCNConv(nfeat, nhid)
         self.convx = GCNConv(nhid, nhid)
-        self.jk = JumpingKnowledge(mode='max')
+        self.jk = JumpingKnowledge(mode="max")
         self.transition = nn.Sequential(
             nn.ReLU(),
         )
@@ -127,7 +148,6 @@ class JK_Body(nn.Module):
             xs.append(x)
         x = self.jk(xs)
         return x
-
 
 
 class GIN(nn.Module):
@@ -169,11 +189,10 @@ class GIN_Body(nn.Module):
         return x
 
 
-
 class GCN(nn.Module):
     def __init__(self, nfeat, nhid, nclass, dropout):
         super(GCN, self).__init__()
-        self.body = GCN_Body(nfeat,nhid,dropout)
+        self.body = GCN_Body(nfeat, nhid, dropout)
         self.fc = nn.Linear(nhid, nclass)
 
         for m in self.modules():
@@ -201,28 +220,31 @@ class GCN_Body(nn.Module):
         return x
 
 
-
-
-
-
-
 def fair_metric(pred, labels, sens):
     idx_s0 = sens == 0
     idx_s1 = sens == 1
     idx_s0_y1 = np.bitwise_and(idx_s0, labels == 1)
     idx_s1_y1 = np.bitwise_and(idx_s1, labels == 1)
     parity = abs(sum(pred[idx_s0]) / sum(idx_s0) - sum(pred[idx_s1]) / sum(idx_s1))
-    equality = abs(sum(pred[idx_s0_y1]) / sum(idx_s0_y1) - sum(pred[idx_s1_y1]) / sum(idx_s1_y1))
+    equality = abs(
+        sum(pred[idx_s0_y1]) / sum(idx_s0_y1) - sum(pred[idx_s1_y1]) / sum(idx_s1_y1)
+    )
     return parity.item(), equality.item()
 
 
-def calculate_similarity_matrix(adj, features, metric=None, filterSigma=None, normalize=None, largestComponent=False):
-    if metric in ['cosine', 'jaccard']:
+def calculate_similarity_matrix(
+    adj, features, metric=None, filterSigma=None, normalize=None, largestComponent=False
+):
+    if metric in ["cosine", "jaccard"]:
         # build similarity matrix
         if largestComponent:
             graph = nx.from_scipy_sparse_matrix(adj)
-            lcc = max(nx.connected_components(graph), key=len)  # take largest connected components
-            adj = nx.to_scipy_sparse_matrix(graph, nodelist=lcc, dtype='float', format='csc')
+            lcc = max(
+                nx.connected_components(graph), key=len
+            )  # take largest connected components
+            adj = nx.to_scipy_sparse_matrix(
+                graph, nodelist=lcc, dtype="float", format="csc"
+            )
         sim = get_similarity_matrix(adj, metric=metric)
         if filterSigma:
             sim = filter_similarity_matrix(sim, sigma=filterSigma)
@@ -267,8 +289,10 @@ def calculate_group_lap(sim, sens):
 def convert_sparse_matrix_to_sparse_tensor(X):
     X = X.tocoo()
 
-    X = torch.sparse_coo_tensor(torch.tensor([X.row.tolist(), X.col.tolist()]),
-                                torch.tensor(X.data.astype(np.float32)))
+    X = torch.sparse_coo_tensor(
+        torch.tensor([X.row.tolist(), X.col.tolist()]),
+        torch.tensor(X.data.astype(np.float32)),
+    )
     return X
 
 
@@ -289,7 +313,9 @@ def symmetric_normalize(mat):
     """
     degrees = np.asarray(mat.sum(axis=0).flatten())
     degrees = np.divide(1, degrees, out=np.zeros_like(degrees), where=degrees != 0)
-    degrees = np.diag(np.asarray(degrees)[0, :])     # ????????????????????   degrees = diags(np.asarray(degrees)[0, :])
+    degrees = np.diag(
+        np.asarray(degrees)[0, :]
+    )  # ????????????????????   degrees = diags(np.asarray(degrees)[0, :])
     degrees.data = np.sqrt(degrees.data)
     return degrees @ mat @ degrees
 
@@ -309,7 +335,7 @@ def jaccard_similarity(mat):
     aa = np.repeat(col_sum, ab.getnnz(axis=0))
     bb = col_sum[ab.indices]
     sim = ab.copy()
-    sim.data /= (aa + bb - ab.data)
+    sim.data /= aa + bb - ab.data
     return sim
 
 
@@ -346,19 +372,19 @@ def get_similarity_matrix(mat, metric=None):
     :param metric: similarity metric
     :return: similarity matrix of nodes
     """
-    if metric == 'jaccard':
+    if metric == "jaccard":
         return jaccard_similarity(mat.tocsc())
-    elif metric == 'cosine':
+    elif metric == "cosine":
         return cosine_similarity(mat.tocsc())
     else:
-        raise ValueError('Please specify the type of similarity metric.')
+        raise ValueError("Please specify the type of similarity metric.")
 
 
 def normalize(mx):
     """Row-normalize sparse matrix"""
     rowsum = np.array(mx.sum(1))
     r_inv = np.power(rowsum, -1).flatten()
-    r_inv[np.isinf(r_inv)] = 0.
+    r_inv[np.isinf(r_inv)] = 0.0
     r_mat_inv = sp.diags(r_inv)
     mx = r_mat_inv.dot(mx)
     return mx
@@ -389,51 +415,71 @@ def sparse_mx_to_torch_sparse_tensor(sparse_mx):
     """Convert a scipy sparse matrix to a torch sparse tensor."""
     sparse_mx = sparse_mx.tocoo().astype(np.float32)
     indices = torch.from_numpy(
-        np.vstack((sparse_mx.row, sparse_mx.col)).astype(np.int64))
+        np.vstack((sparse_mx.row, sparse_mx.col)).astype(np.int64)
+    )
     values = torch.from_numpy(sparse_mx.data)
     shape = torch.Size(sparse_mx.shape)
     return torch.sparse.FloatTensor(indices, values, shape)
 
 
-
 class InFoRM_GNN(nn.Module):
-    def __init__(self, adj, features, idx_train, idx_val, idx_test, labels, sens, gnn_name='gcn', lr=0.001, hidden=16, dropout=0, weight_decay=1e-5, device="cuda"):
+    def __init__(
+        self,
+        adj,
+        features,
+        idx_train,
+        idx_val,
+        idx_test,
+        labels,
+        sens,
+        gnn_name="gcn",
+        lr=0.001,
+        hidden=16,
+        dropout=0,
+        weight_decay=1e-5,
+        device="cuda",
+        path="./",
+    ):
         super(InFoRM_GNN, self).__init__()
 
-        row=adj._indices()[0].cpu().numpy()
-        col=adj._indices ()[1].cpu().numpy()
-        data=adj._values().cpu().numpy()
-        shape=adj.size()
-        adj=sp.csr_matrix((data,(row, col)), shape=shape)
+        row = adj._indices()[0].cpu().numpy()
+        col = adj._indices()[1].cpu().numpy()
+        data = adj._values().cpu().numpy()
+        shape = adj.size()
+        adj = sp.csr_matrix((data, (row, col)), shape=shape)
 
         edge_index = convert.from_scipy_sparse_matrix(adj)[0]
-        sim = calculate_similarity_matrix(adj, features, metric='cosine')
+        sim = calculate_similarity_matrix(adj, features, metric="cosine")
         lap = laplacian(sim)
 
+        import os
 
-        print("Calculating laplacians...(this may take a while)")
-        lap_list, m_list, avgSimD_list = calculate_group_lap(sim, sens)
-        saveLaplacians = {}
-        saveLaplacians['lap_list'] = lap_list
-        saveLaplacians['m_list'] = m_list
-        saveLaplacians['avgSimD_list'] = avgSimD_list
-        with open("laplacians-1" + '.pickle', 'wb') as f:
-            pickle.dump(saveLaplacians, f, protocol=pickle.HIGHEST_PROTOCOL)
-        print("Laplacians calculated and stored.")
+        if not os.path.exists(path + "laplacians" + ".pickle"):
+            print("Calculating laplacians...(this may take a while)")
+            lap_list, m_list, avgSimD_list = calculate_group_lap(sim, sens)
+            saveLaplacians = {}
+            saveLaplacians["lap_list"] = lap_list
+            saveLaplacians["m_list"] = m_list
+            saveLaplacians["avgSimD_list"] = avgSimD_list
+            with open("laplacians" + ".pickle", "wb") as f:
+                pickle.dump(saveLaplacians, f, protocol=pickle.HIGHEST_PROTOCOL)
+            print("Laplacians calculated and stored.")
 
-
-        with open("laplacians-1" + '.pickle', 'rb') as f:
+        with open("laplacians" + ".pickle", "rb") as f:
             loadLaplacians = pickle.load(f)
-        lap_list, m_list, avgSimD_list = loadLaplacians['lap_list'], loadLaplacians['m_list'], loadLaplacians['avgSimD_list']
+        lap_list, m_list, avgSimD_list = (
+            loadLaplacians["lap_list"],
+            loadLaplacians["m_list"],
+            loadLaplacians["avgSimD_list"],
+        )
         print("Laplacians loaded from previous runs")
-
 
         self.lap = convert_sparse_matrix_to_sparse_tensor(lap)
         self.lap_list = [convert_sparse_matrix_to_sparse_tensor(X) for X in lap_list]
         self.lap_1 = None
         self.lap_2 = None
 
-        if device == 'cuda':
+        if device == "cuda":
             self.lap_1 = self.lap_list[0].cuda()
             self.lap_2 = self.lap_list[1].cuda()
         else:
@@ -455,34 +501,34 @@ class InFoRM_GNN(nn.Module):
         self.model = None
         self.optimizer = None
         num_class = 1
-        if gnn_name == 'gcn':
-            self.model = GCN(nfeat=features.shape[1],
-                        nhid=hidden,
-                        nclass=num_class,
-                        dropout=dropout)
-            self.optimizer = optim.Adam(self.model.parameters(), lr=lr, weight_decay=weight_decay)
+        if gnn_name == "gcn":
+            self.model = GCN(
+                nfeat=features.shape[1], nhid=hidden, nclass=num_class, dropout=dropout
+            )
+            self.optimizer = optim.Adam(
+                self.model.parameters(), lr=lr, weight_decay=weight_decay
+            )
             self.model = self.model.to(device)
 
-        elif gnn_name == 'gin':
-            self.model = GIN(nfeat=features.shape[1],
-                        nhid=hidden,
-                        nclass=num_class,
-                        dropout=dropout)
-            self.optimizer = optim.Adam(self.model.parameters(), lr=lr, weight_decay=weight_decay)
+        elif gnn_name == "gin":
+            self.model = GIN(
+                nfeat=features.shape[1], nhid=hidden, nclass=num_class, dropout=dropout
+            )
+            self.optimizer = optim.Adam(
+                self.model.parameters(), lr=lr, weight_decay=weight_decay
+            )
             self.model = self.model.to(device)
 
-        elif gnn_name == 'jk':
-            self.model = JK(nfeat=features.shape[1],
-                       nhid=hidden,
-                       nclass=num_class,
-                       dropout=dropout)
-            self.optimizer = optim.Adam(self.model.parameters(), lr=lr, weight_decay=weight_decay)
+        elif gnn_name == "jk":
+            self.model = JK(
+                nfeat=features.shape[1], nhid=hidden, nclass=num_class, dropout=dropout
+            )
+            self.optimizer = optim.Adam(
+                self.model.parameters(), lr=lr, weight_decay=weight_decay
+            )
             self.model = self.model.to(device)
-
-
 
     def fit(self, epochs=3000, alpha=5e-6, opt_if=1):
-
         # Train model
         t_total = time.time()
         best_loss = np.inf
@@ -491,8 +537,6 @@ class InFoRM_GNN(nn.Module):
         edge_index = self.edge_index.to(self.device)
         labels = self.labels.to(self.device)
         lap = self.lap.to(self.device)
-
-
 
         for epoch in range(epochs + 1):
             t = time.time()
@@ -504,20 +548,26 @@ class InFoRM_GNN(nn.Module):
             # Binary Cross-Entropy
             preds = (output.squeeze() > 0).type_as(labels)
             # output[output < 0.0] = 0.0
-            # output[output > 1.0] = 1.0 
+            # output[output > 1.0] = 1.0
             # print(output)
             # print(labels)
             # assert 1 == 0
-            loss_train = F.binary_cross_entropy_with_logits(output[self.idx_train],
-                                                            labels[self.idx_train].unsqueeze(1).float().to(self.device))
+            loss_train = F.binary_cross_entropy_with_logits(
+                output[self.idx_train],
+                labels[self.idx_train].unsqueeze(1).float().to(self.device),
+            )
 
             if opt_if:
                 # IF loss  torch.sparse.mm
-                if_loss = alpha * torch.trace(torch.mm(output.t(), torch.mm(lap, output)))
+                if_loss = alpha * torch.trace(
+                    torch.mm(output.t(), torch.mm(lap, output))
+                )
                 loss_train = loss_train + if_loss
 
-
-            auc_roc_train = roc_auc_score(labels.cpu().numpy()[self.idx_train.cpu().numpy()], output.detach().cpu().numpy()[self.idx_train.cpu().numpy()])
+            auc_roc_train = roc_auc_score(
+                labels.cpu().numpy()[self.idx_train.cpu().numpy()],
+                output.detach().cpu().numpy()[self.idx_train.cpu().numpy()],
+            )
             loss_train.backward()
             self.optimizer.step()
 
@@ -527,47 +577,69 @@ class InFoRM_GNN(nn.Module):
 
             # Binary Cross-Entropy
             preds = (output.squeeze() > 0).type_as(labels)
-            loss_val = F.binary_cross_entropy_with_logits(output[self.idx_val],
-                                                          labels[self.idx_val].unsqueeze(1).float().to(self.device))
+            loss_val = F.binary_cross_entropy_with_logits(
+                output[self.idx_val],
+                labels[self.idx_val].unsqueeze(1).float().to(self.device),
+            )
 
             if opt_if:
                 # IF loss
-                if_loss = alpha * torch.trace(torch.mm(output.t(), torch.sparse.mm(lap, output)))
+                if_loss = alpha * torch.trace(
+                    torch.mm(output.t(), torch.sparse.mm(lap, output))
+                )
                 loss_val = loss_val + if_loss
 
-            auc_roc_val = roc_auc_score(labels.cpu().numpy()[self.idx_val.cpu().numpy()], output.detach().cpu().numpy()[self.idx_val.cpu().numpy()])
+            auc_roc_val = roc_auc_score(
+                labels.cpu().numpy()[self.idx_val.cpu().numpy()],
+                output.detach().cpu().numpy()[self.idx_val.cpu().numpy()],
+            )
 
             if epoch % 500 == 0:
-                print(f"[Train] Epoch {epoch}:train_loss: {loss_train.item():.4f} | train_auc_roc: {auc_roc_train:.4f} | val_loss: {loss_val.item():.4f} | val_auc_roc: {auc_roc_val:.4f}")
+                print(
+                    f"[Train] Epoch {epoch}:train_loss: {loss_train.item():.4f} | train_auc_roc: {auc_roc_train:.4f} | val_loss: {loss_val.item():.4f} | val_auc_roc: {auc_roc_val:.4f}"
+                )
 
             if loss_val.item() < best_loss:
                 best_loss = loss_val.item()
-                weightName = './v0_weights_vanilla.pt'
+                weightName = "./v0_weights_vanilla.pt"
                 torch.save(self.model.state_dict(), weightName)
 
         print("Optimization Finished!")
         print("Total time elapsed: {:.4f}s".format(time.time() - t_total))
 
-
     def calculate_ranking_fairness(self, epoch, model_name, adj, output):
         y_similarity1 = simi(output[self.idx_train])
         x_similarity = simi(self.features[self.idx_train])
-        lambdas1, x_sorted_scores, y_sorted_idxs, x_corresponding = lambdas_computation(x_similarity, y_similarity1, self.top_k, self.k_para, self.sigma_1)
+        lambdas1, x_sorted_scores, y_sorted_idxs, x_corresponding = lambdas_computation(
+            x_similarity, y_similarity1, self.top_k, self.k_para, self.sigma_1
+        )
         assert lambdas1.shape == y_similarity1.shape
 
         y_similarity = simi(output[self.idx_test])
         x_similarity = simi(self.features[self.idx_test])
 
         print("Ranking optimizing... ")
-        x_sorted_scores, y_sorted_idxs, x_corresponding = lambdas_computation_only_review(x_similarity, y_similarity, self.top_k, self.k_para)
-        self.all_ndcg_list_test.append(avg_ndcg(x_corresponding, x_similarity, x_sorted_scores, y_sorted_idxs, self.top_k))
+        (
+            x_sorted_scores,
+            y_sorted_idxs,
+            x_corresponding,
+        ) = lambdas_computation_only_review(
+            x_similarity, y_similarity, self.top_k, self.k_para
+        )
+        self.all_ndcg_list_test.append(
+            avg_ndcg(
+                x_corresponding,
+                x_similarity,
+                x_sorted_scores,
+                y_sorted_idxs,
+                self.top_k,
+            )
+        )
 
         y_similarity1.backward(self.lambdas_para * lambdas1)
         self.optimizer.step()
 
-
     def predict(self):
-
         self.model.eval()
         output = self.model(self.features, self.edge_index).squeeze()
 
@@ -575,49 +647,53 @@ class InFoRM_GNN(nn.Module):
         output_preds = (output.squeeze() > 0).type_as(self.labels)
         # counter_output_preds = (counter_output.squeeze() > 0).type_as(self.labels)
         # noisy_output_preds = (noisy_output.squeeze() > 0).type_as(self.labels)
-        auc_roc_test = roc_auc_score(self.labels.cpu().numpy()[self.idx_test.cpu().numpy()],
-                                     output.detach().cpu().numpy()[self.idx_test.cpu().numpy()])
+        auc_roc_test = roc_auc_score(
+            self.labels.cpu().numpy()[self.idx_test.cpu().numpy()],
+            output.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
+        )
 
         print(output)
         print(output_preds)
 
-        F1 = f1_score(self.labels.cpu().numpy()[self.idx_test.cpu().numpy()], output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()], average='micro')
-        ACC=accuracy_score(self.labels.detach().cpu().numpy()[self.idx_test.cpu().numpy()], output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],)
-        AUCROC=roc_auc_score(self.labels.cpu().numpy()[self.idx_test.cpu().numpy()], output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()])
-
+        F1 = f1_score(
+            self.labels.cpu().numpy()[self.idx_test.cpu().numpy()],
+            output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
+            average="micro",
+        )
+        ACC = accuracy_score(
+            self.labels.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
+            output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
+        )
+        AUCROC = roc_auc_score(
+            self.labels.cpu().numpy()[self.idx_test.cpu().numpy()],
+            output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
+        )
 
         # counterfactual_fairness = 1 - (output_preds.eq(counter_output_preds)[self.idx_test].sum().item() / self.idx_test.shape[0])
         # robustness_score = 1 - (output_preds.eq(noisy_output_preds)[self.idx_test].sum().item() / self.idx_test.shape[0])
 
-
-        output=output.unsqueeze(1)
-        individual_unfairness = torch.trace(torch.mm(output.t(), torch.sparse.mm(self.lap.to(self.device), output))).item()
-        f_u1 = torch.trace(torch.mm(output.t(), torch.sparse.mm(self.lap_1, output))) / self.m_u1
+        output = output.unsqueeze(1)
+        individual_unfairness = torch.trace(
+            torch.mm(output.t(), torch.sparse.mm(self.lap.to(self.device), output))
+        ).item()
+        f_u1 = (
+            torch.trace(torch.mm(output.t(), torch.sparse.mm(self.lap_1, output)))
+            / self.m_u1
+        )
         f_u1 = f_u1.item()
-        f_u2 = torch.trace(torch.mm(output.t(), torch.sparse.mm(self.lap_2, output))) / self.m_u2
+        f_u2 = (
+            torch.trace(torch.mm(output.t(), torch.sparse.mm(self.lap_2, output)))
+            / self.m_u2
+        )
         f_u2 = f_u2.item()
         if_group_pct_diff = np.abs(f_u1 - f_u2) / min(f_u1, f_u2)
         GDIF = max(f_u2 / f_u1, f_u1 / f_u2)
 
         # print report
         print("The AUCROC of estimator: {:.4f}".format(auc_roc_test))
-        print(f'Total Individual Unfairness: {individual_unfairness}')
-        print(f'Individual Unfairness for Group 1: {f_u1}')
-        print(f'Individual Unfairness for Group 2: {f_u2}')
-        print(f'GDIF: {GDIF}')
+        print(f"Total Individual Unfairness: {individual_unfairness}")
+        print(f"Individual Unfairness for Group 1: {f_u1}")
+        print(f"Individual Unfairness for Group 2: {f_u2}")
+        print(f"GDIF: {GDIF}")
 
         return F1, ACC, AUCROC, individual_unfairness, GDIF
-
-
-
-
-
-
-
-
-
-
-
-
-
-
