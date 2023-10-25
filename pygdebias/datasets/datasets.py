@@ -38,6 +38,7 @@ class Dataset(object):
         self.idx_val_ = None
         self.idx_test_ = None
         self.sens_ = None
+        self.sens_idx_ = None
 
         self.root = root
         if not os.path.exists(self.root):
@@ -129,6 +130,9 @@ class Dataset(object):
             return self.sens_.numpy()
         else:
             raise ValueError("datatype should be torch.tensor, tf.tensor, or np.array")
+
+    def sens_idx(self):
+        return self.sens_idx_
 
 
 def mx_to_torch_sparse_tensor(sparse_mx, is_sparse=False, return_tensor_sparse=True):
@@ -1246,6 +1250,7 @@ class German(Dataset):
         self.idx_val_ = idx_val
         self.idx_test_ = idx_test
         self.sens_ = sens
+        self.sens_idx_ = sens_idx
 
     def feature_norm(self, features):
         min_values = features.min(axis=0)[0]
@@ -1375,6 +1380,7 @@ class Bail(Dataset):
         self.idx_val_ = idx_val
         self.idx_test_ = idx_test
         self.sens_ = sens
+        self.sens_idx_ = sens_idx
 
     def feature_norm(self, features):
         min_values = features.min(axis=0)[0]
@@ -1500,6 +1506,7 @@ class Credit(Dataset):
         self.idx_val_ = idx_val
         self.idx_test_ = idx_test
         self.sens_ = sens
+        self.sens_idx_ = sens_idx
 
     def feature_norm(self, features):
         min_values = features.min(axis=0)[0]
@@ -3007,3 +3014,9 @@ class UNC(Dataset):
 # citeseer = Citeseer()
 # yelp = Yelp()
 # amazon = Amazon()
+# lcc = LCC()
+# lcc_small = LCC_small()
+# epinion = Epinion()
+# ciao = Ciao()
+# dblp = Dblp()
+# german = German()
