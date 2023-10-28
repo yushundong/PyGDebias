@@ -272,8 +272,8 @@ class FairGNN(nn.Module):
             # if acc_val > args.acc: #and roc_val > args.roc:
 
             if acc_val > args.acc or epoch == 0:
-                if parity_val + equality_val < best_fair:
-                    # if acc_val>best_acc:
+                #if parity_val + equality_val < best_fair:
+                if acc_val>best_acc:
                     best_epoch = epoch
                     best_fair = parity_val + equality_val
                     best_acc = acc_val
