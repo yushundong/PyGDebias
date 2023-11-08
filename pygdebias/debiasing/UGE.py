@@ -647,6 +647,30 @@ class UGE():
                                                      pred.parameters()), lr=self.lr)
 
 
+        if debias_method in ['uge-r', 'uge-c']:
+            print('Grouping nodes by attribute combination to support {}...'.format(debias_method))
+
+            attribute_list = SENSITIVE_ATTR_DICT[args.dataset]
+
+            non_sens_attr_ls = [attr for attr in attribute_list if attr != debias_attr]
+            non_sens_attr_idx = [i for i in range(len(attribute_list)) if attribute_list[i] != debias_attr]
+
+            attribute_file = '{}/{}_node_attribute.csv'.format(DATA_FOLDER, args.dataset)
+            node_attributes = pd.read_csv(attribute_file)
+
+            attr_comb_groups = node_attributes.groupby(attribute_list)
+            nobias_comb_groups = node_attributes.groupby(non_sens_attr_ls)
+
+            attr_comb_groups_map = {tuple(group[1].iloc[0]): list(group[1].index)
+                                    for group in attr_comb_groups}
+            nobias_attr_comb_groups_map = {tuple(group[1].iloc[0][non_sens_attr_ls]): list(group[1].index)
+                                           for group in nobias_comb_groups}
+
+            print('Group finished.')
+            print('  attr_comb_group_num:', len(attr_comb_groups_map.keys()))
+            print('  nobias_attr_comb_group_num:', len(nobias_attr_comb_groups_map.keys()))
+
+
 
         print('==== Training with {} debias method ===='.format(debias_method))
 
