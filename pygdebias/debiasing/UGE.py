@@ -703,6 +703,30 @@ class UGE():
             #print(train_pos_score)
             #print(train_neg_score)
             #print(train_weights)
+            
+            if debias_method in ['uge-r', 'uge-c']:
+                regu_loss = 0
+                scr_groups = random.sample(list(attr_comb_groups_map.keys()), 100)
+                dst_groups = random.sample(list(attr_comb_groups_map.keys()), 100)
+                nobias_scr_groups = [map_tuple(group, non_sens_attr_idx) for group in scr_groups]
+                nobias_dst_groups = [map_tuple(group, non_sens_attr_idx) for group in dst_groups]
+
+                for group_idx in range(len(scr_groups)):
+                    scr_group_nodes = attr_comb_groups_map[scr_groups[group_idx]]
+                    dsc_group_nodes = attr_comb_groups_map[dst_groups[group_idx]]
+                    scr_node_embs = h[scr_group_nodes]
+                    dsc_node_embs = h[dsc_group_nodes]
+                    aver_score = mem_eff_matmul_mean(scr_node_embs, dsc_node_embs.T)
+
+                    nobias_scr_group_nodes = nobias_attr_comb_groups_map[nobias_scr_groups[group_idx]]
+                    nobias_dsc_group_nodes = nobias_attr_comb_groups_map[nobias_dst_groups[group_idx]]
+                    nobias_scr_node_embs = h[nobias_scr_group_nodes]
+                    nobias_dsc_node_embs = h[nobias_dsc_group_nodes]
+                    nobias_aver_score = mem_eff_matmul_mean(nobias_scr_node_embs, nobias_dsc_node_embs.T)
+
+                    regu_loss += torch.square(aver_score - nobias_aver_score)
+
+                loss += args.reg_weight * regu_loss / 100 /10
 
             # backward
             optimizer.zero_grad()
