@@ -57,18 +57,19 @@ Specifically, this open-source library *PyGDebias* aims to provide a systematic 
 Our survey paper "Fairness in Graph Mining: A Survey" has been released on arxiv [\[PDF\]](http://yushundong.github.io/files/fairness_survey.pdf). If you find *PyGDebias* helpful, we would appreciate citations to the following paper:
 
 ```
-@article{dong2022fairness,
-  title={Fairness in Graph Mining: A Survey},
-  author={Dong, Yushun and Ma, Jing and Chen, Chen and Li, Jundong},
-  journal={arXiv preprint arXiv:2204.09888},
-  year={2022}
+@article{dong2023fairness,
+  title={Fairness in graph mining: A survey},
+  author={Dong, Yushun and Ma, Jing and Wang, Song and Chen, Chen and Li, Jundong},
+  journal={IEEE Transactions on Knowledge and Data Engineering},
+  year={2023},
+  publisher={IEEE}
 }
 ```
 
 or:
 
 ```
-Dong, Y., Ma, J., Chen, C., & Li, J. (2022). Fairness in Graph Mining: A Survey. arXiv preprint arXiv:2204.09888.
+Dong, Y., Ma, J., Wang, S., Chen, C., & Li, J. (2023). Fairness in graph mining: A survey. IEEE Transactions on Knowledge and Data Engineering.
 ```
 
 ## 2. API Cheatsheet
