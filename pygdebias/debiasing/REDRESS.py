@@ -654,10 +654,14 @@ class REDRESS(nn.Module):
         pre_train=1500,
         epochs=20,
         path="./",
+        dataset=None,
     ):
         super(REDRESS, self).__init__()
 
         self.model_name = model_name
+        if dataset is None:
+            raise ValueError("Please specify the dataset name.")
+        self.dataset = dataset
 
         self.model = get_model(
             model_name, features.size(1), 2, hidden, dropout, cuda
@@ -706,18 +710,18 @@ class REDRESS(nn.Module):
 
         import os
 
-        if not os.path.exists(path + "laplacians" + ".pickle"):
+        if not os.path.exists(path + "laplacians_red_" + self.dataset + ".pickle"):
             print("Calculating laplacians...(this may take a while)")
             lap_list, m_list, avgSimD_list = calculate_group_lap(sim, sens)
             saveLaplacians = {}
             saveLaplacians["lap_list"] = lap_list
             saveLaplacians["m_list"] = m_list
             saveLaplacians["avgSimD_list"] = avgSimD_list
-            with open("laplacians" + ".pickle", "wb") as f:
+            with open(path + "laplacians_red_" + self.dataset + ".pickle", "wb") as f:
                 pickle.dump(saveLaplacians, f, protocol=pickle.HIGHEST_PROTOCOL)
             print("Laplacians calculated and stored.")
 
-        with open("laplacians" + ".pickle", "rb") as f:
+        with open(path + "laplacians_red_" + self.dataset + ".pickle", "rb") as f:
             loadLaplacians = pickle.load(f)
         lap_list, m_list, avgSimD_list = (
             loadLaplacians["lap_list"],

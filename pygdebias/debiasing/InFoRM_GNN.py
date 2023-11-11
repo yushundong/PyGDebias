@@ -439,8 +439,12 @@ class InFoRM_GNN(nn.Module):
         weight_decay=1e-5,
         device="cuda",
         path="./",
+        dataset=None,
     ):
         super(InFoRM_GNN, self).__init__()
+        if dataset is None:
+            raise ValueError("Please specify the dataset.")
+        self.dataset = dataset
 
         row = adj._indices()[0].cpu().numpy()
         col = adj._indices()[1].cpu().numpy()
@@ -454,18 +458,20 @@ class InFoRM_GNN(nn.Module):
 
         import os
 
-        if not os.path.exists(path + "laplacians" + ".pickle"):
+        if not os.path.exists(path + "laplacian_inform_" + self.dataset + ".pickle"):
             print("Calculating laplacians...(this may take a while)")
             lap_list, m_list, avgSimD_list = calculate_group_lap(sim, sens)
             saveLaplacians = {}
             saveLaplacians["lap_list"] = lap_list
             saveLaplacians["m_list"] = m_list
             saveLaplacians["avgSimD_list"] = avgSimD_list
-            with open("laplacians" + ".pickle", "wb") as f:
+            with open(
+                path + "laplacians_inform_" + self.dataset + ".pickle", "wb"
+            ) as f:
                 pickle.dump(saveLaplacians, f, protocol=pickle.HIGHEST_PROTOCOL)
             print("Laplacians calculated and stored.")
 
-        with open("laplacians" + ".pickle", "rb") as f:
+        with open(path + "laplacians_inform_" + self.dataset + ".pickle", "rb") as f:
             loadLaplacians = pickle.load(f)
         lap_list, m_list, avgSimD_list = (
             loadLaplacians["lap_list"],
@@ -680,6 +686,7 @@ class InFoRM_GNN(nn.Module):
             torch.trace(torch.mm(output.t(), torch.sparse.mm(self.lap_1, output)))
             / self.m_u1
         )
+
         f_u1 = f_u1.item()
         f_u2 = (
             torch.trace(torch.mm(output.t(), torch.sparse.mm(self.lap_2, output)))

@@ -1,0 +1,1608 @@
+
+
+Credit GEAR_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 391, in GEAR_
+    model = GEAR(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1459, in __init__
+    self.preprocess(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1570, in preprocess
+    data_cf = generate_cf_data(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 512, in generate_cf_data
+    model_DA.train_model(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 379, in train_model
+    loss_s.backward()
+  File "/home/zhenyu/.local/lib/python3.8/site-packages/torch/_tensor.py", line 396, in backward
+    torch.autograd.backward(self, gradient, retain_graph, create_graph, inputs=inputs)
+  File "/home/zhenyu/.local/lib/python3.8/site-packages/torch/autograd/__init__.py", line 173, in backward
+    Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+
+
+
+
+
+
+German GEAR_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 391, in GEAR_
+    model = GEAR(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1459, in __init__
+    self.preprocess(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1570, in preprocess
+    data_cf = generate_cf_data(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 485, in generate_cf_data
+    model_DA = CFDA(h_dim, input_dim, adj.cuda()).to(device)
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+
+
+
+
+
+
+Facebook GEAR_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 391, in GEAR_
+    model = GEAR(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1459, in __init__
+    self.preprocess(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1570, in preprocess
+    data_cf = generate_cf_data(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 485, in generate_cf_data
+    model_DA = CFDA(h_dim, input_dim, adj.cuda()).to(device)
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+
+
+
+
+
+
+Pokec_z GEAR_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 391, in GEAR_
+    model = GEAR(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1459, in __init__
+    self.preprocess(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1570, in preprocess
+    data_cf = generate_cf_data(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 479, in generate_cf_data
+    adj = sp.coo_matrix(adj_raw.to_dense().numpy())
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/scipy/sparse/_coo.py", line 189, in __init__
+    self.row, self.col = M.nonzero()
+KeyboardInterrupt
+
+
+
+
+
+
+Pokec_n GEAR_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 391, in GEAR_
+    model = GEAR(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1459, in __init__
+    self.preprocess(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1570, in preprocess
+    data_cf = generate_cf_data(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 479, in generate_cf_data
+    adj = sp.coo_matrix(adj_raw.to_dense().numpy())
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/scipy/sparse/_coo.py", line 189, in __init__
+    self.row, self.col = M.nonzero()
+KeyboardInterrupt
+
+
+
+
+
+
+Nba GEAR_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 391, in GEAR_
+    model = GEAR(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1459, in __init__
+    self.preprocess(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1570, in preprocess
+    data_cf = generate_cf_data(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 485, in generate_cf_data
+    model_DA = CFDA(h_dim, input_dim, adj.cuda()).to(device)
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+
+
+
+
+
+
+Google GEAR_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 391, in GEAR_
+    model = GEAR(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1459, in __init__
+    self.preprocess(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1570, in preprocess
+    data_cf = generate_cf_data(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 485, in generate_cf_data
+    model_DA = CFDA(h_dim, input_dim, adj.cuda()).to(device)
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+
+
+
+
+
+
+Pokec_z EDITS_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 170, in EDITS_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/EDITS.py", line 555, in fit
+    self.optimize(adj, features, idx_train, sens, epoch, lr)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/EDITS.py", line 448, in optimize
+    loss_train.backward()
+  File "/home/zhenyu/.local/lib/python3.8/site-packages/torch/_tensor.py", line 396, in backward
+    torch.autograd.backward(self, gradient, retain_graph, create_graph, inputs=inputs)
+  File "/home/zhenyu/.local/lib/python3.8/site-packages/torch/autograd/__init__.py", line 173, in backward
+    Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+RuntimeError: CUDA out of memory. Tried to allocate 8.56 GiB (GPU 0; 47.54 GiB total capacity; 25.99 GiB already allocated; 7.50 GiB free; 27.38 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+
+
+
+
+
+
+
+
+
+
+Facebook FairVGNN_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 278, in FairVGNN_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairVGNN.py", line 1269, in fit
+    data, args.sens_idx, args.corr_sens, args.corr_idx, args.x_min, args.x_max = get_dataset(None, args.top_k, adj, feats, labels, idx_train, idx_val, idx_test, sens, sens_idx)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairVGNN.py", line 1010, in get_dataset
+    corr_matrix = sens_correlation(features, sens_idx)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairVGNN.py", line 953, in sens_correlation
+    return corr[sens_idx].to_numpy()
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/pandas/core/frame.py", line 3505, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/pandas/core/indexes/range.py", line 389, in get_loc
+    raise KeyError(key)
+KeyError: None
+
+
+
+
+
+
+LCC_small GEAR_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 391, in GEAR_
+    model = GEAR(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1459, in __init__
+    self.preprocess(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1570, in preprocess
+    data_cf = generate_cf_data(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 479, in generate_cf_data
+    adj = sp.coo_matrix(adj_raw.to_dense().numpy())
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/scipy/sparse/_coo.py", line 189, in __init__
+    self.row, self.col = M.nonzero()
+KeyboardInterrupt
+
+
+
+
+
+
+Pokec_n EDITS_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 170, in EDITS_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/EDITS.py", line 555, in fit
+    self.optimize(adj, features, idx_train, sens, epoch, lr)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/EDITS.py", line 448, in optimize
+    loss_train.backward()
+  File "/home/zhenyu/.local/lib/python3.8/site-packages/torch/_tensor.py", line 396, in backward
+    torch.autograd.backward(self, gradient, retain_graph, create_graph, inputs=inputs)
+  File "/home/zhenyu/.local/lib/python3.8/site-packages/torch/autograd/__init__.py", line 173, in backward
+    Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+RuntimeError: CUDA out of memory. Tried to allocate 8.26 GiB (GPU 0; 47.54 GiB total capacity; 25.05 GiB already allocated; 7.50 GiB free; 27.38 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+
+
+
+
+
+
+Facebook FairEdit_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 230, in FairEdit_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairEdit.py", line 1096, in fit
+    trainer = fair_edit_trainer(model=model, dataset=None, optimizer=optimizer,
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairEdit.py", line 619, in __init__
+    sens_matrix_base = sens_att.reshape(-1, 1) + sens_att
+RuntimeError: CUDA out of memory. Tried to allocate 1340.35 GiB (GPU 0; 47.54 GiB total capacity; 8.58 MiB already allocated; 45.26 GiB free; 26.00 MiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+
+
+
+
+
+
+Pokec_z FairVGNN_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 278, in FairVGNN_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairVGNN.py", line 1269, in fit
+    data, args.sens_idx, args.corr_sens, args.corr_idx, args.x_min, args.x_max = get_dataset(None, args.top_k, adj, feats, labels, idx_train, idx_val, idx_test, sens, sens_idx)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairVGNN.py", line 1010, in get_dataset
+    corr_matrix = sens_correlation(features, sens_idx)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairVGNN.py", line 953, in sens_correlation
+    return corr[sens_idx].to_numpy()
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/pandas/core/frame.py", line 3505, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/pandas/core/indexes/range.py", line 389, in get_loc
+    raise KeyError(key)
+KeyError: None
+
+
+
+
+
+
+Pokec_z FairEdit_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 230, in FairEdit_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairEdit.py", line 1096, in fit
+    trainer = fair_edit_trainer(model=model, dataset=None, optimizer=optimizer,
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairEdit.py", line 619, in __init__
+    sens_matrix_base = sens_att.reshape(-1, 1) + sens_att
+RuntimeError: CUDA out of memory. Tried to allocate 1313795.60 GiB (GPU 0; 47.54 GiB total capacity; 256.57 MiB already allocated; 45.03 GiB free; 262.00 MiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+
+
+
+
+
+
+Pokec_n FairEdit_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 230, in FairEdit_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairEdit.py", line 1096, in fit
+    trainer = fair_edit_trainer(model=model, dataset=None, optimizer=optimizer,
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairEdit.py", line 619, in __init__
+    sens_matrix_base = sens_att.reshape(-1, 1) + sens_att
+RuntimeError: CUDA out of memory. Tried to allocate 1168066.21 GiB (GPU 0; 47.54 GiB total capacity; 236.80 MiB already allocated; 45.03 GiB free; 262.00 MiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+
+
+
+
+
+
+Nba FairEdit_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 230, in FairEdit_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairEdit.py", line 1096, in fit
+    trainer = fair_edit_trainer(model=model, dataset=None, optimizer=optimizer,
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairEdit.py", line 620, in __init__
+    self.sens_matrix_delete = torch.where(sens_matrix_base != 1, 1, 0).fill_diagonal_(0).int()
+RuntimeError: all dimensions of input must be of equal length
+
+
+
+
+
+
+Google FairEdit_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 230, in FairEdit_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairEdit.py", line 1096, in fit
+    trainer = fair_edit_trainer(model=model, dataset=None, optimizer=optimizer,
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairEdit.py", line 619, in __init__
+    sens_matrix_base = sens_att.reshape(-1, 1) + sens_att
+RuntimeError: CUDA out of memory. Tried to allocate 309939.37 GiB (GPU 0; 47.54 GiB total capacity; 113.44 MiB already allocated; 45.13 GiB free; 166.00 MiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+
+
+
+
+
+
+Pokec_n FairVGNN_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 278, in FairVGNN_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairVGNN.py", line 1269, in fit
+    data, args.sens_idx, args.corr_sens, args.corr_idx, args.x_min, args.x_max = get_dataset(None, args.top_k, adj, feats, labels, idx_train, idx_val, idx_test, sens, sens_idx)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairVGNN.py", line 1010, in get_dataset
+    corr_matrix = sens_correlation(features, sens_idx)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairVGNN.py", line 953, in sens_correlation
+    return corr[sens_idx].to_numpy()
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/pandas/core/frame.py", line 3505, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/pandas/core/indexes/range.py", line 389, in get_loc
+    raise KeyError(key)
+KeyError: None
+
+
+
+
+
+
+Nba FairVGNN_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 278, in FairVGNN_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairVGNN.py", line 1269, in fit
+    data, args.sens_idx, args.corr_sens, args.corr_idx, args.x_min, args.x_max = get_dataset(None, args.top_k, adj, feats, labels, idx_train, idx_val, idx_test, sens, sens_idx)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairVGNN.py", line 1010, in get_dataset
+    corr_matrix = sens_correlation(features, sens_idx)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairVGNN.py", line 953, in sens_correlation
+    return corr[sens_idx].to_numpy()
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/pandas/core/frame.py", line 3505, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/pandas/core/indexes/range.py", line 389, in get_loc
+    raise KeyError(key)
+KeyError: None
+
+
+
+
+
+
+Google FairVGNN_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 278, in FairVGNN_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairVGNN.py", line 1269, in fit
+    data, args.sens_idx, args.corr_sens, args.corr_idx, args.x_min, args.x_max = get_dataset(None, args.top_k, adj, feats, labels, idx_train, idx_val, idx_test, sens, sens_idx)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairVGNN.py", line 1010, in get_dataset
+    corr_matrix = sens_correlation(features, sens_idx)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairVGNN.py", line 953, in sens_correlation
+    return corr[sens_idx].to_numpy()
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/pandas/core/frame.py", line 3505, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/pandas/core/indexes/range.py", line 389, in get_loc
+    raise KeyError(key)
+KeyError: None
+
+
+
+
+
+
+LCC FairEdit_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 230, in FairEdit_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairEdit.py", line 1096, in fit
+    trainer = fair_edit_trainer(model=model, dataset=None, optimizer=optimizer,
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairEdit.py", line 619, in __init__
+    sens_matrix_base = sens_att.reshape(-1, 1) + sens_att
+RuntimeError: CUDA out of memory. Tried to allocate more than 1EB memory.
+
+
+
+
+
+
+LCC_small FairEdit_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 230, in FairEdit_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairEdit.py", line 1096, in fit
+    trainer = fair_edit_trainer(model=model, dataset=None, optimizer=optimizer,
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/FairEdit.py", line 619, in __init__
+    sens_matrix_base = sens_att.reshape(-1, 1) + sens_att
+RuntimeError: CUDA out of memory. Tried to allocate 187722538.91 GiB (GPU 0; 47.54 GiB total capacity; 2.51 GiB already allocated; 42.51 GiB free; 2.77 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+
+
+
+
+
+
+Credit GEAR_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 391, in GEAR_
+    model = GEAR(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1459, in __init__
+    self.preprocess(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1570, in preprocess
+    data_cf = generate_cf_data(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 512, in generate_cf_data
+    model_DA.train_model(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 379, in train_model
+    loss_s.backward()
+  File "/home/zhenyu/.local/lib/python3.8/site-packages/torch/_tensor.py", line 396, in backward
+    torch.autograd.backward(self, gradient, retain_graph, create_graph, inputs=inputs)
+  File "/home/zhenyu/.local/lib/python3.8/site-packages/torch/autograd/__init__.py", line 173, in backward
+    Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+
+
+
+
+
+
+German GEAR_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 391, in GEAR_
+    model = GEAR(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1459, in __init__
+    self.preprocess(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1570, in preprocess
+    data_cf = generate_cf_data(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 485, in generate_cf_data
+    model_DA = CFDA(h_dim, input_dim, adj.cuda()).to(device)
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+
+
+
+
+
+
+Facebook GEAR_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 391, in GEAR_
+    model = GEAR(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1459, in __init__
+    self.preprocess(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1570, in preprocess
+    data_cf = generate_cf_data(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 485, in generate_cf_data
+    model_DA = CFDA(h_dim, input_dim, adj.cuda()).to(device)
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+
+
+
+
+
+
+Nba GEAR_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 391, in GEAR_
+    model = GEAR(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1459, in __init__
+    self.preprocess(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1570, in preprocess
+    data_cf = generate_cf_data(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 485, in generate_cf_data
+    model_DA = CFDA(h_dim, input_dim, adj.cuda()).to(device)
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+
+
+
+
+
+
+Google GEAR_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 391, in GEAR_
+    model = GEAR(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1459, in __init__
+    self.preprocess(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1570, in preprocess
+    data_cf = generate_cf_data(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 485, in generate_cf_data
+    model_DA = CFDA(h_dim, input_dim, adj.cuda()).to(device)
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+
+
+
+
+
+
+Credit GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 30000
+
+
+
+
+
+
+German GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 1000
+
+
+
+
+
+
+Facebook GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 1045
+
+
+
+
+
+
+Nba GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 403
+
+
+
+
+
+
+Google GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 3601
+
+
+
+
+
+
+Credit GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 30000
+
+
+
+
+
+
+LCC GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 129726
+
+
+
+
+
+
+LCC_small GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 39424
+
+
+
+
+
+
+Credit GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 30000
+
+
+
+
+
+
+Bail GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 18876
+
+
+
+
+
+
+Credit GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 30000
+
+
+
+
+
+
+Credit GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 30000
+
+
+
+
+
+
+Credit UGE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 688, in UGE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/UGE.py", line 609, in fit
+    graph = link_pred_data_dict['train_g'].to(device)
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/heterograph.py", line 5448, in to
+    ret._graph = self._graph.copy_to(utils.to_dgl_context(device))
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/heterograph_index.py", line 236, in copy_to
+    return _CAPI_DGLHeteroCopyTo(self, ctx.device_type, ctx.device_id)
+  File "dgl/_ffi/_cython/./function.pxi", line 293, in dgl._ffi._cy3.core.FunctionBase.__call__
+  File "dgl/_ffi/_cython/./function.pxi", line 225, in dgl._ffi._cy3.core.FuncCall
+  File "dgl/_ffi/_cython/./function.pxi", line 215, in dgl._ffi._cy3.core.FuncCall3
+dgl._ffi.base.DGLError: [16:52:41] /opt/dgl/src/runtime/c_runtime_api.cc:88: Check failed: allow_missing: Device API gpu is not enabled. Please install the cuda version of dgl.
+Stack trace:
+  [bt] (0) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dmlc::LogMessageFatal::~LogMessageFatal()+0x4f) [0x7fbfc8d6929f]
+  [bt] (1) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::DeviceAPIManager::GetAPI(std::string, bool)+0x37c) [0x7fbfc903b72c]
+  [bt] (2) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::DeviceAPI::Get(DLContext, bool)+0x1f4) [0x7fbfc9035b14]
+  [bt] (3) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::CopyFromTo(DLTensor*, DLTensor*, void*)+0x242) [0x7fbfc9056c72]
+  [bt] (4) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::CopyTo(DLContext const&, void* const&) const+0xfb) [0x7fbfc909322b]
+  [bt] (5) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::UnitGraph::CopyTo(std::shared_ptr<dgl::BaseHeteroGraph>, DLContext const&, void* const&)+0x317) [0x7fbfc91a3fa7]
+  [bt] (6) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::HeteroGraph::CopyTo(std::shared_ptr<dgl::BaseHeteroGraph>, DLContext const&, void* const&)+0x109) [0x7fbfc90a5069]
+  [bt] (7) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(+0x4eb739) [0x7fbfc90b2739]
+  [bt] (8) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(DGLFuncCall+0x48) [0x7fbfc90350e8]
+
+
+
+
+
+
+
+
+German GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 1000
+
+
+
+
+
+
+German UGE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 688, in UGE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/UGE.py", line 609, in fit
+    graph = link_pred_data_dict['train_g'].to(device)
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/heterograph.py", line 5448, in to
+    ret._graph = self._graph.copy_to(utils.to_dgl_context(device))
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/heterograph_index.py", line 236, in copy_to
+    return _CAPI_DGLHeteroCopyTo(self, ctx.device_type, ctx.device_id)
+  File "dgl/_ffi/_cython/./function.pxi", line 293, in dgl._ffi._cy3.core.FunctionBase.__call__
+  File "dgl/_ffi/_cython/./function.pxi", line 225, in dgl._ffi._cy3.core.FuncCall
+  File "dgl/_ffi/_cython/./function.pxi", line 215, in dgl._ffi._cy3.core.FuncCall3
+dgl._ffi.base.DGLError: [16:52:47] /opt/dgl/src/runtime/c_runtime_api.cc:88: Check failed: allow_missing: Device API gpu is not enabled. Please install the cuda version of dgl.
+Stack trace:
+  [bt] (0) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dmlc::LogMessageFatal::~LogMessageFatal()+0x4f) [0x7fbfc8d6929f]
+  [bt] (1) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::DeviceAPIManager::GetAPI(std::string, bool)+0x37c) [0x7fbfc903b72c]
+  [bt] (2) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::DeviceAPI::Get(DLContext, bool)+0x1f4) [0x7fbfc9035b14]
+  [bt] (3) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::CopyFromTo(DLTensor*, DLTensor*, void*)+0x242) [0x7fbfc9056c72]
+  [bt] (4) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::CopyTo(DLContext const&, void* const&) const+0xfb) [0x7fbfc909322b]
+  [bt] (5) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::UnitGraph::CopyTo(std::shared_ptr<dgl::BaseHeteroGraph>, DLContext const&, void* const&)+0x317) [0x7fbfc91a3fa7]
+  [bt] (6) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::HeteroGraph::CopyTo(std::shared_ptr<dgl::BaseHeteroGraph>, DLContext const&, void* const&)+0x109) [0x7fbfc90a5069]
+  [bt] (7) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(+0x4eb739) [0x7fbfc90b2739]
+  [bt] (8) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(DGLFuncCall+0x48) [0x7fbfc90350e8]
+
+
+
+
+
+
+
+
+Facebook GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 1045
+
+
+
+
+
+
+Facebook UGE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 688, in UGE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/UGE.py", line 609, in fit
+    graph = link_pred_data_dict['train_g'].to(device)
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/heterograph.py", line 5448, in to
+    ret._graph = self._graph.copy_to(utils.to_dgl_context(device))
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/heterograph_index.py", line 236, in copy_to
+    return _CAPI_DGLHeteroCopyTo(self, ctx.device_type, ctx.device_id)
+  File "dgl/_ffi/_cython/./function.pxi", line 293, in dgl._ffi._cy3.core.FunctionBase.__call__
+  File "dgl/_ffi/_cython/./function.pxi", line 225, in dgl._ffi._cy3.core.FuncCall
+  File "dgl/_ffi/_cython/./function.pxi", line 215, in dgl._ffi._cy3.core.FuncCall3
+dgl._ffi.base.DGLError: [16:52:54] /opt/dgl/src/runtime/c_runtime_api.cc:88: Check failed: allow_missing: Device API gpu is not enabled. Please install the cuda version of dgl.
+Stack trace:
+  [bt] (0) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dmlc::LogMessageFatal::~LogMessageFatal()+0x4f) [0x7fbfc8d6929f]
+  [bt] (1) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::DeviceAPIManager::GetAPI(std::string, bool)+0x37c) [0x7fbfc903b72c]
+  [bt] (2) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::DeviceAPI::Get(DLContext, bool)+0x1f4) [0x7fbfc9035b14]
+  [bt] (3) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::CopyFromTo(DLTensor*, DLTensor*, void*)+0x242) [0x7fbfc9056c72]
+  [bt] (4) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::CopyTo(DLContext const&, void* const&) const+0xfb) [0x7fbfc909322b]
+  [bt] (5) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::UnitGraph::CopyTo(std::shared_ptr<dgl::BaseHeteroGraph>, DLContext const&, void* const&)+0x317) [0x7fbfc91a3fa7]
+  [bt] (6) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::HeteroGraph::CopyTo(std::shared_ptr<dgl::BaseHeteroGraph>, DLContext const&, void* const&)+0x109) [0x7fbfc90a5069]
+  [bt] (7) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(+0x4eb739) [0x7fbfc90b2739]
+  [bt] (8) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(DGLFuncCall+0x48) [0x7fbfc90350e8]
+
+
+
+
+
+
+
+
+Nba GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 403
+
+
+
+
+
+
+Nba UGE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 688, in UGE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/UGE.py", line 609, in fit
+    graph = link_pred_data_dict['train_g'].to(device)
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/heterograph.py", line 5448, in to
+    ret._graph = self._graph.copy_to(utils.to_dgl_context(device))
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/heterograph_index.py", line 236, in copy_to
+    return _CAPI_DGLHeteroCopyTo(self, ctx.device_type, ctx.device_id)
+  File "dgl/_ffi/_cython/./function.pxi", line 293, in dgl._ffi._cy3.core.FunctionBase.__call__
+  File "dgl/_ffi/_cython/./function.pxi", line 225, in dgl._ffi._cy3.core.FuncCall
+  File "dgl/_ffi/_cython/./function.pxi", line 215, in dgl._ffi._cy3.core.FuncCall3
+dgl._ffi.base.DGLError: [16:52:58] /opt/dgl/src/runtime/c_runtime_api.cc:88: Check failed: allow_missing: Device API gpu is not enabled. Please install the cuda version of dgl.
+Stack trace:
+  [bt] (0) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dmlc::LogMessageFatal::~LogMessageFatal()+0x4f) [0x7fbfc8d6929f]
+  [bt] (1) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::DeviceAPIManager::GetAPI(std::string, bool)+0x37c) [0x7fbfc903b72c]
+  [bt] (2) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::DeviceAPI::Get(DLContext, bool)+0x1f4) [0x7fbfc9035b14]
+  [bt] (3) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::CopyFromTo(DLTensor*, DLTensor*, void*)+0x242) [0x7fbfc9056c72]
+  [bt] (4) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::CopyTo(DLContext const&, void* const&) const+0xfb) [0x7fbfc909322b]
+  [bt] (5) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::UnitGraph::CopyTo(std::shared_ptr<dgl::BaseHeteroGraph>, DLContext const&, void* const&)+0x317) [0x7fbfc91a3fa7]
+  [bt] (6) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::HeteroGraph::CopyTo(std::shared_ptr<dgl::BaseHeteroGraph>, DLContext const&, void* const&)+0x109) [0x7fbfc90a5069]
+  [bt] (7) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(+0x4eb739) [0x7fbfc90b2739]
+  [bt] (8) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(DGLFuncCall+0x48) [0x7fbfc90350e8]
+
+
+
+
+
+
+
+
+German GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 1000
+
+
+
+
+
+
+Google GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 3601
+
+
+
+
+
+
+Google UGE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 688, in UGE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/UGE.py", line 609, in fit
+    graph = link_pred_data_dict['train_g'].to(device)
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/heterograph.py", line 5448, in to
+    ret._graph = self._graph.copy_to(utils.to_dgl_context(device))
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/heterograph_index.py", line 236, in copy_to
+    return _CAPI_DGLHeteroCopyTo(self, ctx.device_type, ctx.device_id)
+  File "dgl/_ffi/_cython/./function.pxi", line 293, in dgl._ffi._cy3.core.FunctionBase.__call__
+  File "dgl/_ffi/_cython/./function.pxi", line 225, in dgl._ffi._cy3.core.FuncCall
+  File "dgl/_ffi/_cython/./function.pxi", line 215, in dgl._ffi._cy3.core.FuncCall3
+dgl._ffi.base.DGLError: [16:53:25] /opt/dgl/src/runtime/c_runtime_api.cc:88: Check failed: allow_missing: Device API gpu is not enabled. Please install the cuda version of dgl.
+Stack trace:
+  [bt] (0) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dmlc::LogMessageFatal::~LogMessageFatal()+0x4f) [0x7fbfc8d6929f]
+  [bt] (1) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::DeviceAPIManager::GetAPI(std::string, bool)+0x37c) [0x7fbfc903b72c]
+  [bt] (2) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::DeviceAPI::Get(DLContext, bool)+0x1f4) [0x7fbfc9035b14]
+  [bt] (3) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::CopyFromTo(DLTensor*, DLTensor*, void*)+0x242) [0x7fbfc9056c72]
+  [bt] (4) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::CopyTo(DLContext const&, void* const&) const+0xfb) [0x7fbfc909322b]
+  [bt] (5) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::UnitGraph::CopyTo(std::shared_ptr<dgl::BaseHeteroGraph>, DLContext const&, void* const&)+0x317) [0x7fbfc91a3fa7]
+  [bt] (6) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::HeteroGraph::CopyTo(std::shared_ptr<dgl::BaseHeteroGraph>, DLContext const&, void* const&)+0x109) [0x7fbfc90a5069]
+  [bt] (7) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(+0x4eb739) [0x7fbfc90b2739]
+  [bt] (8) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(DGLFuncCall+0x48) [0x7fbfc90350e8]
+
+
+
+
+
+
+
+
+Facebook GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 1045
+
+
+
+
+
+
+Nba GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 403
+
+
+
+
+
+
+LCC GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 129726
+
+
+
+
+
+
+Google GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 3601
+
+
+
+
+
+
+LCC GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 129726
+
+
+
+
+
+
+German GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 1000
+
+
+
+
+
+
+LCC GEAR_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 391, in GEAR_
+    model = GEAR(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1459, in __init__
+    self.preprocess(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1570, in preprocess
+    data_cf = generate_cf_data(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 485, in generate_cf_data
+    model_DA = CFDA(h_dim, input_dim, adj.cuda()).to(device)
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+
+
+
+
+
+
+Facebook GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 1045
+
+
+
+
+
+
+LCC_small GEAR_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 391, in GEAR_
+    model = GEAR(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1459, in __init__
+    self.preprocess(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1570, in preprocess
+    data_cf = generate_cf_data(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 485, in generate_cf_data
+    model_DA = CFDA(h_dim, input_dim, adj.cuda()).to(device)
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+
+
+
+
+
+
+Bail GEAR_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 391, in GEAR_
+    model = GEAR(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1459, in __init__
+    self.preprocess(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 1570, in preprocess
+    data_cf = generate_cf_data(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GEAR.py", line 485, in generate_cf_data
+    model_DA = CFDA(h_dim, input_dim, adj.cuda()).to(device)
+RuntimeError: CUDA error: device-side assert triggered
+CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
+
+
+
+
+
+
+LCC UGE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 688, in UGE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/UGE.py", line 609, in fit
+    graph = link_pred_data_dict['train_g'].to(device)
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/heterograph.py", line 5448, in to
+    ret._graph = self._graph.copy_to(utils.to_dgl_context(device))
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/heterograph_index.py", line 236, in copy_to
+    return _CAPI_DGLHeteroCopyTo(self, ctx.device_type, ctx.device_id)
+  File "dgl/_ffi/_cython/./function.pxi", line 293, in dgl._ffi._cy3.core.FunctionBase.__call__
+  File "dgl/_ffi/_cython/./function.pxi", line 225, in dgl._ffi._cy3.core.FuncCall
+  File "dgl/_ffi/_cython/./function.pxi", line 215, in dgl._ffi._cy3.core.FuncCall3
+dgl._ffi.base.DGLError: [17:00:58] /opt/dgl/src/runtime/c_runtime_api.cc:88: Check failed: allow_missing: Device API gpu is not enabled. Please install the cuda version of dgl.
+Stack trace:
+  [bt] (0) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dmlc::LogMessageFatal::~LogMessageFatal()+0x4f) [0x7fbfc8d6929f]
+  [bt] (1) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::DeviceAPIManager::GetAPI(std::string, bool)+0x37c) [0x7fbfc903b72c]
+  [bt] (2) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::DeviceAPI::Get(DLContext, bool)+0x1f4) [0x7fbfc9035b14]
+  [bt] (3) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::CopyFromTo(DLTensor*, DLTensor*, void*)+0x242) [0x7fbfc9056c72]
+  [bt] (4) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::CopyTo(DLContext const&, void* const&) const+0xfb) [0x7fbfc909322b]
+  [bt] (5) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::UnitGraph::CopyTo(std::shared_ptr<dgl::BaseHeteroGraph>, DLContext const&, void* const&)+0x317) [0x7fbfc91a3fa7]
+  [bt] (6) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::HeteroGraph::CopyTo(std::shared_ptr<dgl::BaseHeteroGraph>, DLContext const&, void* const&)+0x109) [0x7fbfc90a5069]
+  [bt] (7) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(+0x4eb739) [0x7fbfc90b2739]
+  [bt] (8) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(DGLFuncCall+0x48) [0x7fbfc90350e8]
+
+
+
+
+
+
+
+
+LCC_small GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 39424
+
+
+
+
+
+
+Nba GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 403
+
+
+
+
+
+
+LCC_small UGE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 688, in UGE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/UGE.py", line 609, in fit
+    graph = link_pred_data_dict['train_g'].to(device)
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/heterograph.py", line 5448, in to
+    ret._graph = self._graph.copy_to(utils.to_dgl_context(device))
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/heterograph_index.py", line 236, in copy_to
+    return _CAPI_DGLHeteroCopyTo(self, ctx.device_type, ctx.device_id)
+  File "dgl/_ffi/_cython/./function.pxi", line 293, in dgl._ffi._cy3.core.FunctionBase.__call__
+  File "dgl/_ffi/_cython/./function.pxi", line 225, in dgl._ffi._cy3.core.FuncCall
+  File "dgl/_ffi/_cython/./function.pxi", line 215, in dgl._ffi._cy3.core.FuncCall3
+dgl._ffi.base.DGLError: [17:01:50] /opt/dgl/src/runtime/c_runtime_api.cc:88: Check failed: allow_missing: Device API gpu is not enabled. Please install the cuda version of dgl.
+Stack trace:
+  [bt] (0) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dmlc::LogMessageFatal::~LogMessageFatal()+0x4f) [0x7fbfc8d6929f]
+  [bt] (1) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::DeviceAPIManager::GetAPI(std::string, bool)+0x37c) [0x7fbfc903b72c]
+  [bt] (2) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::DeviceAPI::Get(DLContext, bool)+0x1f4) [0x7fbfc9035b14]
+  [bt] (3) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::CopyFromTo(DLTensor*, DLTensor*, void*)+0x242) [0x7fbfc9056c72]
+  [bt] (4) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::CopyTo(DLContext const&, void* const&) const+0xfb) [0x7fbfc909322b]
+  [bt] (5) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::UnitGraph::CopyTo(std::shared_ptr<dgl::BaseHeteroGraph>, DLContext const&, void* const&)+0x317) [0x7fbfc91a3fa7]
+  [bt] (6) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::HeteroGraph::CopyTo(std::shared_ptr<dgl::BaseHeteroGraph>, DLContext const&, void* const&)+0x109) [0x7fbfc90a5069]
+  [bt] (7) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(+0x4eb739) [0x7fbfc90b2739]
+  [bt] (8) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(DGLFuncCall+0x48) [0x7fbfc90350e8]
+
+
+
+
+
+
+
+
+Bail GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 18876
+
+
+
+
+
+
+Google GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 3601
+
+
+
+
+
+
+Bail UGE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 688, in UGE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/UGE.py", line 609, in fit
+    graph = link_pred_data_dict['train_g'].to(device)
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/heterograph.py", line 5448, in to
+    ret._graph = self._graph.copy_to(utils.to_dgl_context(device))
+  File "/home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/heterograph_index.py", line 236, in copy_to
+    return _CAPI_DGLHeteroCopyTo(self, ctx.device_type, ctx.device_id)
+  File "dgl/_ffi/_cython/./function.pxi", line 293, in dgl._ffi._cy3.core.FunctionBase.__call__
+  File "dgl/_ffi/_cython/./function.pxi", line 225, in dgl._ffi._cy3.core.FuncCall
+  File "dgl/_ffi/_cython/./function.pxi", line 215, in dgl._ffi._cy3.core.FuncCall3
+dgl._ffi.base.DGLError: [17:02:40] /opt/dgl/src/runtime/c_runtime_api.cc:88: Check failed: allow_missing: Device API gpu is not enabled. Please install the cuda version of dgl.
+Stack trace:
+  [bt] (0) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dmlc::LogMessageFatal::~LogMessageFatal()+0x4f) [0x7fbfc8d6929f]
+  [bt] (1) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::DeviceAPIManager::GetAPI(std::string, bool)+0x37c) [0x7fbfc903b72c]
+  [bt] (2) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::DeviceAPI::Get(DLContext, bool)+0x1f4) [0x7fbfc9035b14]
+  [bt] (3) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::CopyFromTo(DLTensor*, DLTensor*, void*)+0x242) [0x7fbfc9056c72]
+  [bt] (4) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::runtime::NDArray::CopyTo(DLContext const&, void* const&) const+0xfb) [0x7fbfc909322b]
+  [bt] (5) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::UnitGraph::CopyTo(std::shared_ptr<dgl::BaseHeteroGraph>, DLContext const&, void* const&)+0x317) [0x7fbfc91a3fa7]
+  [bt] (6) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(dgl::HeteroGraph::CopyTo(std::shared_ptr<dgl::BaseHeteroGraph>, DLContext const&, void* const&)+0x109) [0x7fbfc90a5069]
+  [bt] (7) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(+0x4eb739) [0x7fbfc90b2739]
+  [bt] (8) /home/zhenyu/anaconda3/envs/pygdebias/lib/python3.8/site-packages/dgl/libdgl.so(DGLFuncCall+0x48) [0x7fbfc90350e8]
+
+
+
+
+
+
+
+
+LCC GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 129726
+
+
+
+
+
+
+German GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 1000
+
+
+
+
+
+
+German REDRESS_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 676, in REDRESS_
+    (F1, ACC, AUCROC, individual_unfairness, GDIF) = model.predict()
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/REDRESS.py", line 862, in predict
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(self.lap_1, output)))
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 30000, got 1000
+
+
+
+
+
+
+Facebook GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 1045
+
+
+
+
+
+
+Facebook REDRESS_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 676, in REDRESS_
+    (F1, ACC, AUCROC, individual_unfairness, GDIF) = model.predict()
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/REDRESS.py", line 862, in predict
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(self.lap_1, output)))
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 30000, got 1045
+
+
+
+
+
+
+Nba GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 403
+
+
+
+
+
+
+Nba REDRESS_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 676, in REDRESS_
+    (F1, ACC, AUCROC, individual_unfairness, GDIF) = model.predict()
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/REDRESS.py", line 862, in predict
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(self.lap_1, output)))
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 30000, got 403
+
+
+
+
+
+
+LCC EDITS_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 170, in EDITS_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/EDITS.py", line 555, in fit
+    self.optimize(adj, features, idx_train, sens, epoch, lr)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/EDITS.py", line 439, in optimize
+    self.adj_renew.fit(adj, self.lr)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/EDITS.py", line 784, in fit
+    estimator = EstimateAdj(adj, symmetric=False, device='cuda').to('cuda').half()
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/EDITS.py", line 759, in __init__
+    self._init_estimation(adj)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/EDITS.py", line 766, in _init_estimation
+    adj = adj.to_dense()
+RuntimeError: CUDA out of memory. Tried to allocate 31.35 GiB (GPU 0; 47.54 GiB total capacity; 2.78 GiB already allocated; 24.27 GiB free; 10.26 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+
+
+
+
+
+
+Google GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 3601
+
+
+
+
+
+
+LCC_small GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 39424
+
+
+
+
+
+
+Google REDRESS_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 676, in REDRESS_
+    (F1, ACC, AUCROC, individual_unfairness, GDIF) = model.predict()
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/REDRESS.py", line 862, in predict
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(self.lap_1, output)))
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 30000, got 3601
+
+
+
+
+
+
+LCC GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 129726
+
+
+
+
+
+
+Bail GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 18876
+
+
+
+
+
+
+LCC REDRESS_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 674, in REDRESS_
+    model.fit(model_name="GCN")
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/REDRESS.py", line 820, in fit
+    self.train_fair(epoch, model_name, self.adj, output)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/REDRESS.py", line 783, in train_fair
+    y_similarity1 = simi(output[self.idx_train])
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/REDRESS.py", line 283, in simi
+    res = 5 * (torch.mm(a_norm, b_norm.transpose(0, 1)) + 1)
+RuntimeError: CUDA out of memory. Tried to allocate 40.12 GiB (GPU 0; 47.54 GiB total capacity; 42.99 GiB already allocated; 3.45 GiB free; 43.00 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+
+
+
+
+
+
+LCC_small GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 39424
+
+
+
+
+
+
+LCC_small REDRESS_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 674, in REDRESS_
+    model.fit(model_name="GCN")
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/REDRESS.py", line 820, in fit
+    self.train_fair(epoch, model_name, self.adj, output)
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/REDRESS.py", line 785, in train_fair
+    lambdas1, x_sorted_scores, y_sorted_idxs, x_corresponding = lambdas_computation(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/REDRESS.py", line 421, in lambdas_computation
+    (y_sorted_scores, y_sorted_idxs) = y_similarity.sort(dim=1, descending=True)
+RuntimeError: CUDA out of memory. Tried to allocate 11.12 GiB (GPU 0; 47.54 GiB total capacity; 37.97 GiB already allocated; 3.50 GiB free; 42.96 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+
+
+
+
+
+
+Bail GUIDE_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 511, in GUIDE_
+    model.fit(
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/GUIDE.py", line 660, in fit
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(lap_1, output))) / m_u1
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 3111, got 18876
+
+
+
+
+
+
+Bail REDRESS_
+Traceback (most recent call last):
+  File "sample_test.py", line 797, in <module>
+    i(adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx)
+  File "sample_test.py", line 676, in REDRESS_
+    (F1, ACC, AUCROC, individual_unfairness, GDIF) = model.predict()
+  File "/home/zhenyu/program/PyGDebias/pygdebias/debiasing/REDRESS.py", line 862, in predict
+    torch.trace(torch.mm(output.t(), torch.sparse.mm(self.lap_1, output)))
+RuntimeError: addmm: Argument #3 (dense): Expected dim 0 size 30000, got 18876
+
+
+
+
+
+

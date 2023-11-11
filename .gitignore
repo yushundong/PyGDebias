@@ -5,3 +5,4 @@ pygdebias.egg-info
 */__pycache__
 laplacians.pickle
 datasets/dataset/
+dataset/
