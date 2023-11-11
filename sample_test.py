@@ -690,7 +690,16 @@ def GNN_(
 
 
 def GUIDE_(
-    adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx, dataset=None
+    adj,
+    features,
+    idx_train,
+    idx_val,
+    idx_test,
+    labels,
+    sens,
+    sens_idx,
+    dataset="",
+    compute_laplacian=True,
 ):
     print("GUIDE")
     model = GUIDE(
@@ -704,6 +713,7 @@ def GUIDE_(
         dropout=0,
         path="./",
         dataset=dataset,
+        compute_laplacian=compute_laplacian,
     )
     model.fit(
         adj=adj,
@@ -735,7 +745,16 @@ def GUIDE_(
 
 
 def InFoRM_GNN_(
-    adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx, dataset=None
+    adj,
+    features,
+    idx_train,
+    idx_val,
+    idx_test,
+    labels,
+    sens,
+    sens_idx,
+    dataset="",
+    compute_laplacian=True,
 ):
     print("InFoRM_GNN")
     model = InFoRM_GNN(
@@ -753,6 +772,8 @@ def InFoRM_GNN_(
         weight_decay=1e-5,
         device="cuda",
         path="./",
+        dataset=dataset,
+        compute_laplacian=compute_laplacian,
     )
     model.fit(epochs=3000, alpha=5e-6, opt_if=1)
 
@@ -852,7 +873,16 @@ def RawlsGCN_(
 
 
 def REDRESS_(
-    adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx, dataset=None
+    adj,
+    features,
+    idx_train,
+    idx_val,
+    idx_test,
+    labels,
+    sens,
+    sens_idx,
+    dataset="",
+    compute_laplacian=True,
 ):
     print("REDRESS")
     model = REDRESS(
@@ -876,6 +906,7 @@ def REDRESS_(
         epochs=20,
         path="./",
         dataset=dataset,
+        compute_laplacian=compute_laplacian,
     )
     model.fit(model_name="GCN")
 
@@ -2323,16 +2354,14 @@ def process_oklahoma_unc(dataset_name):
     elif dataset_name == "unc28":
         dataset_name = "UNC28"
 
-    file = open(
-        "./dataset/oklahoma&unc/{}/{}.mat".format(dataset_name, dataset_name), "rb"
-    )
+    file = open("./dataset/oklahoma/{}/{}.mat".format(dataset_name, dataset_name), "rb")
 
     data = loadmat(file)
     print(data)
 
     feats = pkl.load(
         open(
-            "./dataset/oklahoma&unc/{}/{}_feat.pkl".format(dataset_name, dataset_name),
+            "./dataset/oklahoma/{}/{}_feat.pkl".format(dataset_name, dataset_name),
             "rb",
         )
     )
@@ -2343,9 +2372,7 @@ def process_oklahoma_unc(dataset_name):
     #    print(one)
 
     matrix = loadmat(
-        open(
-            "./dataset/oklahoma&unc/{}/{}.mat".format(dataset_name, dataset_name), "rb"
-        )
+        open("./dataset/oklahoma/{}/{}.mat".format(dataset_name, dataset_name), "rb")
     )
 
 
@@ -2422,8 +2449,7 @@ adj_, features_, labels_, idx_train_, idx_val_, idx_test_, sens_, sens_idx_ = (
     credit.sens_idx(),
 )
 
-# load_data("oklahoma")
-
+# a = load_data("cr")
 
 REDRESS_(
     adj,
@@ -2435,5 +2461,6 @@ REDRESS_(
     sens,
     sens_idx,
     dataset="credit",
+    compute_laplacian=True,
 )
 # FairVGNN_(adj_, features_, idx_train_, idx_val_, idx_test_, labels_, sens_, sens_idx_)

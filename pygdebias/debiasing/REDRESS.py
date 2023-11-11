@@ -654,14 +654,18 @@ class REDRESS(nn.Module):
         pre_train=1500,
         epochs=20,
         path="./",
-        dataset=None,
+        dataset="",
+        compute_laplacian=True,
     ):
         super(REDRESS, self).__init__()
 
         self.model_name = model_name
-        if dataset is None:
-            raise ValueError("Please specify the dataset name.")
         self.dataset = dataset
+        if dataset == "" and compute_laplacian == False:
+            raise ValueError(
+                "Please specify the dataset name or set compute_laplacian to True."
+            )
+        self.compute_laplacian = compute_laplacian
 
         self.model = get_model(
             model_name, features.size(1), 2, hidden, dropout, cuda
@@ -710,7 +714,9 @@ class REDRESS(nn.Module):
 
         import os
 
-        if not os.path.exists(path + "laplacians_red_" + self.dataset + ".pickle"):
+        if self.compute_laplacian or not os.path.exists(
+            path + "laplacians_red_" + self.dataset + ".pickle"
+        ):
             print("Calculating laplacians...(this may take a while)")
             lap_list, m_list, avgSimD_list = calculate_group_lap(sim, sens)
             saveLaplacians = {}

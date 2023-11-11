@@ -481,12 +481,16 @@ class GUIDE(nn.Module):
         concat=False,
         dropout=0,
         path="./",
-        dataset=None,
+        dataset="",
+        compute_laplacian=True,
     ):
         super(GUIDE, self).__init__()
-        if dataset == None:
-            raise ValueError("Please specify the dataset.")
+        if dataset == "" and compute_laplacian == False:
+            raise ValueError(
+                "please specify dataset name or set compute_laplacian to True"
+            )
         self.dataset = dataset
+        self.compute_laplacian = compute_laplacian
         self.body = guideEncoder_body(
             num_layers, nfeat, nhid, heads, negative_slope, concat, dropout
         )
@@ -586,8 +590,9 @@ class GUIDE(nn.Module):
         print(
             f"Similarity matrix nonzero entries: {torch.count_nonzero(sim_edge_weight)}"
         )
-
-        if not os.path.exists(self.path + "laplacians_guide_" + self.dataset + ".pickle"):
+        if self.compute_laplacian or not os.path.exists(
+            self.path + "laplacians_guide_" + self.dataset + ".pickle"
+        ):
             print("Get laplacians for IFG calculations...")
             print("Calculating laplacians...(this may take a while for pokec_n)")
             lap_list, m_list, avgSimD_list = calculate_group_lap(sim, sens)
@@ -596,11 +601,15 @@ class GUIDE(nn.Module):
             saveLaplacians["m_list"] = m_list
             saveLaplacians["avgSimD_list"] = avgSimD_list
 
-            with open(self.path + "laplacians_guide_" + self.dataset + ".pickle", "wb") as f:
+            with open(
+                self.path + "laplacians_guide_" + self.dataset + ".pickle", "wb"
+            ) as f:
                 pickle.dump(saveLaplacians, f, protocol=pickle.HIGHEST_PROTOCOL)
             print("Laplacians calculated and stored.")
 
-        with open(self.path + "laplacians_guide_" + self.dataset + ".pickle", "rb") as f:
+        with open(
+            self.path + "laplacians_guide_" + self.dataset + ".pickle", "rb"
+        ) as f:
             loadLaplacians = pickle.load(f)
         lap_list, m_list, avgSimD_list = (
             loadLaplacians["lap_list"],
