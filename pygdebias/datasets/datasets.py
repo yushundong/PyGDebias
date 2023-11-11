@@ -927,6 +927,7 @@ class Twitter(Dataset):
         self.idx_val_ = idx_val
         self.idx_test_ = idx_test
         self.sens_ = sens
+        self.sens_idx_ = -1
 
 
 class Cora(Dataset):
@@ -970,6 +971,7 @@ class Cora(Dataset):
         self.idx_val_ = idx_val
         self.idx_test_ = idx_test
         self.sens_ = sens
+        self.sens_idx_ = -1
 
     def build_test(self, G: nx.Graph, nodelist: Dict, ratio: float) -> Tuple:
         """
@@ -1112,6 +1114,7 @@ class Citeseer(Dataset):
         self.idx_val_ = idx_val
         self.idx_test_ = idx_test
         self.sens_ = sens
+        self.sens_idx_ = -1
 
     def build_test(self, G: nx.Graph, nodelist: Dict, ratio: float) -> Tuple:
         """
