@@ -57,7 +57,7 @@ class Dataset(object):
         foofile.extractall(os.path.join(self.root, self.path_name))
 
     def adj(self, datatype: str = "torch.sparse"):
-        assert str(type(self.adj_)) == "<class 'torch.Tensor'>"
+        # assert str(type(self.adj_)) == "<class 'torch.Tensor'>"
         if self.adj_ is None:
             return self.adj_
         if datatype == "torch.sparse":
@@ -245,6 +245,7 @@ class Google(Dataset):
         self.idx_test_ = torch.LongTensor(idx_test)
         self.labels_ = torch.LongTensor(labels)
         self.features_ = torch.cat([self.features_, self.sens_.unsqueeze(-1)], -1)
+        self.sens_idx_ = -1
 
         self.adj_ = mx_to_torch_sparse_tensor(adj)
 
@@ -328,6 +329,7 @@ class Facebook(Dataset):
 
         self.features_ = torch.cat([self.features_, self.sens_.unsqueeze(-1)], -1)
         self.adj_ = mx_to_torch_sparse_tensor(adj)
+        self.sens_idx_ = -1
 
 
 class Nba(Dataset):
@@ -383,6 +385,7 @@ class Nba(Dataset):
         adj = mx_to_torch_sparse_tensor(
             adj, is_sparse=True, return_tensor_sparse=return_tensor_sparse
         )
+        labels[labels > 1] = 1
 
         self.adj_ = adj
         self.features_ = features
@@ -391,6 +394,7 @@ class Nba(Dataset):
         self.idx_val_ = idx_val
         self.idx_test_ = idx_test
         self.sens_ = sens
+        self.sens_idx_ = -1
 
     def load_pokec(
         self,
@@ -548,7 +552,7 @@ class Pokec_z(Dataset):
         adj = mx_to_torch_sparse_tensor(
             adj, is_sparse=True, return_tensor_sparse=return_tensor_sparse
         )
-
+        labels[labels > 1] = 1
         self.adj_ = adj
         self.features_ = features
         self.labels_ = labels
@@ -556,6 +560,7 @@ class Pokec_z(Dataset):
         self.idx_val_ = idx_val
         self.idx_test_ = idx_test
         self.sens_ = sens
+        self.sens_idx_ = -1
 
     def load_pokec(
         self,
@@ -716,7 +721,7 @@ class Pokec_n(Dataset):
         adj = mx_to_torch_sparse_tensor(
             adj, is_sparse=True, return_tensor_sparse=return_tensor_sparse
         )
-
+        labels[labels > 1] = 1
         self.adj_ = adj
         self.features_ = features
         self.labels_ = labels
@@ -724,6 +729,7 @@ class Pokec_n(Dataset):
         self.idx_val_ = idx_val
         self.idx_test_ = idx_test
         self.sens_ = sens
+        self.sens_idx_ = -1
 
     def load_pokec(
         self,
@@ -921,6 +927,7 @@ class Twitter(Dataset):
         self.idx_val_ = idx_val
         self.idx_test_ = idx_test
         self.sens_ = sens
+        self.sens_idx_ = -1
 
 
 class Cora(Dataset):
@@ -964,6 +971,7 @@ class Cora(Dataset):
         self.idx_val_ = idx_val
         self.idx_test_ = idx_test
         self.sens_ = sens
+        self.sens_idx_ = -1
 
     def build_test(self, G: nx.Graph, nodelist: Dict, ratio: float) -> Tuple:
         """
@@ -1106,6 +1114,7 @@ class Citeseer(Dataset):
         self.idx_val_ = idx_val
         self.idx_test_ = idx_test
         self.sens_ = sens
+        self.sens_idx_ = -1
 
     def build_test(self, G: nx.Graph, nodelist: Dict, ratio: float) -> Tuple:
         """
@@ -1700,6 +1709,10 @@ class LCC(Dataset):
         idx_test = np.random.choice(idx_val, len(idx_val) // 2, replace=False)
         idx_val = list(set(idx_val) - set(idx_test))
 
+        unique_labels, counts = np.unique(labels, return_counts=True)
+        most_common_label = unique_labels[np.argmax(counts)]
+        labels = (labels == most_common_label).astype(int)
+
         idx_train = torch.LongTensor(idx_train)
         idx_val = torch.LongTensor(idx_val)
         idx_test = torch.LongTensor(idx_test)
@@ -1717,6 +1730,8 @@ class LCC(Dataset):
             ).todense()
         )
         features = torch.cat([features, sens], -1)
+        sens = sens.squeeze()
+
         adj = mx_to_torch_sparse_tensor(adj, is_sparse=True)
         self.adj_ = adj
         self.features_ = features
@@ -1809,6 +1824,10 @@ class LCC_small(Dataset):
         idx_test = np.random.choice(idx_val, len(idx_val) // 2, replace=False)
         idx_val = list(set(idx_val) - set(idx_test))
 
+        unique_labels, counts = np.unique(labels, return_counts=True)
+        most_common_label = unique_labels[np.argmax(counts)]
+        labels = (labels == most_common_label).astype(int)
+
         idx_train = torch.LongTensor(idx_train)
         idx_val = torch.LongTensor(idx_val)
         idx_test = torch.LongTensor(idx_test)
@@ -1826,6 +1845,7 @@ class LCC_small(Dataset):
             ).todense()
         )
         features = torch.cat([features, sens], -1)
+        sens = sens.squeeze()
         adj = mx_to_torch_sparse_tensor(adj, is_sparse=True)
         self.adj_ = adj
         self.features_ = features
