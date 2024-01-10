@@ -15,7 +15,7 @@
 ![GitHub all releases](https://img.shields.io/github/downloads/yushundong/PyGDebias/total)
 ![GitHub issues](https://img.shields.io/github/issues/yushundong/pygdebias)
 ![GitHub closed issues](https://img.shields.io/github/issues-closed/yushundong/pygdebias)
-![GitHub]([https://img.shields.io/github/license/yushundong/pygdebias](https://img.shields.io/github/license/yushundong/PyGDebias
+![GitHub](https://img.shields.io/github/license/yushundong/PyGDebias
 ))
 
 
