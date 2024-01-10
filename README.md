@@ -15,7 +15,8 @@
 ![GitHub all releases](https://img.shields.io/github/downloads/yushundong/PyGDebias/total)
 ![GitHub issues](https://img.shields.io/github/issues/yushundong/pygdebias)
 ![GitHub closed issues](https://img.shields.io/github/issues-closed/yushundong/pygdebias)
-![GitHub](https://img.shields.io/github/license/yushundong/pygdebias)
+![GitHub]([https://img.shields.io/github/license/yushundong/pygdebias](https://img.shields.io/github/license/yushundong/PyGDebias
+))
 
 
 - [*PyGDebias*: Attributed Network Datasets and Fairness-Aware Graph Mining Algorithms](#pygdebias-attributed-network-datasets-and-fairness-aware-graph-mining-algorithms)
