@@ -15,7 +15,7 @@ def setup_seed(seed):
     random.seed(seed)
 
 
-setup_seed(11)
+setup_seed(10)
 
 bail = Bail()
 adj, feats, idx_train, idx_val, idx_test, labels, sens = (
