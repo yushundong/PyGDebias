@@ -3,9 +3,6 @@ import unittest
 
 
 class Test(unittest.TestCase):
-    def __init__(self):
-        super().__init__()
-
     def test_sum():
         self.assertEqual(1, 1)
 

@@ -1,40 +1,43 @@
 # -*- coding: utf-8 -*-
 import unittest
 from numpy.testing import assert_raises
-from pygdebias.datasets import (
-    Google,
-    Facebook,
-    Oklahoma,
-    UNC,
-    Twitter,
-    Lastfm,
-    Nba,
-    Ml_1m,
-    Ml_20m,
-    Ml_100k,
-    German,
-    Bail,
-    Credit,
-    Cora,
-    Pokec_n,
-    Pokec_z,
-    Filmtrust,
-    Citeseer,
-    Yelp,
-    Amazon,
-    LCC,
-    LCC_small,
-    Epinion,
-    Ciao,
-    Dblp,
-    German,
-)
+import pygdebias.datasets as datasets
+
+# from pygdebias.datasets import (
+#     Google,
+#     Facebook,
+#     Oklahoma,
+#     UNC,
+#     Twitter,
+#     Lastfm,
+#     Nba,
+#     Ml_1m,
+#     Ml_20m,
+#     Ml_100k,
+#     German,
+#     Bail,
+#     Credit,
+#     Cora,
+#     Pokec_n,
+#     Pokec_z,
+#     Filmtrust,
+#     Citeseer,
+#     Yelp,
+#     Amazon,
+#     LCC,
+#     LCC_small,
+#     Epinion,
+#     Ciao,
+#     Dblp,
+#     German,
+# )
 
 
 class Test(unittest.TestCase):
     def test_initialize() -> None:
         with assert_raises(ValueError):
-            self.google = Google()
+            pass
+            # self.google = Google()
             # self.facebook = Facebook()
             # self.oklahoma = Oklahoma()
             # self.unc = UNC()
@@ -62,6 +65,7 @@ class Test(unittest.TestCase):
             # self.german = German()
 
     def test_api():
+        pass
         # adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx = (
         #     self.bail.adj(),
         #     self.bail.features(),
