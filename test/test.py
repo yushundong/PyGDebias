@@ -34,7 +34,7 @@ import pygdebias.datasets as datasets
 
 
 class Test(unittest.TestCase):
-    def test_initialize() -> None:
+    def test_initialize(self) -> None:
         with assert_raises(ValueError):
             pass
             # self.google = Google()
@@ -64,7 +64,7 @@ class Test(unittest.TestCase):
             # self.dblp = Dblp()
             # self.german = German()
 
-    def test_api():
+    def test_api(self):
         pass
         # adj, features, idx_train, idx_val, idx_test, labels, sens, sens_idx = (
         #     self.bail.adj(),
