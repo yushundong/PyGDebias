@@ -41,7 +41,7 @@ jobs:
 
     - name: Test with pytest
       run: |
-        python3 -u -m unittest test/test_datasets.py
+        python3 -u -m unittest 
         # coverage run --source=pygdebias -m torch 
     - name: coverage report
       env:
