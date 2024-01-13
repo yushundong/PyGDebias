@@ -31,10 +31,11 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install torch --index-url https://download.pytorch.org/whl/cpu
-        pip install torch_geometric
-        pip install torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.1.0+cpu.html
-        pip install numpy scipy networkx pandas dgl
+        # pip install torch --index-url https://download.pytorch.org/whl/cpu
+        # pip install torch_geometric
+        # pip install torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.1.0+cpu.html
+        # pip install numpy scipy networkx pandas dgl gdown
+        pip install -r pygdebias/test/requirements_test.txt
         pip install pytest
         pip install coverage
         pip install coveralls
