@@ -3,7 +3,7 @@ import unittest
 
 
 class Test(unittest.TestCase):
-    def test_sum():
+    def test_sum(self):
         self.assertEqual(1, 1)
 
 
