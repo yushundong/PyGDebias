@@ -158,7 +158,7 @@ xxhash==3.2.0
 yapf==0.33.0
 yarl==1.8.2
 zipp==3.8.1
-torch_sparse==0.6.16+pt112
-torch_scatter==2.1.0+pt112
-torch_cluster==1.6.0+pt112
+torch_sparse==0.6.16
+torch_scatter==2.1.0
+torch_cluster==1.6.0
 torch_spline_conv==1.2.1+pt112
