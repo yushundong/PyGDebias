@@ -34,7 +34,7 @@ jobs:
         pip install torch --index-url https://download.pytorch.org/whl/cpu
         pip install torch_geometric
         pip install torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.1.0+cpu.html
-        pip install numpy scipy networkx
+        pip install numpy scipy networkx pandas
         pip install pytest
         pip install coverage
         pip install coveralls
