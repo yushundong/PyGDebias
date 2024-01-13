@@ -1,36 +1,35 @@
 # -*- coding: utf-8 -*-
 import unittest
 from numpy.testing import assert_raises
-import pygdebias.datasets as datasets
 
-# from pygdebias.datasets import (
-#     Google,
-#     Facebook,
-#     Oklahoma,
-#     UNC,
-#     Twitter,
-#     Lastfm,
-#     Nba,
-#     Ml_1m,
-#     Ml_20m,
-#     Ml_100k,
-#     German,
-#     Bail,
-#     Credit,
-#     Cora,
-#     Pokec_n,
-#     Pokec_z,
-#     Filmtrust,
-#     Citeseer,
-#     Yelp,
-#     Amazon,
-#     LCC,
-#     LCC_small,
-#     Epinion,
-#     Ciao,
-#     Dblp,
-#     German,
-# )
+from pygdebias.datasets import (
+    Google,
+    Facebook,
+    Oklahoma,
+    UNC,
+    Twitter,
+    Lastfm,
+    Nba,
+    Ml_1m,
+    Ml_20m,
+    Ml_100k,
+    German,
+    Bail,
+    Credit,
+    Cora,
+    Pokec_n,
+    Pokec_z,
+    Filmtrust,
+    Citeseer,
+    Yelp,
+    Amazon,
+    LCC,
+    LCC_small,
+    Epinion,
+    Ciao,
+    Dblp,
+    German,
+)
 
 
 class Test(unittest.TestCase):
