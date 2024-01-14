@@ -41,6 +41,7 @@ jobs:
         pip install pytest
         pip install coverage
         pip install coveralls
+        python -c "import pygdebias; print(pygdebias.__version__)"
 
     - name: Test with pytest
       run: |
