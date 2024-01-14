@@ -75,8 +75,7 @@ class Test(unittest.TestCase):
         #     self.bail.sens(),
         #     self.bail.sens_idx(),
         # )
-        pass
 
 
-# if __name__ == "__main__":
-#     unittest.main()
+if __name__ == "__main__":
+    unittest.main(argv=[""])
