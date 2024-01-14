@@ -78,4 +78,6 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main(argv=[""])
+    # unittest.main(argv=[""])
+    Test().test_initialize()
+    Test().test_api()

@@ -45,7 +45,7 @@ jobs:
     - name: Test with pytest
       run: |
         # python -m unittest pygdebias/tests/test.py
-        python -m pytest pygdebias/tests/test.py
+        python pygdebias/tests/test.py
         # coverage run --source=pygdebias -m pytest 
     - name: coverage report
       env:
