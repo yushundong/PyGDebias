@@ -3,5 +3,8 @@ dist
 pygdebias.egg-info
 *.ipynb
 */__pycache__
+__pycache__/
+
 laplacians.pickle
 datasets/dataset/
+dataset/
