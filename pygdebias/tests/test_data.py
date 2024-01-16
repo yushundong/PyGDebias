@@ -14,7 +14,6 @@ from pygdebias.datasets import (
     Ml_20m,
     Ml_100k,
     German,
-    dataset,
     Credit,
     Cora,
     Pokec_n,
