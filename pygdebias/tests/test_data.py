@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 import unittest
 from numpy.testing import assert_raises
-import sys
-
-sys.path.append("../")
 
 from pygdebias.datasets import (
     Google,
@@ -36,6 +33,9 @@ from pygdebias.datasets import (
 
 
 class Test(unittest.TestCase):
+    def test_sum(self):
+        self.assertEqual(1, 1)
+
     def test_initialize(self) -> None:
         with assert_raises(ValueError):
             pass
