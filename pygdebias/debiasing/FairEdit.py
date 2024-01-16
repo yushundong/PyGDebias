@@ -1,4 +1,5 @@
 from os import error
+
 # from aif360.sklearn.metrics.metrics import equal_opportunity_difference
 import dgl
 
@@ -19,13 +20,16 @@ from torch_geometric.nn import GCNConv, SAGEConv, GINConv
 from torch_geometric.data import Data
 from sklearn.metrics import f1_score, roc_auc_score
 from torch_geometric.utils import dropout_adj, convert, to_networkx
+
 # from aif360.sklearn.metrics import consistency_score as cs
 # from aif360.sklearn.metrics import generalized_entropy_error as gee
 from torch_geometric.utils.homophily import homophily
 from torch_geometric.utils.subgraph import k_hop_subgraph
-import matplotlib as mpl
+
+# import matplotlib as mpl
 from networkx.algorithms.centrality import closeness_centrality
-import matplotlib.pyplot as plt
+
+# import matplotlib.pyplot as plt
 import os
 import dgl
 import random
@@ -71,6 +75,7 @@ from torch_geometric.utils import (
     dense_to_sparse,
     to_dense_adj,
 )
+
 # from ismember import ismember
 
 EPS = 1e-15
