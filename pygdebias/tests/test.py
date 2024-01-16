@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import unittest
 from numpy.testing import assert_raises
+import sys
+sys.path.append("../")
 
-from ..datasets import (
+from pygdebias.datasets import (
     Google,
     Facebook,
     Oklahoma,
