@@ -2,7 +2,7 @@
 import unittest
 from numpy.testing import assert_raises
 
-from pygdebias.datasets import (
+from ..datasets import (
     Google,
     Facebook,
     Oklahoma,
