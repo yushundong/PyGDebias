@@ -2,6 +2,7 @@
 import unittest
 from numpy.testing import assert_raises
 import sys
+
 sys.path.append("../")
 
 from pygdebias.datasets import (
@@ -80,6 +81,4 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # unittest.main(argv=[""])
-    Test().test_initialize()
-    Test().test_api()
+    unittest.main()
