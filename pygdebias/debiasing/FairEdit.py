@@ -25,11 +25,9 @@ from torch_geometric.utils import dropout_adj, convert, to_networkx
 # from aif360.sklearn.metrics import generalized_entropy_error as gee
 from torch_geometric.utils.homophily import homophily
 from torch_geometric.utils.subgraph import k_hop_subgraph
-
-# import matplotlib as mpl
+import matplotlib as mpl
 from networkx.algorithms.centrality import closeness_centrality
-
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import os
 import dgl
 import random
