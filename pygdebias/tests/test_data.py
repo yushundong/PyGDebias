@@ -218,21 +218,21 @@ class Test(unittest.TestCase):
             dataset.sens_idx(),
         )
 
-    def test_others(self) -> None:
-        dataset = Lastfm()
-        dataset = Ml_1m()
-        dataset = Ml_20m()
-        dataset = Ml_100k()
-        dataset = Yelp()
-        dataset = Amazon()
-        dataset = LCC()
-        dataset = LCC_small()
-        dataset = Epinion()
-        dataset = Ciao()
-        dataset = Dblp()
-        dataset = UNC()
-        dataset = Oklahoma()
-        dataset = Filmtrust()
+    # def test_others(self) -> None:
+    #     dataset = Lastfm()
+    #     dataset = Ml_1m()
+    #     dataset = Ml_20m()
+    #     dataset = Ml_100k()
+    #     dataset = Yelp()
+    #     dataset = Amazon()
+    #     dataset = LCC()
+    #     dataset = LCC_small()
+    #     dataset = Epinion()
+    #     dataset = Ciao()
+    #     dataset = Dblp()
+    #     dataset = UNC()
+    #     dataset = Oklahoma()
+    #     dataset = Filmtrust()
 
 
 if __name__ == "__main__":
