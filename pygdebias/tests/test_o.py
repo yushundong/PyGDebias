@@ -52,8 +52,8 @@ class Test(unittest.TestCase):
             n_order=params["n_order"],
             subgraph_size=params["subgraph_size"],
             epoch=params["epoch"],
-        ).cuda()
-        model.fit(adj, feats, labels, idx_train, idx_val, idx_test, sens, idx_train)
+        )
+        model.fit(adj, feats, labels, idx_train, idx_val, idx_test, sens, idx_train, device="cpu")
         
         
         # Evaluate the model.

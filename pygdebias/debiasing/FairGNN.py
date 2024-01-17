@@ -253,7 +253,7 @@ class FairGNN(nn.Module):
         self.sens = sens
 
         self.edge_index = (
-            torch.tensor(g.to_dense().nonzero(), dtype=torch.long).t().cuda()
+            torch.tensor(g.to_dense().nonzero(), dtype=torch.long).t().to(device)
         )
         self.val_loss = 0
         for epoch in tqdm(range(args.epochs)):
