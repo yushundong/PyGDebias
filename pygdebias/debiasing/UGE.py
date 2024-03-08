@@ -753,8 +753,8 @@ class UGE():
         # Save learned embedding dynamically
         self.embs = h.detach().cpu().numpy()
 
-        print(self.embs.shape)
-        print(labels.shape)
+        # print(self.embs.shape)
+        # print(labels.shape)
 
         self.lgreg = LogisticRegression(penalty='none',random_state=1, class_weight='balanced',solver='lbfgs', max_iter=50000).fit(
             self.embs[idx_train], labels[idx_train])
@@ -766,15 +766,18 @@ class UGE():
 
 
         pred = self.lgreg.predict(self.embs[idx_train])
-        print(pred)
-        print(self.labels[idx_train])
+        # print(pred)
+        # print(self.labels[idx_train])
 
         F1 = f1_score(self.labels[idx_train], pred, average='micro')
         ACC=accuracy_score(self.labels[idx_train], pred,)
-        AUCROC=roc_auc_score(self.labels[idx_train], pred)
+        try:
+            AUCROC=roc_auc_score(self.labels[idx_train], pred)
+        except:
+            AUCROC='N/A'
 
 
-        print(F1, ACC)
+        # print(F1, ACC)
 
 
 
@@ -803,7 +806,10 @@ class UGE():
         if self.labels.max()>1:
             AUCROC=0
         else:
-            AUCROC=roc_auc_score(self.labels[idx_test], pred)
+            try:
+                AUCROC=roc_auc_score(self.labels[idx_test], pred)
+            except:
+                AUCROC='N/A'
 
         ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1=self.predict_sens_group(idx_test)
 
@@ -814,8 +820,8 @@ class UGE():
         loss_fn=torch.nn.BCELoss()
         self.val_loss=loss_fn(torch.FloatTensor(pred).softmax(-1)[:,-1], torch.tensor(self.labels[idx_val]).float()).item()
 
-        print(F1, ACC)
-        print(SP, EO)
+        # print(F1, ACC)
+        # print(SP, EO)
 
 
         return ACC, AUCROC, F1, ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1, SP, EO
@@ -832,7 +838,10 @@ class UGE():
             if self.labels.max() > 1:
                 AUCROC = 0
             else:
-                AUCROC=roc_auc_score(self.labels[idx_test][self.sens[idx_test]==sens], pred[self.sens[idx_test]==sens])
+                try:
+                    AUCROC = roc_auc_score(self.labels[idx_test][self.sens[idx_test]==sens], pred[self.sens[idx_test]==sens])
+                except:
+                    AUCROC = 'N/A'
             result.extend([ACC, AUCROC,F1])
 
         return result
@@ -841,5 +850,8 @@ class UGE():
         pred = self.lgreg_sens.predict(self.embs[idx_test])
         F1 = f1_score(self.labels[idx_test], pred, average='micro')
         ACC=accuracy_score(self.labels[idx_test], pred,)
-        AUCROC=roc_auc_score(self.labels[idx_test], pred)
+        try:
+            AUCROC=roc_auc_score(self.labels[idx_test], pred)
+        except:
+            AUCROC='N/A'
         return ACC, AUCROC, F1

@@ -82,10 +82,14 @@ def evaluate(model, data, args):
     F1s['test'] = f1_score(data.y[data.test_mask].cpu(
     ).numpy(), pred_test.cpu().numpy())
 
-    auc_rocs['val'] = roc_auc_score(
-        data.y[data.val_mask].cpu().numpy(), output[data.val_mask].detach().cpu().numpy())
-    auc_rocs['test'] = roc_auc_score(
-        data.y[data.test_mask].cpu().numpy(), output[data.test_mask].detach().cpu().numpy())
+    try:
+        auc_rocs['val'] = roc_auc_score(
+            data.y[data.val_mask].cpu().numpy(), output[data.val_mask].detach().cpu().numpy())
+        auc_rocs['test'] = roc_auc_score(
+            data.y[data.test_mask].cpu().numpy(), output[data.test_mask].detach().cpu().numpy())
+    except:
+        auc_rocs['val'] = 'nan'
+        auc_rocs['test'] = 'nan'
 
     parity, equality = fair_metric(pred_test.cpu().numpy(), data.y[data.test_mask].cpu(
     ).numpy(), data.sens[data.test_mask].cpu().numpy())
@@ -119,11 +123,14 @@ def evaluate_finetune(encoder, classifier, data, args):
 
     F1s['test'] = f1_score(data.y[data.test_mask].cpu(
     ).numpy(), pred_test.cpu().numpy())
-
-    auc_rocs['val'] = roc_auc_score(
-        data.y[data.val_mask].cpu().numpy(), output[data.val_mask].detach().cpu().numpy())
-    auc_rocs['test'] = roc_auc_score(
-        data.y[data.test_mask].cpu().numpy(), output[data.test_mask].detach().cpu().numpy())
+    try:
+        auc_rocs['val'] = roc_auc_score(
+            data.y[data.val_mask].cpu().numpy(), output[data.val_mask].detach().cpu().numpy())
+        auc_rocs['test'] = roc_auc_score(
+            data.y[data.test_mask].cpu().numpy(), output[data.test_mask].detach().cpu().numpy())
+    except:
+        auc_rocs['val'] = 'nan'
+        auc_rocs['test'] = 'nan'
 
     parity, equality = fair_metric(pred_test.cpu().numpy(), data.y[data.test_mask].cpu(
     ).numpy(), data.sens[data.test_mask].cpu().numpy())
@@ -175,11 +182,14 @@ def evaluate_exploration(x, model, data, args):
 
     F1s['test'] = f1_score(data.y[data.test_mask].cpu(
     ).numpy(), pred_test.cpu().numpy())
-
-    auc_rocs['val'] = roc_auc_score(
-        data.y[data.val_mask].cpu().numpy(), output[data.val_mask].detach().cpu().numpy())
-    auc_rocs['test'] = roc_auc_score(
-        data.y[data.test_mask].cpu().numpy(), output[data.test_mask].detach().cpu().numpy())
+    try:
+        auc_rocs['val'] = roc_auc_score(
+            data.y[data.val_mask].cpu().numpy(), output[data.val_mask].detach().cpu().numpy())
+        auc_rocs['test'] = roc_auc_score(
+            data.y[data.test_mask].cpu().numpy(), output[data.test_mask].detach().cpu().numpy())
+    except:
+        auc_rocs['val'] = 'nan'
+        auc_rocs['test'] = 'nan'
 
     paritys['val'], equalitys['val'] = fair_metric(pred_val.cpu().numpy(), data.y[data.val_mask].cpu(
     ).numpy(), data.sens[data.val_mask].cpu().numpy())
@@ -246,11 +256,14 @@ def evaluate_ged(x, classifier, discriminator, generator, encoder, data, args):
 
     F1s['test'] = f1_score(data.y[data.test_mask].cpu(
     ).numpy(), pred_test.cpu().numpy())
-
-    auc_rocs['val'] = roc_auc_score(
-        data.y[data.val_mask].cpu().numpy(), output[data.val_mask].detach().cpu().numpy())
-    auc_rocs['test'] = roc_auc_score(
-        data.y[data.test_mask].cpu().numpy(), output[data.test_mask].detach().cpu().numpy())
+    try:
+        auc_rocs['val'] = roc_auc_score(
+            data.y[data.val_mask].cpu().numpy(), output[data.val_mask].detach().cpu().numpy())
+        auc_rocs['test'] = roc_auc_score(
+            data.y[data.test_mask].cpu().numpy(), output[data.test_mask].detach().cpu().numpy())
+    except:
+        auc_rocs['val'] = 'nan'
+        auc_rocs['test'] = 'nan'
 
     paritys['val'], equalitys['val'] = fair_metric(pred_val.cpu().numpy(), data.y[data.val_mask].cpu(
     ).numpy(), data.sens[data.val_mask].cpu().numpy())
@@ -309,11 +322,14 @@ def evaluate_ged2(x, classifier, discriminator, generator, encoder, data, args):
 
     F1s['test'] = f1_score(data.y[data.test_mask].cpu(
     ).numpy(), pred_test.cpu().numpy())
-
-    auc_rocs['val'] = roc_auc_score(
-        data.y[data.val_mask].cpu().numpy(), output[data.val_mask].detach().cpu().numpy())
-    auc_rocs['test'] = roc_auc_score(
-        data.y[data.test_mask].cpu().numpy(), output[data.test_mask].detach().cpu().numpy())
+    try:
+        auc_rocs['val'] = roc_auc_score(
+            data.y[data.val_mask].cpu().numpy(), output[data.val_mask].detach().cpu().numpy())
+        auc_rocs['test'] = roc_auc_score(
+            data.y[data.test_mask].cpu().numpy(), output[data.test_mask].detach().cpu().numpy())
+    except:
+        auc_rocs['val'] = 'nan'
+        auc_rocs['test'] = 'nan'
 
     paritys['val'], equalitys['val'] = fair_metric(pred_val.cpu().numpy(), data.y[data.val_mask].cpu(
     ).numpy(), data.sens[data.val_mask].cpu().numpy())
@@ -389,15 +405,23 @@ def evaluate_ged3(x, classifier, discriminator, generator, encoder, data, args):
     F1s['test_sens1']= f1_score(data.y[data.test_mask][data.sens[data.test_mask]==1].cpu(
     ).numpy(), pred_test[data.sens[data.test_mask]==1].cpu().numpy())
 
-    auc_rocs['val'] = roc_auc_score(
-        data.y[data.val_mask].cpu().numpy(), output[data.val_mask].detach().cpu().numpy())
-    auc_rocs['test'] = roc_auc_score(
-        data.y[data.test_mask].cpu().numpy(), output[data.test_mask].detach().cpu().numpy())
+    try:
+        auc_rocs['val'] = roc_auc_score(
+            data.y[data.val_mask].cpu().numpy(), output[data.val_mask].detach().cpu().numpy())
+        auc_rocs['test'] = roc_auc_score(
+            data.y[data.test_mask].cpu().numpy(), output[data.test_mask].detach().cpu().numpy())
+    except:
+        auc_rocs['val'] = 'nan'
+        auc_rocs['test'] = 'nan'
 
-    auc_rocs['test_sens0'] = roc_auc_score(
-        data.y[data.test_mask][data.sens[data.test_mask]==0].cpu().numpy(), output[data.test_mask][data.sens[data.test_mask]==0].detach().cpu().numpy())
-    auc_rocs['test_sens1'] = roc_auc_score(
-        data.y[data.test_mask][data.sens[data.test_mask]==1].cpu().numpy(), output[data.test_mask][data.sens[data.test_mask]==1].detach().cpu().numpy())
+    try:
+        auc_rocs['test_sens0'] = roc_auc_score(
+            data.y[data.test_mask][data.sens[data.test_mask]==0].cpu().numpy(), output[data.test_mask][data.sens[data.test_mask]==0].detach().cpu().numpy())
+        auc_rocs['test_sens1'] = roc_auc_score(
+            data.y[data.test_mask][data.sens[data.test_mask]==1].cpu().numpy(), output[data.test_mask][data.sens[data.test_mask]==1].detach().cpu().numpy())
+    except:
+        auc_rocs['test_sens0'] = 'nan'
+        auc_rocs['test_sens1'] = 'nan'
 
 
     paritys['val'], equalitys['val'] = fair_metric(pred_val.cpu().numpy(), data.y[data.val_mask].cpu(
@@ -501,7 +525,7 @@ def fair_metric(pred, labels, sens):
 def visual(model, data, sens, dataname):
     model.eval()
 
-    print(data.y, sens)
+    # print(data.y, sens)
     hidden = model.encoder(data.x, data.edge_index).cpu().detach().numpy()
     sens, data.y = sens.cpu().numpy(), data.y.cpu().numpy()
     idx_s0, idx_s1, idx_s2, idx_s3 = (sens == 0) & (data.y == 0), (sens == 0) & (
@@ -990,7 +1014,6 @@ def get_dataset(dataname, top_k,adj, features, labels, idx_train, idx_val, idx_t
     #    load, label_num = load_bail, 100
     #elif(dataname == 'german'):
     #    load, label_num = load_german, 100
-
     adj_norm = sys_normalized_adjacency(adj)
     adj_norm_sp = sparse_mx_to_torch_sparse_tensor(adj_norm)
     edge_index, _ = from_scipy_sparse_matrix(sp.coo_matrix(adj.to_dense().numpy()))
@@ -1005,14 +1028,17 @@ def get_dataset(dataname, top_k,adj, features, labels, idx_train, idx_val, idx_t
                        0], torch.min(features, dim=0)[0]
 
     norm_features = feature_norm(features)
+    # norm_feature nan to 0
+    norm_features = torch.nan_to_num(norm_features)
     norm_features[:, sens_idx] = features[:, sens_idx]
     features = norm_features
+    
     corr_matrix = sens_correlation(features, sens_idx)
     corr_idx = np.argsort(-np.abs(corr_matrix))
     if(top_k > 0):
         # corr_idx = np.concatenate((corr_idx[:top_k], corr_idx[-top_k:]))
         corr_idx = corr_idx[:top_k]
-    print('return')
+    # print('return')
     return Data(x=features, edge_index=edge_index, adj_norm_sp=adj_norm_sp, y=labels.float(), train_mask=train_mask, val_mask=val_mask, test_mask=test_mask, sens=sens), sens_idx, corr_matrix, corr_idx, x_min, x_max
 
 
@@ -1067,6 +1093,18 @@ class FairVGNN():
                 dict(params=encoder.conv1.parameters(), weight_decay=args.e_wd),
                 dict(params=encoder.conv2.parameters(), weight_decay=args.e_wd)], lr=args.e_lr)
 
+        test_acc = 'nan'
+        test_auc_roc = 'nan'
+        test_f1 = 'nan'
+        test_parity = 'nan'
+        test_equality = 'nan'
+        test_acc_sens0 = 'nan'
+        test_auc_roc_sens0 = 'nan'
+        test_f1_sens0 = 'nan'
+        test_acc_sens1 = 'nan'
+        test_auc_roc_sens1 = 'nan'
+        test_f1_sens1 = 'nan'
+
         for count in range(args.runs):
             seed_everything(count + args.seed)
             generator.reset_parameters()
@@ -1099,7 +1137,6 @@ class FairVGNN():
                             x = data.x * masks[k].detach()
                             h = encoder(x, data.edge_index, data.adj_norm_sp)
                             output = discriminator(h)
-
                             loss_d += criterion(output.view(-1),
                                                 data.x[:, args.sens_idx])
 
@@ -1196,8 +1233,9 @@ class FairVGNN():
                 # print(epoch, 'Acc:', accs['test'], 'AUC_ROC:', auc_rocs['test'], 'F1:', F1s['test'],
                 #       'Parity:', tmp_parity['test'], 'Equality:', tmp_equality['test'])
 
-                if auc_rocs['val'] + F1s['val'] + accs['val'] - args.alpha * (
-                        tmp_parity['val'] + tmp_equality['val']) > best_val_tradeoff:
+                if (auc_rocs['val'] + F1s['val'] + accs['val'] - args.alpha * (
+                        tmp_parity['val'] + tmp_equality['val']) > best_val_tradeoff) or (auc_rocs is 'nan' and (F1s['val'] + accs['val'] - args.alpha * (
+                        tmp_parity['val'] + tmp_equality['val']) > best_val_tradeoff)):
                     test_acc = accs['test']
                     test_acc_sens0=accs['test_sens0']
                     test_acc_sens1=accs['test_sens1']
@@ -1217,6 +1255,7 @@ class FairVGNN():
                                         accs['val'] - (tmp_parity['val'] + tmp_equality['val'])
 
                     self.val_loss=-accs['val']
+
 
 
             acc[count] = test_acc

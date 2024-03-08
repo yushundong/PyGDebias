@@ -374,7 +374,7 @@ def avg_err(x_corresponding, x_similarity, x_sorted_scores, y_ranks, top_k):
     )
     score_rank = (1 / the_range[:, 0:]) * x_corresponding[:, 0:]
     final = torch.mean(torch.sum(score_rank, axis=1))
-    print("Now Average ERR@k = ", final.item())
+    # print("Now Average ERR@k = ", final.item())
 
     return final.item()
 
@@ -402,19 +402,19 @@ def avg_ndcg(x_corresponding, x_similarity, x_sorted_scores, y_ranks, top_k):
     )
     ndcg_list = torch.sum((numerator / denominator), 1) / idcg
     avg_ndcg = torch.mean(ndcg_list)
-    print("Now Average NDCG@k = ", avg_ndcg.item())
+    # print("Now Average NDCG@k = ", avg_ndcg.item())
 
     return avg_ndcg.item()
 
 
 def lambdas_computation(x_similarity, y_similarity, top_k, k_para, sigma_1):
     max_num = 2000000
-    x_similarity[
-        range(x_similarity.shape[0]), range(x_similarity.shape[0])
-    ] = max_num * torch.ones_like(x_similarity[0, :])
-    y_similarity[
-        range(y_similarity.shape[0]), range(y_similarity.shape[0])
-    ] = max_num * torch.ones_like(y_similarity[0, :])
+    x_similarity[range(x_similarity.shape[0]), range(x_similarity.shape[0])] = (
+        max_num * torch.ones_like(x_similarity[0, :])
+    )
+    y_similarity[range(y_similarity.shape[0]), range(y_similarity.shape[0])] = (
+        max_num * torch.ones_like(y_similarity[0, :])
+    )
 
     # ***************************** ranking ******************************
     (x_sorted_scores, x_sorted_idxs) = x_similarity.sort(dim=1, descending=True)
@@ -511,12 +511,12 @@ def lambdas_computation(x_similarity, y_similarity, top_k, k_para, sigma_1):
 
 def lambdas_computation_only_review(x_similarity, y_similarity, top_k, k_para):
     max_num = 2000000
-    x_similarity[
-        range(x_similarity.shape[0]), range(x_similarity.shape[0])
-    ] = max_num * torch.ones_like(x_similarity[0, :])
-    y_similarity[
-        range(y_similarity.shape[0]), range(y_similarity.shape[0])
-    ] = max_num * torch.ones_like(y_similarity[0, :])
+    x_similarity[range(x_similarity.shape[0]), range(x_similarity.shape[0])] = (
+        max_num * torch.ones_like(x_similarity[0, :])
+    )
+    y_similarity[range(y_similarity.shape[0]), range(y_similarity.shape[0])] = (
+        max_num * torch.ones_like(y_similarity[0, :])
+    )
 
     # ***************************** ranking ******************************
     (x_sorted_scores, x_sorted_idxs) = x_similarity.sort(dim=1, descending=True)
@@ -653,12 +653,13 @@ class REDRESS(nn.Module):
         cuda=1,
         pre_train=1500,
         epochs=20,
-        path="./",
+        path="./data/",
         dataset="",
         compute_laplacian=True,
     ):
         super(REDRESS, self).__init__()
-
+        if not os.path.exists(path):
+            os.makedirs(path)
         self.model_name = model_name
         self.dataset = dataset
         if dataset == "" and compute_laplacian == False:
@@ -755,7 +756,6 @@ class REDRESS(nn.Module):
         # print(output1[self.idx_train])
         # print(self.labels[self.idx_train])
         the_softmax = torch.nn.Softmax(dim=1)
-
         loss_train = F.cross_entropy(
             the_softmax(output1[self.idx_train]), self.labels[self.idx_train]
         )
@@ -776,15 +776,15 @@ class REDRESS(nn.Module):
             the_softmax(output[self.idx_val]), self.labels[self.idx_val]
         )
         acc_val = 0  # accuracy(output[self.idx_val], self.labels[self.idx_val])
-        if epoch % 300 == 0:
-            print(
-                "Epoch: {:04d}".format(epoch + 1),
-                "loss_train: {:.4f}".format(loss_train.item()),
-                #   'acc_train: {:.4f}'.format(acc_train.item()),
-                "loss_val: {:.4f}".format(loss_val.item()),
-                #   'acc_val: {:.4f}'.format(acc_val.item()),
-                "time: {:.4f}s".format(time.time() - t),
-            )
+        # if epoch % 300 == 0:
+        #     print(
+        #         "Epoch: {:04d}".format(epoch + 1),
+        #         "loss_train: {:.4f}".format(loss_train.item()),
+        #         #   'acc_train: {:.4f}'.format(acc_train.item()),
+        #         "loss_val: {:.4f}".format(loss_val.item()),
+        #         #   'acc_val: {:.4f}'.format(acc_val.item()),
+        #         "time: {:.4f}s".format(time.time() - t),
+        #     )
 
         return output1
 
@@ -800,7 +800,7 @@ class REDRESS(nn.Module):
         y_similarity = simi(output[self.idx_test])
         x_similarity = simi(self.features[self.idx_test])
 
-        print("Ranking optimizing... ")
+        # print("Ranking optimizing... ")
         (
             x_sorted_scores,
             y_sorted_idxs,
@@ -845,7 +845,6 @@ class REDRESS(nn.Module):
 
         # Report
         output_preds = torch.argmax(output, -1).type_as(self.labels)
-        print(output_preds)
 
         F1 = f1_score(
             self.labels.cpu().numpy()[self.idx_test.cpu().numpy()],
@@ -856,10 +855,13 @@ class REDRESS(nn.Module):
             self.labels.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
             output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
         )
-        AUCROC = roc_auc_score(
-            self.labels.cpu().numpy()[self.idx_test.cpu().numpy()],
-            output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
-        )
+        try:
+            AUCROC = roc_auc_score(
+                self.labels.cpu().numpy()[self.idx_test.cpu().numpy()],
+                output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
+            )
+        except:
+            AUCROC = "N/A"
 
         # counterfactual_fairness = 1 - (output_preds.eq(counter_output_preds)[self.idx_test].sum().item() / self.idx_test.shape[0])
         # robustness_score = 1 - (output_preds.eq(noisy_output_preds)[self.idx_test].sum().item() / self.idx_test.shape[0])
@@ -879,7 +881,10 @@ class REDRESS(nn.Module):
         )
         f_u2 = f_u2.item()
         if_group_pct_diff = np.abs(f_u1 - f_u2) / min(f_u1, f_u2)
-        GDIF = max(f_u2 / f_u1, f_u1 / f_u2)
+        if f_u1 == 0 or f_u2 == 0:
+            GDIF = "N/A"
+        else:
+            GDIF = max(f_u2 / f_u1, f_u1 / f_u2)
 
         # print report
         print(f"Total Individual Unfairness: {individual_unfairness}")

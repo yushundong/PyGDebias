@@ -19,6 +19,7 @@ import math
 from tqdm import tqdm
 from torch_geometric.utils import dropout_adj, convert
 import time
+
 # import ipdb
 import torch
 import torch.nn as nn
@@ -701,7 +702,7 @@ class EDITS(nn.Module):
         the_con1 = np.where(np.abs(the_con1) == 1, the_con1, the_con1 * 0)
         A_debiased = adj_ori + sp.coo_matrix(the_con1)
 
-        print(A_debiased)
+        # print(A_debiased)
         assert A_debiased.max() == 1
         assert A_debiased.min() == 0
         features = features[:, torch.nonzero(features.sum(axis=0)).squeeze()].detach()
@@ -709,7 +710,7 @@ class EDITS(nn.Module):
 
         print("****************************After debiasing****************************")
         metric_wd(features, A_debiased, sens, 0.9, 0)
-        metric_wd(features, A_debiased, sens, 0.9, 2)
+        # metric_wd(features, A_debiased, sens, 0.9, 2)
         print(
             "****************************************************************************"
         )
@@ -857,9 +858,12 @@ class EDITS(nn.Module):
                 labels[idx_test.cpu().numpy()].detach().cpu().numpy(),
                 output_preds,
             )
-            AUCROC_all = roc_auc_score(
-                labels[idx_test.cpu().numpy()].detach().cpu().numpy(), output_preds
-            )
+            try:
+                AUCROC_all = roc_auc_score(
+                    labels[idx_test.cpu().numpy()].detach().cpu().numpy(), output_preds
+                )
+            except:
+                AUCROC_all = "N/A"
 
             # print("Test set results:",
             #       "loss= {:.4f}".format(loss_test.item()),
@@ -875,7 +879,6 @@ class EDITS(nn.Module):
 
             # ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1=self.predict_sens_group(output, idx_test)
             sens = self.sens
-
             SP, EO = self.fair_metric_direct(
                 output_preds,
                 labels[idx_test].detach().cpu().numpy(),
@@ -894,10 +897,13 @@ class EDITS(nn.Module):
                     self.labels[idx_test][self.sens[idx_test] == sens],
                     pred[self.sens[idx_test] == sens],
                 )
-                AUCROC = roc_auc_score(
-                    self.labels[idx_test][self.sens[idx_test] == sens],
-                    pred[self.sens[idx_test] == sens],
-                )
+                try:
+                    AUCROC = roc_auc_score(
+                        self.labels[idx_test][self.sens[idx_test] == sens],
+                        pred[self.sens[idx_test] == sens],
+                    )
+                except:
+                    AUCROC = "N/A"
                 result.extend([ACC, AUCROC, F1])
 
             (

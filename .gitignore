@@ -5,6 +5,24 @@ pygdebias.egg-info
 */__pycache__
 __pycache__/
 
-laplacians.pickle
+
+
+*.txt
+*.pickle
+*.sh
+*.md
+*.pt
+*.pyc
+
+/home/zhenyu/program/pygdebias/PyGDebias/pygdebias/datasets/__pycache__/__init__.cpython-310.pyc
+
 datasets/dataset/
 dataset/
+error/
+graphFair_subgraph/
+output/
+models_save
+
+sample_t.py
+sample_test.py
+test_german.py

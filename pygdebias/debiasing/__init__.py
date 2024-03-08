@@ -26,4 +26,10 @@ from .REDRESS import REDRESS as REDRESS
 
 from .UGE import UGE as UGE
 
-__all__ = ['FairEdit', 'FairGNN', 'FairVGNN', 'FairWalk', 'GEAR', 'GNN', 'GUIDE', 'InFoRM_GNN', 'NIFTY', 'RawlsGCN', 'REDRESS', 'UGE', 'CrossWalk', 'EDITS']
+from .GNN_individual import GNN_individual as GNN_individual
+
+from .GNN_cf import GNN_cf as GNN_cf
+
+from .NIFTY_cf import NIFTY_cf as NIFTY_cf
+
+__all__ = ['FairEdit', 'FairGNN', 'FairVGNN', 'FairWalk', 'GEAR', 'GNN', 'GUIDE', 'InFoRM_GNN', 'NIFTY', 'RawlsGCN', 'REDRESS', 'UGE', 'CrossWalk', 'EDITS', 'GNN_individual', 'GNN_cf', 'NIFTY_cf']

@@ -460,7 +460,7 @@ class FairWalk:
         # self.embs=torch.nn.functional.normalize(torch.tensor(self.embs).float(),dim=-1)
 
         self.labels = labels
-        print("label_size", self.labels.shape)
+        # print("label_size", self.labels.shape)
         self.sens = sens.squeeze()
         # self.lgreg_label = LogisticRegression(random_state=0, class_weight='balanced', max_iter=5000).fit(
         #    self.embs[idx_train], labels[idx_train])
@@ -567,31 +567,34 @@ class FairWalk:
         res_diff_avg = np.mean(np.array(res_diff_total), axis=0)
         res_var_avg = np.mean(np.array(res_var_total), axis=0)
 
-        print(
-            res_avg,
-            ", ",
-            res_1_avg,
-            ", ",
-            res_0_avg,
-            ", ",
-            res_diff_avg,
-            ", ",
-            res_var_avg,
-        )
+        # print(
+        #     res_avg,
+        #     ", ",
+        #     res_1_avg,
+        #     ", ",
+        #     res_0_avg,
+        #     ", ",
+        #     res_diff_avg,
+        #     ", ",
+        #     res_var_avg,
+        # )
 
-        print(y_pred)
+        # print(y_pred)
 
         F1 = f1_score(y_test, y_pred, average="micro")
         ACC = accuracy_score(
             y_test,
             y_pred,
         )
-        AUCROC = roc_auc_score(y_test, y_pred)
+        try:
+            AUCROC = roc_auc_score(y_test, y_pred)
+        except:
+            AUCROC = "N/A"
 
         print("testing--------------")
-        print(F1)
-        print(ACC)
-        print(AUCROC)
+        # print(F1)
+        # print(ACC)
+        # print(AUCROC)
 
         (
             ACC_sens0,
@@ -604,7 +607,7 @@ class FairWalk:
 
         SP, EO = self.fair_metric(np.array(y_pred), y_test, z_test)
 
-        print(SP, EO)
+        # print(SP, EO)
         loss_fn = torch.nn.BCELoss()
         self.val_loss = loss_fn(
             torch.FloatTensor(y_pred), torch.tensor(y_test).float()
@@ -701,7 +704,10 @@ class FairWalk:
                 y_test[z_test == sens],
                 y_pred[z_test == sens],
             )
-            AUCROC = roc_auc_score(y_test[z_test == sens], y_pred[z_test == sens])
+            try:
+                AUCROC = roc_auc_score(y_test[z_test == sens], y_pred[z_test == sens])
+            except:
+                AUCROC = "nan"
             result.extend([ACC, AUCROC, F1])
 
         return result
@@ -802,9 +808,9 @@ class FairWalk:
                     )
 
                     # Save neighbors
-                    d_graph[current_node].setdefault(self.NEIGHBORS_KEY, {})[
-                        group
-                    ] = list(cur_d_neighbors)
+                    d_graph[current_node].setdefault(self.NEIGHBORS_KEY, {})[group] = (
+                        list(cur_d_neighbors)
+                    )
 
             # Calculate first_travel weights for source
             first_travel_weights = []
