@@ -174,6 +174,7 @@ class SimAttConv(MessagePassing):
         **kwargs (optional): Additional arguments of
             :class:`torch_geometric.nn.conv.MessagePassing`.
     """
+
     _alpha: OptTensor
 
     def __init__(
@@ -480,11 +481,13 @@ class GUIDE(nn.Module):
         negative_slope=0.2,
         concat=False,
         dropout=0,
-        path="./",
+        path="./data/",
         dataset="",
         compute_laplacian=True,
     ):
         super(GUIDE, self).__init__()
+        if not os.path.exists(path):
+            os.makedirs(path)
         if dataset == "" and compute_laplacian == False:
             raise ValueError(
                 "please specify dataset name or set compute_laplacian to True"
@@ -682,13 +685,13 @@ class GUIDE(nn.Module):
             loss_label_init_train.backward()
             optimizer.step()
             ################################Logging################################
-            if epoch % 100 == 0:
-                print(f"----------------------------")
-                print(f"[Train] Epoch {epoch}: ")
-                print(f"---Embedding Initialize---")
-                print(
-                    f"Embedding Initialize: loss_label_train: {loss_label_init_train.item():.4f}, auc_roc_train: {auc_roc_init_train:.4f}, individual_unfairness_vanilla: {individual_unfairness_vanilla:.4f}, GDIF_vanilla {GDIF_vanilla:.4f}"
-                )
+            # if epoch % 100 == 0:
+            #     print(f"----------------------------")
+            #     print(f"[Train] Epoch {epoch}: ")
+            #     print(f"---Embedding Initialize---")
+            #     print(
+            #         f"Embedding Initialize: loss_label_train: {loss_label_init_train.item():.4f}, auc_roc_train: {auc_roc_init_train:.4f}, individual_unfairness_vanilla: {individual_unfairness_vanilla:.4f}, GDIF_vanilla {GDIF_vanilla:.4f}"
+            #     )
 
         print(f"--------------------Training GUIDE--------------------------")
 
@@ -825,10 +828,13 @@ class GUIDE(nn.Module):
             self.labels.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
             output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
         )
-        AUCROC = roc_auc_score(
-            self.labels.cpu().numpy()[self.idx_test.cpu().numpy()],
-            output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
-        )
+        try:
+            AUCROC = roc_auc_score(
+                self.labels.cpu().numpy()[self.idx_test.cpu().numpy()],
+                output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
+            )
+        except:
+            AUCROC = "nan"
 
         output = output
         individual_unfairness = torch.trace(

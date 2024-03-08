@@ -15,6 +15,7 @@ import csv
 import pickle as pkl
 import requests
 import os
+import pdb
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 import zipfile
@@ -29,8 +30,14 @@ NotLoaded: LCC, Filmtrust, Lastfm, UNC, oklahoma
 import requests
 
 
+def feature_norm(self, features):
+    min_values = features.min(axis=0)[0]
+    max_values = features.max(axis=0)[0]
+    return 2 * (features - min_values).div(max_values - min_values) - 1
+
+
 class Dataset(object):
-    def __init__(self, root: str = "./dataset") -> None:
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset") -> None:
         self.adj_ = None
         self.features_ = None
         self.labels_ = None
@@ -39,6 +46,7 @@ class Dataset(object):
         self.idx_test_ = None
         self.sens_ = None
         self.sens_idx_ = None
+        self.is_normalize = is_normalize
 
         self.root = root
         if not os.path.exists(self.root):
@@ -72,6 +80,9 @@ class Dataset(object):
             )
 
     def features(self, datatype: str = "torch.tensor"):
+        if self.is_normalize and self.features_ is not None:
+            self.features_ = feature_norm(self, self.features_)
+
         if self.features is None:
             return self.features_
         if datatype == "torch.tensor":
@@ -132,6 +143,8 @@ class Dataset(object):
             raise ValueError("datatype should be torch.tensor, tf.tensor, or np.array")
 
     def sens_idx(self):
+        if self.sens_idx_ is None:
+            self.sens_idx_ = -1
         return self.sens_idx_
 
 
@@ -154,8 +167,10 @@ def mx_to_torch_sparse_tensor(sparse_mx, is_sparse=False, return_tensor_sparse=T
 
 
 class Google(Dataset):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(
+        self, is_normalize: bool = False, root: str = "./dataset", sym=True
+    ) -> None:
+        super().__init__(root=root, is_normalize=is_normalize)
         self.path_name = "google"
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
@@ -230,6 +245,9 @@ class Google(Dataset):
 
         for j in range(edges.shape[0]):
             adj[node_mapping[edges[j][0]], node_mapping[edges[j][1]]] = 1
+        if sym:
+            for j in range(edges.shape[0]):
+                adj[node_mapping[edges[j][1]], node_mapping[edges[j][0]]] = 1
 
         idx_train = np.random.choice(
             list(range(node_num)), int(0.8 * node_num), replace=False
@@ -251,8 +269,13 @@ class Google(Dataset):
 
 
 class Facebook(Dataset):
-    def __init__(self, path: str = "./dataset/facebook/") -> None:
-        super().__init__()
+    def __init__(
+        self,
+        path: str = "./dataset/facebook/",
+        is_normalize: bool = False,
+        root: str = "./dataset",
+    ) -> None:
+        super().__init__(is_normalize=is_normalize, root=root)
         self.path_name = "facebook"
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
@@ -334,9 +357,14 @@ class Facebook(Dataset):
 
 class Nba(Dataset):
     def __init__(
-        self, dataset_name="nba", predict_attr_specify=None, return_tensor_sparse=True
+        self,
+        dataset_name="nba",
+        predict_attr_specify=None,
+        return_tensor_sparse=True,
+        is_normalize: bool = False,
+        root: str = "./dataset",
     ):
-        super().__init__()
+        super().__init__(is_normalize=is_normalize, root=root)
         if dataset_name != "nba":
             if dataset_name == "pokec_z":
                 dataset = "region_job"
@@ -502,8 +530,10 @@ class Pokec_z(Dataset):
         dataset_name="pokec_z",
         predict_attr_specify=None,
         return_tensor_sparse=True,
+        is_normalize: bool = False,
+        root: str = "./dataset",
     ):
-        super().__init__()
+        super().__init__(is_normalize=is_normalize, root=root)
         if dataset_name != "nba":
             if dataset_name == "pokec_z":
                 dataset = "region_job"
@@ -672,8 +702,10 @@ class Pokec_n(Dataset):
         dataset_name="pokec_n",
         predict_attr_specify=None,
         return_tensor_sparse=True,
+        is_normalize: bool = False,
+        root: str = "./dataset",
     ):
-        super().__init__()
+        super().__init__(is_normalize=is_normalize, root=root)
         if dataset_name != "nba":
             if dataset_name == "pokec_z":
                 dataset = "region_job"
@@ -837,8 +869,8 @@ class Pokec_n(Dataset):
 
 
 class Twitter(Dataset):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super().__init__(is_normalize=is_normalize, root=root)
         self.path_name = "twitter"
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
@@ -893,7 +925,6 @@ class Twitter(Dataset):
         feats = np.concatenate([feats[:, :264], feats[:, 266:]], -1)
 
         feats = np.concatenate([feats[:, :220], feats[:, 221:]], -1)
-
         edges = np.array(edges)
         # edges=torch.tensor(edges)
 
@@ -931,8 +962,8 @@ class Twitter(Dataset):
 
 
 class Cora(Dataset):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset") -> None:
+        super().__init__(is_normalize=is_normalize, root=root)
         self.cora_label = {
             "Genetic_Algorithms": 0,
             "Reinforcement_Learning": 1,
@@ -966,7 +997,7 @@ class Cora(Dataset):
         adj = mx_to_torch_sparse_tensor(adj)
         self.adj_ = adj
         self.features_ = features
-        self.labels_ = None
+        self.labels_ = sens
         self.idx_train_ = idx_train
         self.idx_val_ = idx_val
         self.idx_test_ = idx_test
@@ -1066,8 +1097,8 @@ class Cora(Dataset):
 
 
 class Citeseer(Dataset):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset") -> None:
+        super().__init__(is_normalize=is_normalize, root=root)
         self.cora_label = {
             "Genetic_Algorithms": 0,
             "Reinforcement_Learning": 1,
@@ -1109,7 +1140,7 @@ class Citeseer(Dataset):
         adj = mx_to_torch_sparse_tensor(adj)
         self.adj_ = adj
         self.features_ = features
-        self.labels_ = None
+        self.labels_ = sens
         self.idx_train_ = idx_train
         self.idx_val_ = idx_val
         self.idx_test_ = idx_test
@@ -1230,8 +1261,8 @@ class Citeseer(Dataset):
 
 
 class German(Dataset):
-    def __init__(self):
-        super(German, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(German, self).__init__(is_normalize=is_normalize, root=root)
         (
             adj,
             features,
@@ -1250,7 +1281,7 @@ class German(Dataset):
         idx_val = torch.LongTensor(idx_val)
         idx_test = torch.LongTensor(idx_test)
         labels = torch.LongTensor(labels)
-        features = self.feature_norm(features)
+
         adj = mx_to_torch_sparse_tensor(adj, is_sparse=True)
         self.adj_ = adj
         self.features_ = features
@@ -1327,6 +1358,7 @@ class German(Dataset):
         adj = adj + sp.eye(adj.shape[0])
 
         features = torch.FloatTensor(np.array(features.todense()))
+
         labels = torch.LongTensor(labels)
 
         import random
@@ -1360,8 +1392,8 @@ class German(Dataset):
 
 
 class Bail(Dataset):
-    def __init__(self):
-        super(Bail, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(Bail, self).__init__(is_normalize=is_normalize, root=root)
         (
             adj,
             features,
@@ -1380,7 +1412,6 @@ class Bail(Dataset):
         idx_val = torch.LongTensor(idx_val)
         idx_test = torch.LongTensor(idx_test)
         labels = torch.LongTensor(labels)
-        features = self.feature_norm(features)
         adj = mx_to_torch_sparse_tensor(adj, is_sparse=True)
         self.adj_ = adj
         self.features_ = features
@@ -1486,8 +1517,8 @@ class Bail(Dataset):
 
 
 class Credit(Dataset):
-    def __init__(self):
-        super(Credit, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(Credit, self).__init__(is_normalize=is_normalize, root=root)
         (
             adj,
             features,
@@ -1506,7 +1537,6 @@ class Credit(Dataset):
         idx_val = torch.LongTensor(idx_val)
         idx_test = torch.LongTensor(idx_test)
         labels = torch.LongTensor(labels)
-        features = self.feature_norm(features)
         adj = mx_to_torch_sparse_tensor(adj, is_sparse=True)
         self.adj_ = adj
         self.features_ = features
@@ -1612,8 +1642,8 @@ class Credit(Dataset):
 
 
 class LCC(Dataset):
-    def __init__(self):
-        super(LCC, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(LCC, self).__init__(is_normalize=is_normalize, root=root)
         path = "./dataset/raw_LCC"
         name = "LCC"
         self.path_name = "LCC"
@@ -1743,8 +1773,8 @@ class LCC(Dataset):
 
 
 class LCC_small(Dataset):
-    def __init__(self):
-        super(LCC_small, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(LCC_small, self).__init__(is_normalize=is_normalize, root=root)
         path = "./dataset/raw_small"
         name = "Small"
         self.path_name = "raw_small"
@@ -1857,8 +1887,8 @@ class LCC_small(Dataset):
 
 
 class Amazon(Dataset):
-    def __init__(self):
-        super(Amazon, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(Amazon, self).__init__(is_normalize=is_normalize, root=root)
         dataname = "Amazon-2"
         self.path_name = "amazon"
         if not os.path.exists(os.path.join(self.root, self.path_name)):
@@ -1967,8 +1997,8 @@ class Amazon(Dataset):
 
 
 class Yelp(Dataset):
-    def __init__(self):
-        super(Yelp, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(Yelp, self).__init__(is_normalize=is_normalize, root=root)
         dataname = "Yelp"
 
         self.path_name = "yelp"
@@ -2079,7 +2109,12 @@ from scipy.io import loadmat
 
 
 class data_handler:
-    def __init__(self, rating_path, trust_path, dataset_name):
+    def __init__(
+        self,
+        rating_path,
+        trust_path,
+        dataset_name,
+    ):
         self.rating_path = rating_path
         self.trust_path = trust_path
         self.n_users = 0
@@ -2144,8 +2179,8 @@ class data_handler:
 
 
 class Epinion(Dataset):
-    def __init__(self):
-        super(Epinion, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(Epinion, self).__init__(is_normalize=is_normalize, root=root)
         self.path_name = "epinion"
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
@@ -2230,8 +2265,8 @@ class Epinion(Dataset):
 
 
 class Ciao(Dataset):
-    def __init__(self):
-        super(Ciao, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(Ciao, self).__init__(is_normalize=is_normalize, root=root)
         self.path_name = "ciao"
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
@@ -2316,8 +2351,8 @@ class Ciao(Dataset):
 
 
 class Dblp(Dataset):
-    def __init__(self):
-        super(Dblp, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(Dblp, self).__init__(is_normalize=is_normalize, root=root)
         dataset_path = "./dataset/dblp/"
         self.path_name = "dblp"
         if not os.path.exists(os.path.join(self.root, self.path_name)):
@@ -2404,8 +2439,8 @@ class Dblp(Dataset):
 
 
 class Filmtrust(Dataset):
-    def __init__(self):
-        super(Filmtrust, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(Filmtrust, self).__init__(is_normalize=is_normalize, root=root)
         self.path_name = "filmtrust"
         if not os.path.exists(os.path.join(self.root, self.path_name)):
             os.makedirs(os.path.join(self.root, self.path_name))
@@ -2482,8 +2517,8 @@ class Filmtrust(Dataset):
 
 
 class Lastfm(Dataset):
-    def __init__(self):
-        super(Lastfm, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(Lastfm, self).__init__(is_normalize=is_normalize, root=root)
         self.path_name = "lastfm"
         self.url = "https://drive.google.com/u/0/uc?id=1paK8y0Ii4r6Z2x3H4PqdnAW9N3siMTnh&export=download"
         self.destination = join(self.root, self.path_name, "lastfm.zip")
@@ -2532,8 +2567,8 @@ class Lastfm(Dataset):
 
 
 class Ml_1m(Dataset):
-    def __init__(self):
-        super(Ml_1m, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(Ml_1m, self).__init__(is_normalize=is_normalize, root=root)
         dataset_name = "ml-1m"
         user_num = 6040
         item_num = 3952
@@ -2591,8 +2626,8 @@ class Ml_1m(Dataset):
 
 
 class Ml_100k(Dataset):
-    def __init__(self):
-        super(Ml_100k, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(Ml_100k, self).__init__(is_normalize=is_normalize, root=root)
         dataset_name = "ml-100k"
         self.path_name = "ml-100k"
         if not os.path.exists(os.path.join(self.root, self.path_name)):
@@ -2650,8 +2685,8 @@ class Ml_100k(Dataset):
 
 
 class Ml_20m(Dataset):
-    def __init__(self):
-        super(Ml_20m, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(Ml_20m, self).__init__(is_normalize=is_normalize, root=root)
         dataset_name = "ml-20m"
         user_num = 138493
         item_num = 27278
@@ -2711,8 +2746,8 @@ class Ml_20m(Dataset):
 
 
 class Oklahoma(Dataset):
-    def __init__(self):
-        super(Oklahoma, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(Oklahoma, self).__init__(is_normalize=is_normalize, root=root)
         dataset_name = "oklahoma"
         from scipy.io import loadmat
 
@@ -2817,6 +2852,34 @@ class Oklahoma(Dataset):
         self.train_items_ = train_items
         self.test_items_ = test_items
         self.sens_ = sens
+        self.sens_idx_ = -1
+
+        # random train_idx
+        self.idx_train_ = np.random.choice(
+            list(train_items.keys()), int(len(features) * 0.8), replace=False
+        )
+        # random val and test
+        self.idx_val_ = np.random.choice(
+            list(set(train_items.keys()) - set(self.idx_train_)),
+            int(len(features) * 0.1),
+            replace=False,
+        )
+        self.idx_test_ = list(
+            set(train_items.keys()) - set(self.idx_train_) - set(self.idx_val_)
+        )
+
+        # random label
+        self.labels_ = np.zeros(len(features))
+        self.pos_idx_ = np.random.choice(
+            np.arange(len(features)), int(len(features) * 0.1), replace=False
+        )
+        self.labels_[self.pos_idx_] = 1
+
+        # to torch
+        self.labels_ = torch.tensor(self.labels_, dtype=torch.long)
+        self.idx_train_ = torch.tensor(self.idx_train_, dtype=torch.long)
+        self.idx_val_ = torch.tensor(self.idx_val_, dtype=torch.long)
+        self.idx_test_ = torch.tensor(self.idx_test_, dtype=torch.long)
 
     def adj(self, datatype: str = "torch.sparse"):
         if self.adj_ is None:
@@ -2866,8 +2929,8 @@ class Oklahoma(Dataset):
 
 
 class UNC(Dataset):
-    def __init__(self):
-        super(UNC, self).__init__()
+    def __init__(self, is_normalize: bool = False, root: str = "./dataset"):
+        super(UNC, self).__init__(is_normalize=is_normalize, root=root)
         from scipy.io import loadmat
 
         dataset_name = "unc28"
@@ -2967,6 +3030,33 @@ class UNC(Dataset):
         self.test_items_ = test_items
         self.sens_ = sens
 
+        # random train_idx
+        self.idx_train_ = np.random.choice(
+            list(train_items.keys()), int(len(features) * 0.8), replace=False
+        )
+        # random val and test
+        self.idx_val_ = np.random.choice(
+            list(set(train_items.keys()) - set(self.idx_train_)),
+            int(len(features) * 0.1),
+            replace=False,
+        )
+        self.idx_test_ = list(
+            set(train_items.keys()) - set(self.idx_train_) - set(self.idx_val_)
+        )
+
+        # random label
+        self.labels_ = np.zeros(len(features))
+        self.pos_idx_ = np.random.choice(
+            np.arange(len(train_items)), int(len(train_items) * 0.1), replace=False
+        )
+        self.labels_[self.pos_idx_] = 1
+
+        # to torch
+        self.labels_ = torch.tensor(self.labels_, dtype=torch.long)
+        self.idx_train_ = torch.tensor(self.idx_train_, dtype=torch.long)
+        self.idx_val_ = torch.tensor(self.idx_val_, dtype=torch.long)
+        self.idx_test_ = torch.tensor(self.idx_test_, dtype=torch.long)
+
     def adj(self, datatype: str = "torch.sparse"):
         if self.adj_ is None:
             return self.adj_
@@ -3040,3 +3130,6 @@ class UNC(Dataset):
 # ciao = Ciao()
 # dblp = Dblp()
 # german = German()
+
+# Google()
+# Oklahoma()

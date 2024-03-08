@@ -294,10 +294,13 @@ class FairGNN(nn.Module):
                     if self.labels.max() > 1:
                         AUCROC = 0
                     else:
-                        AUCROC = roc_auc_score(
-                            self.labels[idx_test].detach().cpu().numpy(),
-                            output[idx_test],
-                        )
+                        try:
+                            AUCROC = roc_auc_score(
+                                self.labels[idx_test].detach().cpu().numpy(),
+                                output[idx_test],
+                            )
+                        except:
+                            AUCROC = 'N/A'
                     (
                         ACC_sens0,
                         AUCROC_sens0,
@@ -352,9 +355,12 @@ class FairGNN(nn.Module):
         if self.labels.max() > 1:
             AUCROC = 0
         else:
-            AUCROC = roc_auc_score(
-                self.labels[idx_test].detach().cpu().numpy(), output[idx_test]
-            )
+            try:
+                AUCROC = roc_auc_score(
+                    self.labels[idx_test].detach().cpu().numpy(), output[idx_test]
+                )
+            except:
+                AUCROC = 'N/A'
         (
             ACC_sens0,
             AUCROC_sens0,
@@ -410,15 +416,18 @@ class FairGNN(nn.Module):
             if self.labels.max() > 1:
                 AUCROC = 0
             else:
-                AUCROC = roc_auc_score(
-                    self.labels[idx_test][
-                        self.sens[idx_test].detach().cpu().numpy() == sens
-                    ]
-                    .detach()
-                    .cpu()
-                    .numpy(),
-                    pred[self.sens[idx_test].detach().cpu().numpy() == sens],
-                )
+                try:
+                    AUCROC = roc_auc_score(
+                        self.labels[idx_test][
+                            self.sens[idx_test].detach().cpu().numpy() == sens
+                        ]
+                        .detach()
+                        .cpu()
+                        .numpy(),
+                        pred[self.sens[idx_test].detach().cpu().numpy() == sens],
+                    )
+                except:
+                    AUCROC = 'N/A'
             result.extend([ACC, AUCROC, F1])
 
         return result

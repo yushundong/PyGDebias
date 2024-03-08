@@ -2,9 +2,11 @@ from os import error
 
 # from aif360.sklearn.metrics.metrics import equal_opportunity_difference
 import dgl
+import pdb
 
 # import ipdb
 import time
+import os
 import argparse
 import numpy as np
 
@@ -23,8 +25,9 @@ from torch_geometric.utils import dropout_adj, convert, to_networkx
 
 # from aif360.sklearn.metrics import consistency_score as cs
 # from aif360.sklearn.metrics import generalized_entropy_error as gee
-from torch_geometric.utils.homophily import homophily
-from torch_geometric.utils.subgraph import k_hop_subgraph
+# from torch_geometric.utils.homophily import homophily
+from torch_geometric.utils import homophily
+from torch_geometric.utils import k_hop_subgraph
 import matplotlib as mpl
 from networkx.algorithms.centrality import closeness_centrality
 import matplotlib.pyplot as plt
@@ -560,9 +563,11 @@ def nifty(
         if (val_c_loss + val_s_loss) < best_loss:
             # print(f'{epoch} | {val_s_loss:.4f} | {val_c_loss:.4f}')
             best_loss = val_c_loss + val_s_loss
-            torch.save(model.state_dict(), f"weights_ssf_{self.model}.pt")
+            if not os.path.exists("data"):
+                os.makedirs("data")
+            torch.save(model.state_dict(), f"data/weights_ssf_{self.model}.pt")
 
-    model.load_state_dict(torch.load(f"weights_ssf_{self.model}.pt"))
+    model.load_state_dict(torch.load(f"data/weights_ssf_{self.model}.pt"))
     model.eval()
     emb = model(features.to(device), edge_index.to(device))
     output = model.predict(emb)
@@ -820,8 +825,11 @@ class fair_edit_trainer:
         for edge in deleted_edges.T:
             vals = self.edge_index == torch.tensor([[edge[0]], [edge[1]]]).cuda()
             sum = torch.sum(vals, dim=0).cpu()
-            col_idx = np.where(sum == 2)[0][0]
-            delete_indices.append(col_idx)
+            try:
+                col_idx = np.where(sum == 2)[0][0]
+                delete_indices.append(col_idx)
+            except:
+                col_idx = np.where(sum == 2)[0]
 
         delete_indices.sort(reverse=True)
         for col_idx in delete_indices:
@@ -843,6 +851,12 @@ class fair_edit_trainer:
 
     def fair_graph_edit(self):
         grad_gen = GNNExplainer(self.model)
+
+        is_undirected = set(self.edge_index[0]) == set(self.edge_index[1])
+        if not is_undirected:
+            self.edge_index = torch.cat(
+                (self.edge_index, self.edge_index.flip(0)), dim=1
+            )
 
         # perturb graph (return the ACTUAL edges)
         deleted_edges, added_edges = self.add_drop_edge_random(add_prob=0.5)
@@ -880,11 +894,17 @@ class fair_edit_trainer:
             self.edge_index == torch.tensor([[best_delete[1]], [best_delete[0]]]).cuda()
         )
         sum_del = torch.sum(val_del, dim=0).cuda()
-        col_idx_del = np.where(sum_del.cpu() == 2)[0][0]
-        self.edge_index = torch.cat(
-            (self.edge_index[:, :col_idx_del], self.edge_index[:, col_idx_del + 1 :]),
-            axis=1,
-        )
+        try:
+            col_idx_del = np.where(sum_del.cpu() == 2)[0][0]
+            self.edge_index = torch.cat(
+                (
+                    self.edge_index[:, :col_idx_del],
+                    self.edge_index[:, col_idx_del + 1 :],
+                ),
+                axis=1,
+            )
+        except:
+            print("no del")
 
         best_delete_comp = torch.tensor([[best_delete[1]], [best_delete[0]]]).cuda()
         val_del_comp = (
@@ -892,14 +912,18 @@ class fair_edit_trainer:
             == torch.tensor([[best_delete_comp[1]], [best_delete_comp[0]]]).cuda()
         )
         sum_del_comp = torch.sum(val_del_comp, dim=0).cuda()
-        col_idx_del_comp = np.where(sum_del_comp.cpu() == 2)[0][0]
-        self.edge_index = torch.cat(
-            (
-                self.edge_index[:, :col_idx_del_comp],
-                self.edge_index[:, col_idx_del_comp + 1 :],
-            ),
-            axis=1,
-        )
+        try:
+            col_idx_del_comp = np.where(sum_del_comp.cpu() == 2)[0][0]
+
+            self.edge_index = torch.cat(
+                (
+                    self.edge_index[:, :col_idx_del_comp],
+                    self.edge_index[:, col_idx_del_comp + 1 :],
+                ),
+                axis=1,
+            )
+        except:
+            print("no comp")
 
     def train(self, epochs=200):
         best_loss = 100
@@ -1001,7 +1025,10 @@ class fair_edit_trainer:
                     labels[idx_test],
                     output_preds,
                 )
-                AUCROC = roc_auc_score(labels[idx_test], output_preds)
+                try:
+                    AUCROC = roc_auc_score(labels[idx_test], output_preds)
+                except:
+                    AUCROC = "N/A"
 
                 (
                     ACC_sens0,
@@ -1068,13 +1095,16 @@ class fair_edit_trainer:
                 .numpy(),
                 pred[self.sens[idx_test] == sens],
             )
-            AUCROC = roc_auc_score(
-                self.labels[idx_test][self.sens[idx_test] == sens]
-                .detach()
-                .cpu()
-                .numpy(),
-                pred[self.sens[idx_test] == sens],
-            )
+            try:
+                AUCROC = roc_auc_score(
+                    self.labels[idx_test][self.sens[idx_test] == sens]
+                    .detach()
+                    .cpu()
+                    .numpy(),
+                    pred[self.sens[idx_test] == sens],
+                )
+            except:
+                AUCROC = "N/A"
             result.extend([ACC, AUCROC, F1])
 
         return result

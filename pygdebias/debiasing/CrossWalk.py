@@ -487,7 +487,6 @@ class Graph(defaultdict):
 
 def from_numpy(x, undirected=True):
     G = Graph()
-    print(x.shape)
     if issparse(x):
         cx = x.tocoo()
         for i, j, v in zip(cx.row, cx.col, cx.data):
@@ -601,7 +600,6 @@ class CrossWalk:
             workers=self.workers,
         )
 
-        print(model.wv.vectors.shape)
         return model.wv.vectors
         # model.wv.save_word2vec_format(self.output)
 
@@ -684,31 +682,34 @@ class CrossWalk:
         res_diff_avg = np.mean(np.array(res_diff_total), axis=0)
         res_var_avg = np.mean(np.array(res_var_total), axis=0)
 
-        print(
-            res_avg,
-            ", ",
-            res_1_avg,
-            ", ",
-            res_0_avg,
-            ", ",
-            res_diff_avg,
-            ", ",
-            res_var_avg,
-        )
+        # print(
+        #     res_avg,
+        #     ", ",
+        #     res_1_avg,
+        #     ", ",
+        #     res_0_avg,
+        #     ", ",
+        #     res_diff_avg,
+        #     ", ",
+        #     res_var_avg,
+        # )
 
-        print(y_pred)
+        # print(y_pred)
 
         F1 = f1_score(y_test, y_pred, average="micro")
         ACC = accuracy_score(
             y_test,
             y_pred,
         )
-        AUCROC = roc_auc_score(y_test, y_pred)
+        try:
+            AUCROC = roc_auc_score(y_test, y_pred)
+        except:
+            AUCROC = "N/A"
 
         print("testing--------------")
-        print(F1)
-        print(ACC)
-        print(AUCROC)
+        # print(F1)
+        # print(ACC)
+        # print(AUCROC)
 
         (
             ACC_sens0,
@@ -721,7 +722,7 @@ class CrossWalk:
 
         SP, EO = self.fair_metric(np.array(y_pred), y_test, z_test)
 
-        print(SP, EO)
+        # print(SP, EO)
         loss_fn = torch.nn.BCELoss()
         self.val_loss = loss_fn(
             torch.FloatTensor(y_pred), torch.tensor(y_test).float()
@@ -801,8 +802,8 @@ class CrossWalk:
         # self.lgreg = LogisticRegression(random_state=1, class_weight='balanced', max_iter=100000).fit(
         #    self.embs[idx_train], labels[idx_train])
 
-        print(self.embs.shape)
-        print(self.labels.shape)
+        # print(self.embs.shape)
+        # print(self.labels.shape)
 
         self.lgreg = LogisticRegression(
             random_state=0, C=1.0, multi_class="auto", solver="lbfgs", max_iter=1000
@@ -837,9 +838,9 @@ class CrossWalk:
                     torch.tensor(self.labels[idx]).float(),
                 )
 
-                if i % 500 == 0:
-                    print(self.labels[idx])
-                    print(loss)
+                # if i % 500 == 0:
+                #     print(self.labels[idx])
+                #     print(loss)
                 loss.backward()
                 optimizer.step()
 
@@ -854,9 +855,9 @@ class CrossWalk:
                 .squeeze()
             )
             ACC = accuracy_score(self.labels[idx_train], pred.detach().numpy())
-            print(self.embs)
-            print(pred)
-            print("train acc", ACC)
+            # print(self.embs)
+            # print(pred)
+            # print("train acc", ACC)
 
     def fair_metric(self, pred, labels, sens):
         idx_s0 = sens == 0
@@ -883,7 +884,10 @@ class CrossWalk:
                 y_test[z_test == sens],
                 y_pred[z_test == sens],
             )
-            AUCROC = roc_auc_score(y_test[z_test == sens], y_pred[z_test == sens])
+            try:
+                AUCROC = roc_auc_score(y_test[z_test == sens], y_pred[z_test == sens])
+            except:
+                AUCROC = "N/A"
             result.extend([ACC, AUCROC, F1])
 
         return result

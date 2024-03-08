@@ -308,13 +308,15 @@ class CFDA(nn.Module):
         loss_reconst_x = loss_mse(X_pred, X_ns)
 
         loss_ce = nn.CrossEntropyLoss()
+        # import pdb
+        # pdb.set_trace()
         loss_s = loss_ce(S_agg_pred, S_agg_cat.view(-1))  # S_agg_pred: n x K, S_agg: n
         loss_result = {'loss_reconst_a': loss_reconst_a, 'loss_reconst_x': loss_reconst_x, 'loss_s': loss_s}
         return loss_result
 
     def train_model(self, X, adj, sen_idx, dataset, model_path='', lr=0.0001, weight_decay=1e-5):
         rate_1 = torch.sparse.sum(adj) / (adj.shape[0] * adj.shape[1])
-        print('adj=1: ', rate_1)
+        # print('adj=1: ', rate_1)
 
         par_s = list(self.pred_s.parameters())
         par_other = list(self.base_gcn.parameters()) + list(self.gcn_mean.parameters()) + list(self.gcn_logstddev.parameters()) + list(self.pred_a.parameters()) + \
@@ -361,14 +363,14 @@ class CFDA(nn.Module):
             if epoch % 100 == 0:
                 self.eval()
                 eval_result = self.test(adj, X, sen_idx, S_agg_cat)
-                print('Epoch: {:04d}'.format(epoch + 1),
-                      'loss_reconst_a: {:.4f}'.format(loss_reconst_a.item()),
-                      'loss_reconst_x: {:.4f}'.format(loss_reconst_x.item()),
-                      'loss_s: {:.4f}'.format(loss_s.item()),
-                      'acc_a_pred: {:.4f}'.format(eval_result['acc_a_pred'].item()),
-                      'acc_a_pred_0: {:.4f}'.format(eval_result['acc_a_pred_0'].item()),
-                      'acc_a_pred_1: {:.4f}'.format(eval_result['acc_a_pred_1'].item()),
-                      )
+                # print('Epoch: {:04d}'.format(epoch + 1),
+                #       'loss_reconst_a: {:.4f}'.format(loss_reconst_a.item()),
+                #       'loss_reconst_x: {:.4f}'.format(loss_reconst_x.item()),
+                #       'loss_s: {:.4f}'.format(loss_s.item()),
+                #       'acc_a_pred: {:.4f}'.format(eval_result['acc_a_pred'].item()),
+                #       'acc_a_pred_0: {:.4f}'.format(eval_result['acc_a_pred_0'].item()),
+                #       'acc_a_pred_1: {:.4f}'.format(eval_result['acc_a_pred_1'].item()),
+                #       )
                 # save model
                 save_model = True
                 if save_model and epoch > 0:
@@ -376,7 +378,7 @@ class CFDA(nn.Module):
                         os.makedirs(model_path)
                     save_model_path = model_path + f'weights_CFDA_{dataset}' + '.pt'
                     torch.save(self.state_dict(), save_model_path)
-                    print('saved model weight in: ', save_model_path)
+                    # print('saved model weight in: ', save_model_path)
                 self.train()
         return
 
@@ -445,12 +447,12 @@ def generate_cf_data(data, sens_idx, mode=1, sens_cf=None, adj_raw=None, model_p
             S_agg_cat = torch.floor(S_agg / ((S_agg_max + 0.000001 - S_agg_min) / s_num)).long()  # n x 1
 
             eval_result = model_DA.test(adj.cuda(), data.x.cuda(), sens_idx, S_agg_cat.cuda())
-            print(
-                'loss_reconst_a: {:.4f}'.format(eval_result['loss_reconst_a'].item()),
-                'acc_a_pred: {:.4f}'.format(eval_result['acc_a_pred'].item()),
-                'acc_a_pred_0: {:.4f}'.format(eval_result['acc_a_pred_0'].item()),
-                'acc_a_pred_1: {:.4f}'.format(eval_result['acc_a_pred_1'].item()),
-            )
+            # print(
+            #     'loss_reconst_a: {:.4f}'.format(eval_result['loss_reconst_a'].item()),
+            #     'acc_a_pred: {:.4f}'.format(eval_result['acc_a_pred'].item()),
+            #     'acc_a_pred_0: {:.4f}'.format(eval_result['acc_a_pred_0'].item()),
+            #     'acc_a_pred_1: {:.4f}'.format(eval_result['acc_a_pred_1'].item()),
+            # )
     else:
         model_DA.train_model(data.x.cuda(), adj.cuda(), sens_idx, dataset, model_path=model_path, lr=0.0001, weight_decay=1e-5)
 
@@ -593,7 +595,7 @@ class PPR:
     def process(self, path, seed):
         ppr_path = os.path.join(path, 'ppr{}'.format(seed))
         if not os.path.isfile(ppr_path) or os.stat(ppr_path).st_size == 0:
-            print('Processing node {}.'.format(seed))
+            # print('Processing node {}.'.format(seed))
             neighbor = self.search(seed)
             torch.save(neighbor, ppr_path)
         else:
@@ -874,18 +876,18 @@ class CFGT(nn.Module):
             if epoch % 100 == 0:
                 self.eval()
                 eval_result = self.test(X, adj, sen_idx)
-                print('Epoch: {:04d}'.format(epoch + 1),
-                      'loss_reconst_a: {:.4f}'.format(loss_reconst_a.item()),
-                      'acc_a_pred: {:.4f}'.format(eval_result['acc_a_pred'].item()),
-                      'acc_a_pred_0: {:.4f}'.format(eval_result['acc_a_pred_0'].item()),
-                      'acc_a_pred_1: {:.4f}'.format(eval_result['acc_a_pred_1'].item()),
-                      )
+                # print('Epoch: {:04d}'.format(epoch + 1),
+                #       'loss_reconst_a: {:.4f}'.format(loss_reconst_a.item()),
+                #       'acc_a_pred: {:.4f}'.format(eval_result['acc_a_pred'].item()),
+                #       'acc_a_pred_0: {:.4f}'.format(eval_result['acc_a_pred_0'].item()),
+                #       'acc_a_pred_1: {:.4f}'.format(eval_result['acc_a_pred_1'].item()),
+                #       )
                 # save model
                 save_model = True
                 if save_model and epoch > 0:
                     save_model_path = model_path + f'weights_CFGT_{dataset}' + '.pt'
                     torch.save(self.state_dict(), save_model_path)
-                    print('saved model weight in: ', save_model_path)
+                    # print('saved model weight in: ', save_model_path)
                 self.train()
         return
 
@@ -952,12 +954,12 @@ def generate_cf_true_rw(data, dataset, sens_rate_list, sens_idx, save_path, save
             test_model = False
             if test_model:
                 eval_result = model_GT.test(data.x.cuda(), adj.cuda(), sens_idx)
-                print(
-                    'loss_reconst_a: {:.4f}'.format(eval_result['loss_reconst_a'].item()),
-                    'acc_a_pred: {:.4f}'.format(eval_result['acc_a_pred'].item()),
-                    'acc_a_pred_0: {:.4f}'.format(eval_result['acc_a_pred_0'].item()),
-                    'acc_a_pred_1: {:.4f}'.format(eval_result['acc_a_pred_1'].item()),
-                )
+                # print(
+                #     'loss_reconst_a: {:.4f}'.format(eval_result['loss_reconst_a'].item()),
+                #     'acc_a_pred: {:.4f}'.format(eval_result['acc_a_pred'].item()),
+                #     'acc_a_pred_0: {:.4f}'.format(eval_result['acc_a_pred_0'].item()),
+                #     'acc_a_pred_1: {:.4f}'.format(eval_result['acc_a_pred_1'].item()),
+                # )
         else:
             model_GT.train_model(data.x.cuda(), adj.cuda(), sens_idx, dataset, model_path=save_path, lr=0.0001, weight_decay=1e-5)
 
@@ -1084,8 +1086,10 @@ def evaluate(model, data, subgraph, cf_subgraph_list, labels, sens, idx_select, 
         emb = get_all_node_emb(model, idx_select_mask, subgraph, n, hidden_size, batch_size)
         output = model.forwarding_predict(emb)
         output_preds = (output.squeeze() > 0).type_as(labels)
-
-        auc_roc = roc_auc_score(labels.cpu().numpy()[idx_select], output.detach().cpu().numpy())
+        try:
+            auc_roc = roc_auc_score(labels.cpu().numpy()[idx_select], output.detach().cpu().numpy())
+        except:
+            auc_roc = 'nan'
         f1_s = f1_score(labels[idx_select].cpu().numpy(), output_preds.cpu().numpy())
         acc = accuracy_score(labels[idx_select].cpu().numpy(), output_preds.cpu().numpy())
 
@@ -1163,14 +1167,18 @@ def analyze_dependency(sens, adj, ypred_tst, idx_select, type='mean'):
 
 
 class GEAR(torch.nn.Module):
-    def __init__(self, adj, features, labels, idx_train, idx_val, idx_test, sens, sens_idx, hidden_size=1024, proj_hidden=16, num_class=1, encoder_hidden_size=1024, encoder_base_model='gcn', experiment_type='train'):
+    def __init__(self, adj, features, labels, idx_train, idx_val, idx_test, sens, sens_idx, hidden_size=1024, dataset_name='None', proj_hidden=16, num_class=1, encoder_hidden_size=1024, encoder_base_model='gcn', experiment_type='train'):
         super(GEAR, self).__init__()
         self.encoder = Encoder(features.shape[1], encoder_hidden_size, base_model=encoder_base_model)
         self.hidden_size = hidden_size
         self.num_proj_hidden = proj_hidden
         self.num_class = num_class
         self.experiment_type = experiment_type
+        self.dataset = dataset_name
 
+
+        if not os.path.exists(f'graphFair_subgraph/'):
+            os.makedirs(f'graphFair_subgraph/')
         # Projection
         self.fc1 = nn.Sequential(
             spectral_norm(nn.Linear(self.hidden_size, self.num_proj_hidden)),
@@ -1198,7 +1206,7 @@ class GEAR(torch.nn.Module):
 
         self.reset_parameters()
 
-        self.preprocess(adj, features, labels, idx_train, idx_val, idx_test, sens, sens_idx)
+        self.preprocess(adj, features, labels, idx_train, idx_val, idx_test, sens, sens_idx, dataset=dataset_name)
 
     def reset_parameters(self):
         reset(self.encoder)
@@ -1264,7 +1272,7 @@ class GEAR(torch.nn.Module):
 
         # Subgraph: Setting up the subgraph extractor
         self.subgraph_size = subgraph_size
-        self.ppr_path = './graphFair_subgraph/' + dataset
+        self.ppr_path = './graphFair_subgraph/' + self.dataset
         self.n_order = n_order
 
         self.subgraph = Subgraph(self.data.x, self.data.edge_index, self.ppr_path, self.subgraph_size, n_order)
@@ -1332,7 +1340,7 @@ class GEAR(torch.nn.Module):
 
         # Setting up the model and optimizer
         # model = self.GraphCF(encoder=Encoder(self.data.num_features, encoder_hidden_size, base_model=encoder_base_model), args=args, num_class=encoder_num_class).to(device)
-        print(epochs, lr, batch_size, weight_decay, sim_coeff, encoder_name, dataset_name, device)
+        # print(epochs, lr, batch_size, weight_decay, sim_coeff, encoder_name, dataset_name, device)
         par_1 = list(self.encoder.parameters()) + list(self.fc1.parameters()) + list(self.fc2.parameters()) + list(
             self.fc3.parameters()) + list(self.fc4.parameters())
         par_2 = list(self.c1.parameters()) + list(self.encoder.parameters())
@@ -1422,17 +1430,17 @@ class GEAR(torch.nn.Module):
                 self.eval()
                 eval_results_trn = evaluate(self, self.data, self.subgraph, self.cf_subgraph_list, labels, self.sens, self.idx_train, self.n, sim_coeff, self.hidden_size, batch_size, device)
                 eval_results_val = evaluate(self, self.data, self.subgraph, self.cf_subgraph_list, labels, self.sens, self.idx_val, self.n, sim_coeff, self.hidden_size, batch_size, device)
-                print(f"[Train] Epoch {epoch}:train_s_loss: {(sim_loss / rep):.4f} | train_c_loss: {cl_loss:.4f} | "
-                      f"trn_loss: {eval_results_trn['loss']:.4f} |"
-                      f"trn_acc: {eval_results_trn['acc']:.4f} | trn_auc_roc: {eval_results_trn['auc']:.4f} | trn_F1: {eval_results_trn['f1']:.4f} | "
-                      f"trn_Parity: {eval_results_trn['parity']:.4f} | trn_Equality: {eval_results_trn['equality']:.4f} | trn_CounterFactual Fairness: {eval_results_trn['cf']:.4f} |"
-                      f"val_loss: {eval_results_val['loss']:.4f} |"
-                      f"val_acc: {eval_results_val['acc']:.4f} | val_auc_roc: {eval_results_val['auc']:.4f} | val_F1: {eval_results_val['f1']:.4f} | "
-                      f"val_Parity: {eval_results_val['parity']:.4f} | val_Equality: {eval_results_val['equality']:.4f} | val_CounterFactual Fairness: {eval_results_val['cf']:.4f} |"
-                      # f"tst_loss: {eval_results_tst['loss']:.4f} |"
-                      # f"tst_acc: {eval_results_tst['acc']:.4f} | tst_auc_roc: {eval_results_tst['auc']:.4f} | tst_F1: {eval_results_tst['f1']:.4f} | "
-                      # f"tst_Parity: {eval_results_tst['parity']:.4f} | tst_Equality: {eval_results_tst['equality']:.4f} | tst_CounterFactual Fairness: {eval_results_tst['cf']:.4f} |"
-                      )
+                # print(f"[Train] Epoch {epoch}:train_s_loss: {(sim_loss / rep):.4f} | train_c_loss: {cl_loss:.4f} | "
+                #       f"trn_loss: {eval_results_trn['loss']:.4f} |"
+                #       f"trn_acc: {eval_results_trn['acc']:.4f} | trn_auc_roc: {eval_results_trn['auc']:.4f} | trn_F1: {eval_results_trn['f1']:.4f} | "
+                #       f"trn_Parity: {eval_results_trn['parity']:.4f} | trn_Equality: {eval_results_trn['equality']:.4f} | trn_CounterFactual Fairness: {eval_results_trn['cf']:.4f} |"
+                #       f"val_loss: {eval_results_val['loss']:.4f} |"
+                #       f"val_acc: {eval_results_val['acc']:.4f} | val_auc_roc: {eval_results_val['auc']:.4f} | val_F1: {eval_results_val['f1']:.4f} | "
+                #       f"val_Parity: {eval_results_val['parity']:.4f} | val_Equality: {eval_results_val['equality']:.4f} | val_CounterFactual Fairness: {eval_results_val['cf']:.4f} |"
+                #       # f"tst_loss: {eval_results_tst['loss']:.4f} |"
+                #       # f"tst_acc: {eval_results_tst['acc']:.4f} | tst_auc_roc: {eval_results_tst['auc']:.4f} | tst_F1: {eval_results_tst['f1']:.4f} | "
+                #       # f"tst_Parity: {eval_results_tst['parity']:.4f} | tst_Equality: {eval_results_tst['equality']:.4f} | tst_CounterFactual Fairness: {eval_results_tst['cf']:.4f} |"
+                #       )
 
                 val_c_loss = eval_results_val['loss_c']
                 val_s_loss = eval_results_val['loss_s']
@@ -1533,7 +1541,10 @@ class GEAR(torch.nn.Module):
 
         F1 = f1_score(labels[idx_test], output_preds, average='micro')
         ACC = accuracy_score(labels[idx_test], output_preds, )
-        AUCROC = roc_auc_score(labels[idx_test], output_preds)
+        try:
+            AUCROC = roc_auc_score(labels[idx_test], output_preds)
+        except:
+            AUCROC = 'nan'
 
         ACC_sens0, AUCROC_sens0, F1_sens0, ACC_sens1, AUCROC_sens1, F1_sens1 = self.predict_sens_group(output_preds,
                                                                                                        idx_test)
@@ -1587,7 +1598,10 @@ class GEAR(torch.nn.Module):
         for sens in [0,1]:
             F1 = f1_score(self.labels[idx_test][self.sens[idx_test]==sens].detach().cpu().numpy(), pred[self.sens[idx_test]==sens], average='micro')
             ACC=accuracy_score(self.labels[idx_test][self.sens[idx_test]==sens].detach().cpu().numpy(), pred[self.sens[idx_test]==sens],)
-            AUCROC=roc_auc_score(self.labels[idx_test][self.sens[idx_test]==sens].detach().cpu().numpy(), pred[self.sens[idx_test]==sens])
+            try:
+                AUCROC=roc_auc_score(self.labels[idx_test][self.sens[idx_test]==sens].detach().cpu().numpy(), pred[self.sens[idx_test]==sens])
+            except:
+                AUCROC='nan'
             result.extend([ACC, AUCROC, F1])
 
         return result

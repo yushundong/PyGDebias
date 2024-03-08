@@ -63,7 +63,7 @@ def avg_err(x_corresponding, x_similarity, x_sorted_scores, y_ranks, top_k):
     )
     score_rank = (1 / the_range[:, 0:]) * x_corresponding[:, 0:]
     final = torch.mean(torch.sum(score_rank, axis=1))
-    print("Now Average ERR@k = ", final.item())
+    # print("Now Average ERR@k = ", final.item())
 
     return final.item()
 
@@ -90,7 +90,7 @@ def avg_ndcg(x_corresponding, x_similarity, x_sorted_scores, y_ranks, top_k):
     )
     ndcg_list = torch.sum((numerator / denominator), 1) / idcg
     avg_ndcg = torch.mean(ndcg_list)
-    print("Now Average NDCG@k = ", avg_ndcg.item())
+    # print("Now Average NDCG@k = ", avg_ndcg.item())
 
     return avg_ndcg.item()
 
@@ -438,11 +438,13 @@ class InFoRM_GNN(nn.Module):
         dropout=0,
         weight_decay=1e-5,
         device="cuda",
-        path="./",
+        path="./data/",
         dataset="",
         compute_laplacian=True,
     ):
         super(InFoRM_GNN, self).__init__()
+        if not os.path.exists(path):
+            os.makedirs(path)
         self.dataset = dataset
         self.compute_laplacian = compute_laplacian
         if dataset == "" and compute_laplacian == False:
@@ -606,10 +608,10 @@ class InFoRM_GNN(nn.Module):
                 output.detach().cpu().numpy()[self.idx_val.cpu().numpy()],
             )
 
-            if epoch % 500 == 0:
-                print(
-                    f"[Train] Epoch {epoch}:train_loss: {loss_train.item():.4f} | train_auc_roc: {auc_roc_train:.4f} | val_loss: {loss_val.item():.4f} | val_auc_roc: {auc_roc_val:.4f}"
-                )
+            # if epoch % 500 == 0:
+            #     print(
+            #         f"[Train] Epoch {epoch}:train_loss: {loss_train.item():.4f} | train_auc_roc: {auc_roc_train:.4f} | val_loss: {loss_val.item():.4f} | val_auc_roc: {auc_roc_val:.4f}"
+            #     )
 
             if loss_val.item() < best_loss:
                 best_loss = loss_val.item()
@@ -630,7 +632,7 @@ class InFoRM_GNN(nn.Module):
         y_similarity = simi(output[self.idx_test])
         x_similarity = simi(self.features[self.idx_test])
 
-        print("Ranking optimizing... ")
+        # print("Ranking optimizing... ")
         (
             x_sorted_scores,
             y_sorted_idxs,
@@ -664,8 +666,8 @@ class InFoRM_GNN(nn.Module):
             output.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
         )
 
-        print(output)
-        print(output_preds)
+        # print(output)
+        # print(output_preds)
 
         F1 = f1_score(
             self.labels.cpu().numpy()[self.idx_test.cpu().numpy()],
@@ -676,10 +678,13 @@ class InFoRM_GNN(nn.Module):
             self.labels.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
             output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
         )
-        AUCROC = roc_auc_score(
-            self.labels.cpu().numpy()[self.idx_test.cpu().numpy()],
-            output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
-        )
+        try:
+            AUCROC = roc_auc_score(
+                self.labels.cpu().numpy()[self.idx_test.cpu().numpy()],
+                output_preds.detach().cpu().numpy()[self.idx_test.cpu().numpy()],
+            )
+        except:
+            AUCROC = "N/A"
 
         # counterfactual_fairness = 1 - (output_preds.eq(counter_output_preds)[self.idx_test].sum().item() / self.idx_test.shape[0])
         # robustness_score = 1 - (output_preds.eq(noisy_output_preds)[self.idx_test].sum().item() / self.idx_test.shape[0])
