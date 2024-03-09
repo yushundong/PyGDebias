@@ -6,8 +6,10 @@ pandas==1.4.3
 torch-geometric==2.1.0.post1
 tensorboard==2.9.1
 tqdm==4.64.0
-dgl==1.1.2+cu116 -f https://data.dgl.ai/wheels/cu116/repo.html
-dglgo==0.0.2 -f https://data.dgl.ai/wheels-test/repo.html
+dgl==1.1.2+cu116
+#  -f https://data.dgl.ai/wheels/cu116/repo.html
+dglgo==0.0.2
+#  -f https://data.dgl.ai/wheels-test/repo.html
 matplotlib==3.5.2
 datasets==2.9.0
 aif360==0.5.0

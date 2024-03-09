@@ -91,22 +91,22 @@ Here, we provide guidelines for setting up the library. There are basically 2 wa
 
 ```bash
 # Set up the environment
-conda create -n pygdebias python=3.8
+conda create -n pygdebias python=3.9
 conda activate pygdebias
 
 # Installation
 git clone https://github.com/yushundong/PyGDebias.git
 pip install torch==1.12.0+cu116 -f https://download.pytorch.org/whl/torch_stable.html
-pip install PyGDebias/ -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f https://download.pytorch.org/whl/torch_stable.html
+pip install PyGDebias/ -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f https://download.pytorch.org/whl/torch_stable.html  -f https://data.dgl.ai/wheels/cu116/repo.html -f https://data.dgl.ai/wheels-test/repo.html
 ```
 
 ### 3.2 `pip`
 
 ```bash
-conda create -n pygdebias python=3.8
+conda create -n pygdebias python=3.9
 conda activate pygdebias
 pip install torch==1.12.0+cu116 -f https://download.pytorch.org/whl/torch_stable.html
-pip install pygdebias==1.0.1 -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f https://download.pytorch.org/whl/torch_stable.html
+pip install pygdebias==1.1.1 -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f https://download.pytorch.org/whl/torch_stable.html  -f https://data.dgl.ai/wheels/cu116/repo.html -f https://data.dgl.ai/wheels-test/repo.html
 ```
 
 ## 4. Usage & Examples
