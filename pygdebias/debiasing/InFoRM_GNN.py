@@ -17,6 +17,7 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
+import os
 import pickle as pkl
 
 
@@ -461,8 +462,6 @@ class InFoRM_GNN(nn.Module):
         edge_index = convert.from_scipy_sparse_matrix(adj)[0]
         sim = calculate_similarity_matrix(adj, features, metric="cosine")
         lap = laplacian(sim)
-
-        import os
 
         if self.compute_laplacian == True or not os.path.exists(
             path + "laplacian_inform_" + self.dataset + ".pickle"

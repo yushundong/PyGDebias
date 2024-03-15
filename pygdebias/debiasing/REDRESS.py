@@ -18,6 +18,7 @@ from torch_geometric.utils import dropout_adj, convert
 from scipy.sparse.csgraph import laplacian
 import pickle as pkl
 from sklearn.metrics import f1_score, roc_auc_score, accuracy_score
+import os
 
 
 def accuracy(output, labels):
@@ -712,8 +713,6 @@ class REDRESS(nn.Module):
         adj = sp.csr_matrix((data, (row, col)), shape=shape)
         sim = calculate_similarity_matrix(adj, features, metric="cosine")
         lap = laplacian(sim)
-
-        import os
 
         if self.compute_laplacian or not os.path.exists(
             path + "laplacians_red_" + self.dataset + ".pickle"
