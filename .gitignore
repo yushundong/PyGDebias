@@ -3,7 +3,7 @@ dist
 pygdebias.egg-info
 *.ipynb
 */__pycache__
-__pycache__/
+__pycache__/*
 
 
 
@@ -13,6 +13,7 @@ __pycache__/
 *.md
 *.pt
 *.pyc
+*.csv
 
 /home/zhenyu/program/pygdebias/PyGDebias/pygdebias/datasets/__pycache__/__init__.cpython-310.pyc
 
