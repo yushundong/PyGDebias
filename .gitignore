@@ -3,7 +3,7 @@ dist
 pygdebias.egg-info
 *.ipynb
 */__pycache__
-__pycache__/
+__pycache__/*
 
 
 
@@ -13,6 +13,10 @@ __pycache__/
 *.md
 *.pt
 *.pyc
+*.csv
+*.json
+*.zip
+*.in
 
 /home/zhenyu/program/pygdebias/PyGDebias/pygdebias/datasets/__pycache__/__init__.cpython-310.pyc
 
@@ -21,8 +25,23 @@ dataset/
 error/
 graphFair_subgraph/
 output/
+examples
 models_save
+PyGDebias_data
+csv
+csv_given
+csv_yushun
+data
+PyGDebias
+
 
 sample_t.py
 sample_test.py
 test_german.py
+csv_std_test.py
+csv_test.py
+dataloading_test.ipynb
+dataloading.py
+pipeline.py
+setup.cfg
+requirements.txt
