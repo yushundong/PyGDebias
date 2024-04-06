@@ -18,6 +18,7 @@ from torch_geometric.utils import dropout_adj, convert
 from scipy.sparse.csgraph import laplacian
 import pickle as pkl
 from sklearn.metrics import f1_score, roc_auc_score, accuracy_score
+import os
 
 
 def accuracy(output, labels):
