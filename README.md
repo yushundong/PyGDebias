@@ -110,8 +110,9 @@ conda activate pygdebias
 # install torch
 pip install torch==1.12.0+cu116 -f https://download.pytorch.org/whl/torch_stable.html
 # You can also choose conda to install torch through the following command
-conda install pytorch==1.12.0 torchvision==0.13.0 torchaudio==0.12.0 cudatoolkit=11.6 -c pytorch -c conda-forge
+# conda install pytorch==1.12.0 torchvision==0.13.0 torchaudio==0.12.0 cudatoolkit=11.6 -c pytorch -c conda-forge
 
+# install pygdebias
 pip install pygdebias==1.1.1 -f https://data.pyg.org/whl/torch-1.12.0%2Bcu116.html -f https://download.pytorch.org/whl/torch_stable.html  -f https://data.dgl.ai/wheels/cu116/repo.html -f https://data.dgl.ai/wheels-test/repo.html
 ```
 
