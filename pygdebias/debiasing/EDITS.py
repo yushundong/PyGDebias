@@ -622,21 +622,19 @@ class EDITS(nn.Module):
         adj = sparse_mx_to_torch_sparse_tensor(adj)
 
         if half:
-            self.cuda().half()
-            adj = adj.cuda().half()
-            features = features.cuda().half()
-            features_preserve = features_preserve.cuda().half()
-            idx_train = idx_train.cuda()
-            idx_val = idx_val.cuda()
-            sens = sens.cuda()
+            self.to(device).half()
+            adj = adj.to(device).half()
+            features = features.to(device).half()
+            features_preserve = features_preserve.to(device).half()
         else:
             self.to(device)
             adj = adj.to(device)
             features = features.to(device)
             features_preserve = features_preserve.to(device)
-            idx_train = idx_train.to(device)
-            idx_val = idx_val.to(device)
-            sens = sens.to(device)
+        
+        idx_train = idx_train.to(device)
+        idx_val = idx_val.to(device)
+        sens = sens.to(device)
 
         A_debiased, X_debiased = adj, features
         val_adv = []
